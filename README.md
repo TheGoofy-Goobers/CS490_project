@@ -6,3 +6,4 @@ CS490 Code ChatGPT Translator
 | Jason Cho | Flex, Backend |
 | Dzejla Arapovic | Frontend, Database, Backend |
 | Matthew DeFranceschi | Backend, Database |
+| Naman Raval | Frontend, Backend |
