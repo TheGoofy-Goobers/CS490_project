@@ -20,6 +20,8 @@ root/
  - - about
  - - translation page
  - - admin/
+ - .git/
  - .env
  - .gitignore
+ - README.md
 ```
