@@ -7,3 +7,19 @@ CS490 Code ChatGPT Translator
 | Dzejla Arapovic | Frontend, Database, Backend |
 | Matthew DeFranceschi | Backend, Database |
 | Naman Raval | Frontend, Backend |
+
+### Repository Structure
+```
+root/
+ - backend/
+ - - functions/
+ - - db/
+ - - api/
+ - web/
+ - - landing page
+ - - about
+ - - translation page
+ - - admin/
+ - .env
+ - .gitignore
+```
