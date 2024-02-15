@@ -1,5 +1,18 @@
 # CS490_project
-CS490 Code ChatGPT Translator 
+CS490 Code ChatGPT Translator
+
+### Project Overview
+
+We are creating a code translation tool that will allow users to translate blocks of code from one language to another. The project uses the GPT API to perform the translation. Technologies involved include the following:
+
+- Backend: Python with Flask
+- Frontend: React
+- Database: MySQL
+- Hosting/Deployment: Azure
+- Testing: Jest
+
+Responsibilities are broken down as follows:
+
 | Name | Role |
 |------|------|
 | Hamdi Korreshi | Project Manager |
