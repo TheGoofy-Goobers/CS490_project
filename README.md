@@ -4,3 +4,5 @@ CS490 Code ChatGPT Translator
 |------|------|
 | Hamdi Korreshi | Project Manager |
 | Jason Cho | Flex |
+| Dzejla Arapovic | Frontend, Databse, Backend |
+
