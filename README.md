@@ -15,7 +15,7 @@ Responsibilities are broken down as follows:
 
 | Name | Role |
 |------|------|
-| Hamdi Korreshi | Project Manager |
+| Hamdi Korreshi | Project Manager and DevOps |
 | Jason Cho | Flex, Backend |
 | Dzejla Arapovic | Frontend, Database, Backend |
 | Matthew DeFranceschi | Backend, Database |
