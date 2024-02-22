@@ -1,0 +1,78 @@
+body {
+    background-color: #343a40;
+    color: white;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .translate-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .translate-panel {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px; /* This creates space between columns and button */
+  }
+  
+  .translate-column {
+    flex: 1; /* This allows each column to grow and fill the available space */
+  }
+  
+  .input-column, .output-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* This makes the children (select, textarea) stretch to fill the column width */
+  }
+  
+  h2 {
+    color: #fff;
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .language-select, .code-area {
+    margin-bottom: 10px;
+  }
+  
+  .language-select {
+    padding: 10px;
+    background-color: #23272b;
+    color: #fff;
+    border: 1px solid #495057;
+    border-radius: 4px;
+  }
+  
+  .code-area {
+    height: 300px; /* Adjust this value as needed */
+    padding: 10px;
+    background-color: #23272b;
+    color: #fff;
+    border: 1px solid #495057;
+    border-radius: 4px;
+    resize: none;
+  }
+  
+  .translate-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .translate-button:hover {
+    background-color: #0056b3;
+  }
+  
