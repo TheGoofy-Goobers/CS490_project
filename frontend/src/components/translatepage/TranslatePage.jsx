@@ -13,7 +13,7 @@ const TranslatePage = () => {
   return (
     <div className="translate-container">
       <div className="translate-panel">
-        <div className="translate-column input-column">
+        <div className="translate-column">
           <h2>Input</h2>
           <select className="language-select" id="sourceLanguage">
             <option>JavaScript</option>
@@ -26,10 +26,7 @@ const TranslatePage = () => {
             onChange={(e) => setSourceText(e.target.value)}
           />
         </div>
-        <button id="translateBtn" className="translate-button" onClick={handleTranslate}>
-          Translate
-        </button>
-        <div className="translate-column output-column">
+        <div className="translate-column">
           <h2>Output</h2>
           <select className="language-select" id="targetLanguage">
             <option>Python</option>
@@ -43,6 +40,9 @@ const TranslatePage = () => {
           />
         </div>
       </div>
+      <button id="translateBtn" className="translate-button" onClick={handleTranslate}>
+        Translate
+      </button>
     </div>
   );
 };
