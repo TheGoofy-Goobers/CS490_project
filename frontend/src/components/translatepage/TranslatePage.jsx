@@ -1,4 +1,6 @@
-import React from 'react';
+import {React, useState} from 'react';
+import axios from "axios";
+import { FLASK_URL } from '../../vars.js'
 import './TranslatePage.css';
 import { FaRegClipboard, FaDownload } from 'react-icons/fa';
 import aboutUsIcon from './about_us.png'; // Assuming the images are in the same directory
@@ -16,6 +18,27 @@ const TranslatePage = () => {
   const handleDownloadCode = () => {
     // Logic to download the code
   };
+
+  const [profileData, setProfileData] = useState(null)
+  const getData = () => {
+    axios({
+      method: "GET",
+      url:`${FLASK_URL}/profile`,
+    })
+    .then((response) => {
+      const res =response.data
+      setProfileData(({
+        profile_name: res.name,
+        about_me: res.about}))
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+        }
+    })
+
+  }
 
   return (
     <div className="translate-page">
@@ -70,9 +93,16 @@ const TranslatePage = () => {
           </div>
         </div>
         <div className="translate-button-container">
-          <button id="translateBtn" className="btn translate-button">Translate</button>
+          <button id="translateBtn" className="btn translate-button" onClick={getData}>Translate</button>
         </div>
       </div>
+      <p>To get your profile details: </p><br />
+        {profileData && <div>
+              <p>Profile name: {profileData.profile_name}</p>
+              <p>About me: {profileData.about_me}</p>
+              <br />
+            </div>
+        }
     </div>
   );
 }
