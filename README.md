@@ -38,3 +38,41 @@ root/
  - .gitignore
  - README.md
 ```
+
+## Serve the app
+`cd frontend`
+`npm start` starts frontend
+`npm run start-backend` starts backend
+
+## PROJECT SETUP:
+Follow https://dev.to/nagatodev/how-to-connect-flask-to-reactjs-1k8i for more extensive details
+
+Navigate to frontend directory
+`cd frontend`
+run `npm start`
+This may require some debugging
+
+In a new terminal, navigate to backend
+`cd backend`
+Create a virtual environment
+```
+For mac/unix users: python3 -m venv env
+For windows users: py -m venv env
+```
+Activate the virtual environment
+```
+For mac/unix users: source env/bin/activate
+For windows users: .\env\Scripts\activate
+```
+
+Install flask 
+Run
+`pip install flask` and `pip install python-dotenv`
+
+In backend directory, run
+`flask run`
+or, if that does not work, run
+`python -m flask run`
+
+You may need to run `npm install axios`, I'm not sure.
+
