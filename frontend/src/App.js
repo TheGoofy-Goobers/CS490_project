@@ -16,7 +16,6 @@ function App() {
     })
     .then((response) => {
       const res =response.data
-      console.log(res)
       setProfileData(({
         profile_name: res.name,
         about_me: res.about}))
