@@ -1,77 +1,198 @@
-body {
-    background-color: #343a40;
-    color: white;
-    margin: 0;
-    padding-top: 15vh; /* Padding to lower the translate container for the banner */
-    height: 100vh;
-    display: flex;
-    align-items: flex-start; /* Align to the top, after the padding */
-    justify-content: center;
-    overflow: hidden; /* Prevent scrolling on the body */
-  }
-  
-  .translate-container {
-    width: 80%; /* Container width */
-    max-width: 1200px; /* Maximum width */
-    display: flex;
+.translate-page {
+  background-color: #343a40;
+  color: white;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+}
+
+.banner {
+  background-color: #23272b; /* Darker banner background */
+  padding: 20px 0; /* Increased padding for a larger banner */
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  /* Other styles for logo container */
+}
+
+.banner-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+  /* Adjust the gap to your preference */
+  gap: 10px;
+}
+
+.icon-container img {
+  height: 32px; /* Adjust the size as needed */
+  cursor: pointer;
+}
+
+.logo-butterfly {
+  height: 55px;
+  width: 55px;
+  /* Adjust margins as needed to position the butterfly */
+}
+
+/* Adjust the left margin of the h1 to bring it closer to the butterfly icon */
+h1 {
+  margin-left: -30px; /* Reduce this value to bring it closer to the butterfly icon */
+  margin-bottom: 0;
+  padding: 0;
+  font-size: 2rem;
+  display: inline-block;
+}
+
+h1, h2 {
+  color: #fff;
+}
+
+.main-content {
+  padding: 2rem 0;
+}
+
+.code-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 1rem;
+}
+
+.code-box {
+  width: calc(50% - 15px);
+}
+
+.code-area {
+  width: 100%;
+  background-color: #23272b;
+  color: #fff;
+  border: 1px solid #343a40;
+  border-radius: 4px;
+  padding: 10px;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  min-height: 300px; /* Increased min-height */
+}
+
+.code-area::placeholder {
+  color: #bbb;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  color: #bbb;
+  display: block;
+}
+
+.form-control {
+  background-color: white;
+  border: 1px solid #343a40;
+  color: black;
+  width: 100%;
+  box-sizing: border-box;
+  height: 38px;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  /* Set a specific height to match the code areas */
+  min-height: 38px; /* Adjust the height to match the text areas */
+}
+
+.form-control:focus {
+  background-color: white;
+  border-color: #007bff;
+  box-shadow: none;
+}
+
+.translate-button-container {
+  text-align: center;
+  margin-top: 20px; /* Added margin-top for spacing */
+}
+
+.translate-button {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+  padding: .5rem 2rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  border-radius: .3rem;
+  cursor: pointer;
+  display: inline-block; /* Make the button inline-block for a smaller width */
+}
+
+.translate-button:hover {
+  background-color: #0069d9;
+  border-color: #0062cc;
+}
+
+/* Icons positioning and styling within the output box */
+.textarea-container {
+  position: relative;
+}
+
+.icons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.icon {
+  color: #bbb;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.icon:hover {
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .code-container {
     flex-direction: column;
-    align-items: center; /* Center children horizontally */
-    justify-content: center; /* Center children vertically */
-    gap: 20px; /* Space between translate-panel and translate-button */
+    gap: 15px;
   }
-  
-  .translate-panel {
-    display: flex;
-    justify-content: space-between; /* Space between the input and output boxes */
-    width: 150%; /* Width as per your screenshot */
-    gap: 200px; /* Gap as per your screenshot */
+
+  .code-box {
+    width: 100%;
   }
-  
-  .translate-column {
-    flex: 1; /* Allows columns to grow and fill the space */
-    margin: 0 10px; /* Margin between the columns */
+
+  .icons {
+    right: 10px;
+    top: -40px; /* Adjust if necessary for mobile layout */
   }
-  
-  .language-select, .code-area {
-    width: 150%; /* Set the width according to your screenshot */
-    margin-bottom: 10px;
-  }
-  
-  .language-select {
-    padding: 10px;
-    background-color: white; /* Background color set to white */
-    color: black; /* Text color for better visibility */
-    border: 1px solid #495057;
-    border-radius: 4px;
-  }
-  
-  .code-area {
-    height: 30vh; /* Height as per your screenshot */
-    padding: 10px;
-    background-color: #23272b;
-    color: #fff;
-    border: 1px solid #495057;
-    border-radius: 4px;
-    resize: none;
-    overflow: auto;
-  }
-  
+
   .translate-button {
-    padding: 15px 40px;
-    font-size: 1rem;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    align-self: flex-start; /* Align button to the start of the flex container */
-    position: absolute; /* Absolute positioning */
-    top: calc(60% + 40px); /* Position below the text areas, with space */
-    left: calc(41% + 100px); /* Adjusted to move the button to the right */
+    padding: .5rem 1rem;
   }
-  
-  .translate-button:hover {
-    background-color: #0056b3;
+
+  .header-content {
+    justify-content: center; /* Center the header content on smaller screens */
+    padding-left: 0; /* Remove padding to center the content */
   }
-  
+}
