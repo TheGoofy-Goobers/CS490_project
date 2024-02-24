@@ -13,7 +13,7 @@
 
 .banner {
   background-color: #23272b; /* Darker banner background */
-  padding: 20px 0; /* Increased padding for a larger banner */
+  padding: 10px 0; /* Increased padding for a larger banner */
 }
 
 .header-content {
@@ -25,40 +25,37 @@
 .logo-container {
   display: flex;
   align-items: center;
-  /* Other styles for logo container */
+  margin-right: auto;
 }
 
-.banner-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.logo-butterfly {
+  margin-right: -19px; /* Adjust this to control space between butterfly and text */
+  height: 65px; /* Size of butterfly */
+  width: auto;
+}
+
+h1 {
+  font-size: 3rem;
+  margin: 0;
+  padding: 0;
+  line-height: 70px;
+  display: inline-block;
 }
 
 .icon-container {
   display: flex;
   align-items: center;
-  /* Adjust the gap to your preference */
-  gap: 10px;
+  justify-content: flex-end; /* Aligns the icons to the right */
+  flex-grow: 1;
+  /* Remove flex-grow if you don't want icons to take up all available space */
+  gap: 15px; /* Adjust the space between the icons */
 }
 
 .icon-container img {
-  height: 32px; /* Adjust the size as needed */
+  height: 70px; /* Adjust the size of icons */
   cursor: pointer;
-}
-
-.logo-butterfly {
-  height: 55px;
-  width: 55px;
-  /* Adjust margins as needed to position the butterfly */
-}
-
-/* Adjust the left margin of the h1 to bring it closer to the butterfly icon */
-h1 {
-  margin-left: -30px; /* Reduce this value to bring it closer to the butterfly icon */
-  margin-bottom: 0;
-  padding: 0;
-  font-size: 2rem;
-  display: inline-block;
+  /* Adjust margin-bottom to align icons with the codeCraft text */
+  margin-top: -66px; /* This is an example value; you may need to adjust it */
 }
 
 h1, h2 {
