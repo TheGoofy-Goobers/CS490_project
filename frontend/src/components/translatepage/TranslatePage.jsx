@@ -40,6 +40,7 @@ const TranslatePage = () => {
     })}
 
     // TODO: Handle registration response and redirection on front end
+    // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
     var res
     const register = () => {
       axios.post(`${FLASK_URL}/registerNewUser`, {
@@ -49,7 +50,7 @@ const TranslatePage = () => {
         password: "somepassword"
       }).then((response) => {
         res = response.data
-        console.log(`Response has error: ${res.errors}`)
+        console.log(`Response has error: ${res.hasError}`)
         if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
         if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       }).catch((error) => {
@@ -61,16 +62,24 @@ const TranslatePage = () => {
       })
     }
 
-    // const testPost = () => {
-    //   axios.post(`${FLASK_URL}/test_post`, {
-    //     data: "test data"
-    //   }).catch((error) => {
-    //     if (error.response) {
-    //       console.log(error.response)
-    //       console.log(error.response.status)
-    //       console.log(error.response.headers)
-    //       }
-    //   })}
+    //TODO handle login response and redirection on front end
+    const login = () => {
+      axios.post(`${FLASK_URL}/userLoginCredentials`, {
+        // TODO: Data should be passed in from form- this function will likely be moved to a different component
+        username: "sampleUser",
+        password: "somepassword"
+      }).then((response) => {
+        res = response.data
+        console.log(`Response has error: ${res.errors}`)
+        if(res.errors) console.log(`Error response: ${res.errorMessage}`)
+      }).catch((error) => {
+        if (error.response) {
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+          }
+      })
+    }
 
   return (
     <div className="translate-page">
