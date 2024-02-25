@@ -36,9 +36,18 @@ const TranslatePage = () => {
         console.log(error.response.status)
         console.log(error.response.headers)
         }
-    })
+    })}
 
-  }
+    // const testPost = () => {
+    //   axios.post(`${FLASK_URL}/test_post`, {
+    //     data: "test data"
+    //   }).catch((error) => {
+    //     if (error.response) {
+    //       console.log(error.response)
+    //       console.log(error.response.status)
+    //       console.log(error.response.headers)
+    //       }
+    //   })}
 
   return (
     <div className="translate-page">
