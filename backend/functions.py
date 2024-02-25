@@ -35,3 +35,10 @@ def validate_username(username: str) -> bool:
     if not hasLetterOrNum:
         valid = False
         errorMessage.append("Username must contain at least one alphanumeric character")
+
+    REmatch = re.fullmatch(usernameRE, username)
+    if not REmatch:
+        valid = False
+        errorMessage.append("Username does not follow correct format. Usernames must contain only alphanumeric characters, underscores, and hyphens, and cannot begin or end with a hyphen.")
+    
+    return valid, errorMessage

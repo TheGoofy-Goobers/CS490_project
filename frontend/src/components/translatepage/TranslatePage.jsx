@@ -19,6 +19,7 @@ const TranslatePage = () => {
     // Logic to download the code
   };
 
+  //sample function linked to flask backend
   const [profileData, setProfileData] = useState(null)
   const getData = () => {
     axios({
@@ -38,14 +39,19 @@ const TranslatePage = () => {
         }
     })}
 
+    // TODO: Handle registration response on front end
+    var res
     const register = () => {
       axios.post(`${FLASK_URL}/registerNewUser`, {
-        //Data should be passed in from form- this function will likely be moved to a different component
+        // TODO: Data should be passed in from form- this function will likely be moved to a different component
         username: "sampleUser",
         email: "sample.example@example.com",
         password: "somepassword"
       }).then((response) => {
-        console.log(response.data)
+        res = response.data
+        console.log(`Response has error: ${res.errors}`)
+        if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
+        if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       }).catch((error) => {
         if (error.response) {
           console.log(error.response)
