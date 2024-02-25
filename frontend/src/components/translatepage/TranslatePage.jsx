@@ -39,7 +39,7 @@ const TranslatePage = () => {
         }
     })}
 
-    // TODO: Handle registration response on front end
+    // TODO: Handle registration response and redirection on front end
     var res
     const register = () => {
       axios.post(`${FLASK_URL}/registerNewUser`, {

@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, redirect
 from flask_cors import CORS
 import json
 from functions import validate_email, validate_username
@@ -26,7 +26,7 @@ def test_post():
 
 @api.route('/registerNewUser', methods = ["POST"])
 def registerNewUser():
-    response = {"errors" : False}
+    response = {"hasError" : False}
 
     responseJson = json.loads(request.data.decode())
 
@@ -41,16 +41,14 @@ def registerNewUser():
     # username validation
     validUser, errors = validate_username(username)
     if not validUser:
-        response["errors"] = True
+        response["hasError"] = True
         response["usernameErrors"] = errors
-        print(errors)
 
     # email validation
     validEmail, errors = validate_email(email)
     if not validEmail:
-        response["errors"] = True
+        response["hasError"] = True
         response["emailErrors"] = errors
-        print(errors)
 
     #query db to make sure email and username are unique
     
