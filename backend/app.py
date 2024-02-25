@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 import json
+from functions import validate_email, validate_username
 
 api = Flask(__name__)
 CORS(api)
@@ -16,20 +17,29 @@ def my_profile():
 
 @api.route('/test_post', methods = ['GET', 'POST'])
 def test_post():
-    print(json.loads(request.data.decode())['data'])
-    return request.data
+    if request.method == 'POST':
+        print(json.loads(request.data.decode())['data'])
+        return request.data.decode()
+    return ""
 
 @api.route('/registerNewUser', methods = ["POST"])
 def registerNewUser():
     responseJson = json.loads(request.data.decode())
 
-    username = responseJson['username']
-    email = responseJson['email']
+    username = responseJson['username'].strip()
+    email = responseJson['email'].strip()
     # all password checks should be on frontend
     encryptedPW = responseJson["password"]
 
-    #email sanitization
-    #basic username check
+    # username validation
+
+    # email validation
+    print(f"Username: {username}\nEmail: {email}\nPW: {encryptedPW}\n")
+    validEmail, errors = validate_email(email)
+    if not validEmail:
+        # TODO: return error response to be handled/displayed on frontend
+        print(errors)
+
     #query db to make sure email and username are unique
     
     #insert into db

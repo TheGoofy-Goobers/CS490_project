@@ -38,6 +38,23 @@ const TranslatePage = () => {
         }
     })}
 
+    const register = () => {
+      axios.post(`${FLASK_URL}/registerNewUser`, {
+        //Data should be passed in from form- this function will likely be moved to a different component
+        username: "sampleUser",
+        email: "sample.example@example.com",
+        password: "somepassword"
+      }).then((response) => {
+        console.log(response.data)
+      }).catch((error) => {
+        if (error.response) {
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+          }
+      })
+    }
+
     // const testPost = () => {
     //   axios.post(`${FLASK_URL}/test_post`, {
     //     data: "test data"
@@ -102,7 +119,7 @@ const TranslatePage = () => {
           </div>
         </div>
         <div className="translate-button-container">
-          <button id="translateBtn" className="btn translate-button" onClick={getData}>Translate</button>
+          <button id="translateBtn" className="btn translate-button" onClick={register}>Translate</button>
         </div>
       </div>
       <p>To get your profile details: </p><br />
