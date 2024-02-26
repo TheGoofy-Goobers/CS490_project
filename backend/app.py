@@ -15,7 +15,7 @@ def create_app():
     api.config['MYSQL_HOST'] = 'localhost'
     api.config['MYSQL_USER'] = 'root'
     api.config['MYSQL_PASSWORD'] = ''
-    api.config['MYSQL_DB'] = 'flask'
+    api.config['MYSQL_DB'] = 'codecraft'
     mysql = MySQL(api)
 
     # test method - remove later
@@ -111,6 +111,7 @@ def create_app():
 
         # make sure password matches
         if encrypted_pw == user['encrypted_password']:
+            # TODO: set user session
             response["user_id"] = user['id']
             response["success"] = True
             return response
@@ -119,6 +120,11 @@ def create_app():
             response["errorMessage"] = "Invalid password"
             
         return response
+    
+    @api.route('/userLogoffRequest')
+    def user_logoff():
+        # TODO: cancel user session
+        pass
         
     return api
 
