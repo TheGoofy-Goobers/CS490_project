@@ -1,8 +1,8 @@
 import pytest
-from backend.app import create_app
+from app import create_app
 import json
 
-class TestLoginRegistrationTests:
+class TestRegistrationLoginLogout:
     @pytest.fixture()
     def app(self):
         app = create_app()
@@ -127,3 +127,51 @@ class TestLoginRegistrationTests:
         assert response["hasError"]
         assert "emailErrors" in response
         assert len(response["emailErrors"]) == 1
+
+    # TODO: These unit tests
+    def test_user_login_success(self, client):
+        pass
+        # TODO: work on actual page first before thinking about what this test will look like
+        #will likely have to make a mock db
+    
+    def test_user_login_unrecognized_username_or_email_returns_error_response(self, client):
+        pass
+
+    def test_user_login_password_incorrect_returns_error_response(self, client):
+        pass
+
+    def test_user_login_valid_username_passes_validation(self, client):
+        response = ""
+        with pytest.raises(AttributeError):
+            response = client.post("/userLoginCredentials", data=json.dumps({"username": "mockuser", "password": "mockpassword"}))
+        # TODO: This passing criteria should be changed after DB is set up
+        if "errorMessage" in response:
+            assert response["errorMessage"] != "Invalid format for username or email"
+        
+        #if there was no error message, then the username passed validation and the entire function did not return any error response
+        pass
+
+    def test_user_login_valid_email_passes_validation(self, client):
+        response = ""
+        with pytest.raises(AttributeError):
+            response = client.post("/userLoginCredentials", data=json.dumps({"username": "mock@email.com", "password": "mockpassword"}))
+        # TODO: This passing criteria should be changed after DB is set up
+        if "errorMessage" in response:
+            assert response["errorMessage"] != "Invalid format for username or email"
+        
+        #if there was no error message, then the username passed validation and the entire function did not return any error response
+        pass
+
+    def test_user_login_invalid_username_or_email_returns_error_response(self, client):
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": "bad@userOrEmail", "password": "mockpassword"}))
+        response = response.json
+        
+        assert "success" not in response
+        assert response["hasError"]
+        assert "errorMessage" in response
+        assert response["errorMessage"] == "Invalid format for username or email"
+
+    # TODO: This unit test
+    def test_user_logout_success(self, client):
+        pass
+

@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 import json
-from backend.functions import validate_email, validate_username
+from functions import validate_email, validate_username
 import mysql.connector
 
 # All functions require a return statement
@@ -46,7 +46,7 @@ def create_app():
         if response["hasError"]:
             return response
         
-        #query db to make sure email and username are unique
+        # TODO: query db to make sure email and username are unique
         
         #insert into db
         
@@ -79,7 +79,7 @@ def create_app():
 
         encrypted_pw = responseJson['password']
 
-        # TODO: query DB 
+        # TODO: query DB/setup DB
         # Query the database to check if the user credentials are valid
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
@@ -89,8 +89,9 @@ def create_app():
         if user:
             # Check if the password matches (assuming the password is encrypted in the database)
             if encrypted_pw == user['encrypted_password']:
-                # User authenticated successfully, you can handle the session or token management here
+                # User authenticated successfully, handle the session or token management here
                 response["user_id"] = user['id']
+                response["success"] = True
                 return response
             else:
                 response["hasError"] = True

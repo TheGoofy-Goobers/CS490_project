@@ -1,11 +1,15 @@
 ### Make sure to install pytest
 
 # How to run test suite
+Navigate to frontend directory
+`cd frontend/`
+Run script
 ```
-python -m pytest backend/Tests/
-or
-pytest backend/Tests/
+npm run test-backend
 ```
+
+If this does not work, you can test without a script
+`cd backend && pytest Tests/`
 
 # Unit test naming criteria
 These criteria must be followed or pytest will not run the test(s).
