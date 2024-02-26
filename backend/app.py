@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_mysqldb import MySQL
 import json
 from functions import validate_email, validate_username
 import mysql.connector
@@ -9,6 +10,13 @@ import mysql.connector
 def create_app():
     api = Flask(__name__)
     CORS(api)
+
+    # mysql configurations
+    api.config['MYSQL_HOST'] = 'localhost'
+    api.config['MYSQL_USER'] = 'root'
+    api.config['MYSQL_PASSWORD'] = ''
+    api.config['MYSQL_DB'] = 'flask'
+    mysql = MySQL(api)
 
     # test method - remove later
     @api.route('/profile')
@@ -29,7 +37,7 @@ def create_app():
         username = responseJson['username'].strip()
         email = responseJson['email'].strip()
         # all password checks should be on frontend
-        encryptedPW = responseJson["password"]
+        encrypted_pw = responseJson["password"]
 
         # username validation
         validUser, errors = validate_username(username)
@@ -46,9 +54,20 @@ def create_app():
         if response["hasError"]:
             return response
         
-        # TODO: query db to make sure email and username are unique
+        # query db to make sure email and username are unique
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
+        existing_user = cur.fetchone()
+
+        if existing_user:
+            response["hasError"] = True
+            response["errorMessage"] = "Username or email already exists"
+            return response
         
-        #insert into db
+        # insert new user into db
+        cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, encrypted_pw))
+        mysql.connection.commit()
+        cur.close()
         
         response["success"] = True
         return response
@@ -79,28 +98,27 @@ def create_app():
 
         encrypted_pw = responseJson['password']
 
-        # TODO: query DB/setup DB
-        # Query the database to check if the user credentials are valid
+        # query the database to check if the user credentials are valid
         cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
-        user = cur.fetchone()  # Assuming the query returns one user record
+        user = cur.fetchone()
         cur.close()
 
-        if user:
-            # Check if the password matches (assuming the password is encrypted in the database)
-            if encrypted_pw == user['encrypted_password']:
-                # User authenticated successfully, handle the session or token management here
-                response["user_id"] = user['id']
-                response["success"] = True
-                return response
-            else:
-                response["hasError"] = True
-                response["errorMessage"] = "Invalid password"
-                return response
-        else:
+        if not user:
             response["hasError"] = True
             response["errorMessage"] = "User not found"
             return response
+
+        # make sure password matches
+        if encrypted_pw == user['encrypted_password']:
+            response["user_id"] = user['id']
+            response["success"] = True
+            return response
+        else:
+            response["hasError"] = True
+            response["errorMessage"] = "Invalid password"
+            
+        return response
         
     return api
 
