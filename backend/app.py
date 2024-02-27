@@ -63,11 +63,8 @@ def create_app(testing: bool):
         
         # query db to make sure email and username are unique
         cur = mysql.connection.cursor()
-        print("made it here!")
         cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
-
-        print("query 1")
 
         if existing_user:
             response["hasError"] = True
@@ -78,8 +75,6 @@ def create_app(testing: bool):
         cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, encrypted_pw))
         mysql.connection.commit()
         cur.close()
-
-        print("query 2")
         
         response["success"] = True
         return response
