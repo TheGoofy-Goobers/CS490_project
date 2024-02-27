@@ -7,15 +7,22 @@ import mysql.connector
 
 # All functions require a return statement
 
-def create_app():
+def create_app(testing: bool):
     api = Flask(__name__)
     CORS(api)
 
-    # mysql configurations
-    api.config['MYSQL_HOST'] = 'localhost'
-    api.config['MYSQL_USER'] = 'root'
-    api.config['MYSQL_PASSWORD'] = ''
+    #api.config["MYSQL_CURSORCLASS"] = "DictCursor"
     api.config['MYSQL_DB'] = 'codecraft'
+    # mysql configurations
+    if not testing:
+        api.config['MYSQL_HOST'] = 'localhost'
+        api.config['MYSQL_USER'] = 'root'
+        api.config['MYSQL_PASSWORD'] = ''
+    else:
+        api.config['MYSQL_HOST'] = 'localhost'
+        api.config['MYSQL_USER'] = 'root'
+        api.config['MYSQL_PASSWORD'] = ''
+
     mysql = MySQL(api)
 
     # test method - remove later
@@ -56,18 +63,23 @@ def create_app():
         
         # query db to make sure email and username are unique
         cur = mysql.connection.cursor()
+        print("made it here!")
         cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
 
+        print("query 1")
+
         if existing_user:
             response["hasError"] = True
-            response["errorMessage"] = "Username or email already exists"
+            response["sqlError"] = "Username or email already exists"
             return response
         
         # insert new user into db
         cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, encrypted_pw))
         mysql.connection.commit()
         cur.close()
+
+        print("query 2")
         
         response["success"] = True
         return response
@@ -127,5 +139,3 @@ def create_app():
         pass
         
     return api
-
-create_app()

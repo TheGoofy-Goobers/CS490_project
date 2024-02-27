@@ -5,7 +5,7 @@ import json
 class TestRegistrationLoginLogout:
     @pytest.fixture()
     def app(self):
-        app = create_app()
+        app = create_app(True)
         app.config.update({
             "TESTING": True,
         })
