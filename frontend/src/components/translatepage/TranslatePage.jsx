@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload } from 'react-icons/fa';
+import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
 import aboutUsIcon from './about_us.png'; // Assuming the images are in the same directory
 import feedbackIcon from './feedback.png';
 import githubIcon from './github-logo.png';
@@ -11,6 +11,23 @@ const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [targetLanguage, setTargetLanguage] = useState('Python');
+
+  const fileInputRef = useRef(null);
+
+  // Function to trigger the hidden file input
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // Function to handle file input change
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Handle the file upload here
+      console.log('File uploaded:', file.name);
+      // You can read the file and set it to inputText or perform other actions
+    }
+  };
 
   const handleTranslate = () => {
     setOutputText(inputText);
@@ -59,17 +76,26 @@ const TranslatePage = () => {
             </div>
           </div>
         </header>
-      <div className="container main-content">
+        <div className="container main-content">
         <div className="code-container">
           <div className="code-box input-box">
             <h2>Input</h2>
-            <div className="form-group">
-              <label htmlFor="sourceLanguage">Source Language</label>
-              <select className="form-control" id="sourceLanguage">
-                <option>JavaScript</option>
-                <option>Python</option>
-                <option>C++</option>
-              </select>
+            <div className="input-header">
+              <div className="form-group">
+                <label htmlFor="sourceLanguage">Source Language</label>
+                <select className="form-control" id="sourceLanguage">
+                  <option>JavaScript</option>
+                  <option>Python</option>
+                  <option>C++</option>
+                </select>
+              </div>
+              <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileInputChange} 
+                style={{ display: 'none' }} 
+              />
             </div>
             <textarea 
               value={inputText} 
