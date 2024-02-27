@@ -4,25 +4,31 @@ from flask_mysqldb import MySQL
 import json
 from functions import validate_email, validate_username
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # All functions require a return statement
-
 def create_app(testing: bool):
     api = Flask(__name__)
     CORS(api)
 
     #api.config["MYSQL_CURSORCLASS"] = "DictCursor"
-    api.config['MYSQL_DB'] = 'codecraft'
     # mysql configurations
-    if not testing:
+    if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
         api.config['MYSQL_PASSWORD'] = ''
+        api.config['MYSQL_DB'] = 'codecraft'
     else:
-        api.config['MYSQL_HOST'] = 'localhost'
-        api.config['MYSQL_USER'] = 'root'
-        api.config['MYSQL_PASSWORD'] = ''
+        api.config['MYSQL_HOST'] = os.getenv('DB_URL')
+        api.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
+        api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
+        api.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
+    print(api.config)
+    
     mysql = MySQL(api)
 
     # test method - remove later
