@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import {React, useState} from 'react';
-import axios from "axios";
-import { FLASK_URL } from '../../vars.js'
-=======
 import React, { useState, useRef } from 'react';
->>>>>>> 2f80e153c4cd3b1a2c2efdb7a07118763b91df42
+import {FLASK_URL} from '../../vars.js'
+import axios from 'axios'
 import './TranslatePage.css';
 import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
 import aboutUsIcon from './about_us.png'; // Assuming the images are in the same directory
@@ -81,49 +77,28 @@ const TranslatePage = () => {
         console.log(error.response.status)
         console.log(error.response.headers)
         }
-    })}
+    })
+  }
 
-    // TODO: Handle registration response and redirection on front end
-    // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
-    var res
-    const register = () => {
-      axios.post(`${FLASK_URL}/registerNewUser`, {
-        // TODO: Data should be passed in from form- this function will likely be moved to a different component
-        username: "sampleUser",
-        email: "sample.example@example.com",
-        password: "somepassword"
-      }).then((response) => {
-        res = response.data
-        console.log(`Response has error: ${res.hasError}`)
-        if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
-        if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
-      }).catch((error) => {
-        if (error.response) {
-          console.log(error.response)
-          console.log(error.response.status)
-          console.log(error.response.headers)
-          }
-      })
-    }
-
-    //TODO handle login response and redirection on front end
-    const login = () => {
-      axios.post(`${FLASK_URL}/userLoginCredentials`, {
-        // TODO: Data should be passed in from form- this function will likely be moved to a different component
-        username: "sampleUser",
-        password: "somepassword"
-      }).then((response) => {
-        res = response.data
-        console.log(`Response has error: ${res.errors}`)
-        if(res.errors) console.log(`Error response: ${res.errorMessage}`)
-      }).catch((error) => {
-        if (error.response) {
-          console.log(error.response)
-          console.log(error.response.status)
-          console.log(error.response.headers)
-          }
-      })
-    }
+  //TODO handle login response and redirection on front end
+  var res
+  const login = () => {
+    axios.post(`${FLASK_URL}/userLoginCredentials`, {
+      // TODO: Data should be passed in from form- this function will likely be moved to a different component
+      username: "sampleUser",
+      password: "somepassword"
+    }).then((response) => {
+      res = response.data
+      console.log(`Response has error: ${res.errors}`)
+      if(res.errors) console.log(`Error response: ${res.errorMessage}`)
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+        }
+    })
+  }
 
   return (
     <div className="translate-page">
@@ -199,9 +174,6 @@ const TranslatePage = () => {
           </div>
         </div>
         <div className="translate-button-container">
-<<<<<<< HEAD
-          <button id="translateBtn" className="btn translate-button" onClick={register}>Translate</button>
-=======
           <button 
             id="translateBtn" 
             className="btn translate-button"
@@ -209,16 +181,15 @@ const TranslatePage = () => {
           >
             Translate
           </button>
->>>>>>> 2f80e153c4cd3b1a2c2efdb7a07118763b91df42
         </div>
       </div>
-      <p>To get your profile details: </p><br />
+      {/* <p>To get your profile details: </p><br />
         {profileData && <div>
               <p>Profile name: {profileData.profile_name}</p>
               <p>About me: {profileData.about_me}</p>
               <br />
             </div>
-        }
+        } */}
     </div>
   );
 }

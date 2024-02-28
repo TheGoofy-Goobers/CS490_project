@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import axios from 'axios'
+import { FLASK_URL } from '../../vars';
 import './RegistrationPage.css';
 
 const RegistrationPage = () => {
   const [user, setUser] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
   });
@@ -19,19 +21,42 @@ const RegistrationPage = () => {
     console.log('Registration details:', user);
   };
 
+  // TODO: Handle registration response and redirection on front end
+  // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
+  var res
+  const register = () => {
+    axios.post(`${FLASK_URL}/registerNewUser`, user)
+    .then((response) => {
+      delete user.username 
+      delete user.email
+      delete user.password
+      res = response.data
+      console.log(`Response has error: ${res.hasError}`)
+      if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
+      if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+        }
+    })
+  }
+
   return (
     <div className="registration-page-container">
       <div className="registration-form-box">
         <form onSubmit={handleSubmit}>
           <h2 className="registration-form-title">Register</h2>
           <div className="registration-form-group">
-            <label>Name:</label>
+            <label>Username:</label>
             <input 
               type="text" 
-              name="name" 
-              value={user.name} 
+              name="username" 
+              value={user.username} 
               onChange={handleChange} 
               className="registration-form-control"
+              required
             />
           </div>
           <div className="registration-form-group">
@@ -42,6 +67,7 @@ const RegistrationPage = () => {
               value={user.email} 
               onChange={handleChange} 
               className="registration-form-control"
+              required
             />
           </div>
           <div className="registration-form-group">
@@ -52,6 +78,7 @@ const RegistrationPage = () => {
               value={user.password} 
               onChange={handleChange} 
               className="registration-form-control"
+              required
             />
           </div>
           <div className="registration-button-container">
