@@ -2,7 +2,7 @@
   background-color: #343a40;
   color: white;
   min-height: 100vh;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Proxima Nova';
 }
 
 .container {
@@ -13,7 +13,7 @@
 
 .banner {
   background-color: #23272b; /* Darker banner background */
-  padding: 20px 0; /* Increased padding for a larger banner */
+  padding: 10px 0; /* Increased padding for a larger banner */
 }
 
 .header-content {
@@ -25,40 +25,37 @@
 .logo-container {
   display: flex;
   align-items: center;
-  /* Other styles for logo container */
+  margin-right: auto;
 }
 
-.banner-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.logo-butterfly {
+  margin-right: -19px; /* Adjust this to control space between butterfly and text */
+  height: 65px; /* Size of butterfly */
+  width: auto;
+}
+
+h1 {
+  font-size: 3rem;
+  margin: 0;
+  padding: 0;
+  line-height: 70px;
+  display: inline-block;
 }
 
 .icon-container {
   display: flex;
   align-items: center;
-  /* Adjust the gap to your preference */
-  gap: 10px;
+  justify-content: flex-end; /* Aligns the icons to the right */
+  flex-grow: 1;
+  /* Remove flex-grow if you don't want icons to take up all available space */
+  gap: 15px; /* Adjust the space between the icons */
 }
 
 .icon-container img {
-  height: 32px; /* Adjust the size as needed */
+  height: 70px; /* Adjust the size of icons */
   cursor: pointer;
-}
-
-.logo-butterfly {
-  height: 55px;
-  width: 55px;
-  /* Adjust margins as needed to position the butterfly */
-}
-
-/* Adjust the left margin of the h1 to bring it closer to the butterfly icon */
-h1 {
-  margin-left: -30px; /* Reduce this value to bring it closer to the butterfly icon */
-  margin-bottom: 0;
-  padding: 0;
-  font-size: 2rem;
-  display: inline-block;
+  /* Adjust margin-bottom to align icons with the codeCraft text */
+  margin-top: -66px; /* This is an example value; you may need to adjust it */
 }
 
 h1, h2 {
@@ -67,6 +64,27 @@ h1, h2 {
 
 .main-content {
   padding: 2rem 0;
+}
+
+.input-box {
+  position: relative;
+  /* Your styles for the input container */
+}
+
+.icon {
+  /* Shared styles for icons */
+  cursor: pointer;
+  font-size: 1.5em; /* Example size, adjust as needed to match other icons */
+}
+
+
+.upload-icon {
+  cursor: pointer;
+  font-size: 1.5rem; /* Adjust the size to match the other icons */
+  position: absolute; /* Position the icon absolutely within the .input-header */
+  top: 160px; /* Adjust this value to align it with the top of the textarea */
+  right: -11px; /* Adjust this value to align it with the right of the textarea */
+  color: #bbb; /* Style the color to match other icons */
 }
 
 .code-container {
@@ -153,12 +171,11 @@ h1, h2 {
 
 .icons {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px; /* Adjust as needed */
+  right: -10px; /* Keep this positive and as small as needed */
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
 }
 
 .icon {

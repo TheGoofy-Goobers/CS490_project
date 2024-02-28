@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 import {React, useState} from 'react';
 import axios from "axios";
 import { FLASK_URL } from '../../vars.js'
+=======
+import React, { useState, useRef } from 'react';
+>>>>>>> 2f80e153c4cd3b1a2c2efdb7a07118763b91df42
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload } from 'react-icons/fa';
+import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
 import aboutUsIcon from './about_us.png'; // Assuming the images are in the same directory
 import feedbackIcon from './feedback.png';
 import githubIcon from './github-logo.png';
@@ -10,13 +14,53 @@ import profileIcon from './Profile.png';
 import translatorIcon from './translator_icon.png';
 
 const TranslatePage = () => {
-  // Functions to handle icon click events
-  const handleCopyToClipboard = () => {
-    // Logic to copy text to clipboard
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
+  const [targetLanguage, setTargetLanguage] = useState('Python');
+
+  const fileInputRef = useRef(null);
+
+  // Function to trigger the hidden file input
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
   };
 
+  // Function to handle file input change
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Handle the file upload here
+      console.log('File uploaded:', file.name);
+      // You can read the file and set it to inputText or perform other actions
+    }
+  };
+
+  const handleTranslate = () => {
+    setOutputText(inputText);
+  };
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard.writeText(outputText).then(() => {
+      // You can display some message to the user indicating the text was copied
+      console.log('Copied to clipboard');
+    });
+  };
+  
   const handleDownloadCode = () => {
-    // Logic to download the code
+    const blob = new Blob([outputText], { type: 'text/plain' });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = href;
+    // Use the selected target language to determine the file extension
+    const extension = targetLanguage === 'JavaScript' ? 'js' :
+                      targetLanguage === 'Python' ? 'py' :
+                      targetLanguage === 'C++' ? 'cpp' :
+                      'txt'; // Default or any other condition for C++
+    link.download = `code.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
   };
 
   //sample function linked to flask backend
@@ -92,49 +136,80 @@ const TranslatePage = () => {
               <h1>codeCraft</h1>
             </div>
             <div className="icon-container">
-              <img src={translatorIcon} alt="Translator" />
-              <img src={feedbackIcon} alt="Feedback" />
-              <img src={aboutUsIcon} alt="About Us" />              
-              <img src={githubIcon} alt="GitHub" />
-              <img src={profileIcon} alt="Profile" />            
+            <img src={translatorIcon} alt="Translator" title="Translator" />
+            <img src={feedbackIcon} alt="Feedback" title="Feedback" />
+            <img src={aboutUsIcon} alt="About Us" title="About Us" />            
+            <img src={githubIcon} alt="GitHub" title="GitHub" />
+            <img src={profileIcon} alt="Profile" title="Profile" />                      
             </div>
           </div>
         </header>
-      <div className="container main-content">
+        <div className="container main-content">
         <div className="code-container">
           <div className="code-box input-box">
             <h2>Input</h2>
-            <div className="form-group">
-              <label htmlFor="sourceLanguage">Source Language</label>
-              <select className="form-control" id="sourceLanguage">
-                <option>JavaScript</option>
-                <option>Python</option>
-                <option>C++</option>
-              </select>
+            <div className="input-header">
+              <div className="form-group">
+                <label htmlFor="sourceLanguage">Source Language</label>
+                <select className="form-control" id="sourceLanguage">
+                  <option>JavaScript</option>
+                  <option>Python</option>
+                  <option>C++</option>
+                </select>
+              </div>
+              <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileInputChange} 
+                style={{ display: 'none' }} 
+              />
             </div>
-            <textarea id="inputCode" className="code-area" rows="12" placeholder="Enter some code..."></textarea>
+            <textarea 
+              value={inputText} 
+              onChange={(e) => setInputText(e.target.value)}
+              className="code-area" 
+              rows="12" 
+              placeholder="Enter some code..."
+            ></textarea>
           </div>
           <div className="code-box output-box">
             <h2>Output</h2>
             <div className="form-group">
               <label htmlFor="targetLanguage">Target Language</label>
-              <select className="form-control" id="targetLanguage">
-                <option>Python</option>
-                <option>JavaScript</option>
-                <option>C++</option>
+              <select className="form-control" id="targetLanguage" onChange={(e) => setTargetLanguage(e.target.value)}>
+                <option value="Python">Python</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="C++">C++</option>
               </select>
             </div>
             <div className="position-relative textarea-container">
-              <textarea id="outputCode" className="code-area" rows="12" placeholder="Translated code will appear here..." readOnly></textarea>
+            <textarea 
+              value={outputText} 
+              className="code-area" 
+              rows="12" 
+              placeholder="Translated code will appear here..."
+              readOnly
+            ></textarea>
               <div className="icons">
-                <FaRegClipboard className="icon" onClick={handleCopyToClipboard} />
-                <FaDownload className="icon" onClick={handleDownloadCode} />
+                <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
+                <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
               </div>
             </div>
           </div>
         </div>
         <div className="translate-button-container">
+<<<<<<< HEAD
           <button id="translateBtn" className="btn translate-button" onClick={register}>Translate</button>
+=======
+          <button 
+            id="translateBtn" 
+            className="btn translate-button"
+            onClick={handleTranslate}
+          >
+            Translate
+          </button>
+>>>>>>> 2f80e153c4cd3b1a2c2efdb7a07118763b91df42
         </div>
       </div>
       <p>To get your profile details: </p><br />
