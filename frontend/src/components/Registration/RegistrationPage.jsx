@@ -18,6 +18,7 @@ const RegistrationPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle registration logic here
+    register();
     console.log('Registration details:', user);
   };
 
@@ -82,7 +83,7 @@ const RegistrationPage = () => {
             />
           </div>
           <div className="registration-button-container">
-            <button type="submit" className="registration-form-button" onSubmit={register}>Register</button>
+            <button type="submit" className="registration-form-button">Register</button>
           </div>
         </form>
       </div>
