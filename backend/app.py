@@ -3,7 +3,6 @@ from flask_cors import CORS
 from flask_mysqldb import MySQL
 import json
 from functions import validate_email, validate_username
-import mysql.connector
 import os
 from dotenv import load_dotenv
 
@@ -27,8 +26,6 @@ def create_app(testing: bool):
         api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
         api.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
-    print(api.config)
-    
     mysql = MySQL(api)
 
     # test method - remove later
