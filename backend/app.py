@@ -65,8 +65,11 @@ def create_app(testing: bool):
             return response
         
         # query db to make sure email and username are unique
+        print("validation")
         cur = mysql.connection.cursor()
+        print("cursor done")
         cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
+        print("executed")
         existing_user = cur.fetchone()
 
         if existing_user:
