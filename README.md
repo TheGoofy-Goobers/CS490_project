@@ -42,7 +42,8 @@ root/
 ## Serve the app
 `cd frontend`
 `npm start` starts frontend
-`npm run start-backend` starts backend
+For UNIX, `npm run start-backend` starts backend
+For Windows, `npm run run-backend` starts backend
 
 ## Run test suite
 `cd frontend`
