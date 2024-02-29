@@ -21,15 +21,15 @@ const RegistrationPage = () => {
     console.log('Registration details:', user);
   };
 
-  // TODO: Handle registration response and redirection on front end
-  // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
   var res
   const register = () => {
+    // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
     axios.post(`${FLASK_URL}/registerNewUser`, user)
     .then((response) => {
       delete user.username 
       delete user.email
       delete user.password
+      // TODO: Handle registration response and redirection on front end
       res = response.data
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
@@ -82,7 +82,7 @@ const RegistrationPage = () => {
             />
           </div>
           <div className="registration-button-container">
-            <button type="submit" className="registration-form-button">Register</button>
+            <button type="submit" className="registration-form-button" onSubmit={register}>Register</button>
           </div>
         </form>
       </div>
