@@ -5,11 +5,19 @@ mysql_config = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'codecraft'
 }
 
 # connect to server
-# TODO: make this work with azure
+connection = mysql.connector.connect(**mysql_config)
+
+# create database if it doesn't exist
+create_database_query = "CREATE DATABASE IF NOT EXISTS codecraft"
+cursor = connection.cursor()
+cursor.execute(create_database_query)
+
+# switch to the 'codecraft' database
+mysql_config['database'] = 'codecraft'
+connection.close()
 connection = mysql.connector.connect(**mysql_config)
 
 # create users table
@@ -26,5 +34,7 @@ cursor.execute(create_table_query)
 
 # commit changes
 connection.commit()
+
+# close cursor and connection
 cursor.close()
 connection.close()
