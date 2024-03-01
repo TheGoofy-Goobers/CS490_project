@@ -112,7 +112,6 @@ def create_app(testing: bool):
         cur = mysql.connection.cursor()
         cur.execute("SELECT user_id, password FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
         user = cur.fetchone()
-        print(user)
         cur.close()
 
         if not user:
