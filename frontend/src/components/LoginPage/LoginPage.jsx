@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import './LoginPage.css';
+import { FLASK_URL } from '../../vars';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
@@ -15,8 +17,28 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle login logic here
+    login()
     console.log('Login credentials:', credentials);
   };
+
+  //TODO handle login response and redirection on front end
+  var res
+  const login = () => {
+    axios.post(`${FLASK_URL}/userLoginCredentials`, credentials)
+    .then((response) => {
+      delete credentials.username
+      delete credentials.password
+      res = response.data
+      console.log(`Response has error: ${res.errors}`)
+      if(res.errors) console.log(`Error response: ${res.errorMessage}`)
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+        }
+    })
+  }
 
   return (
     <div className="login-page-container">
@@ -24,11 +46,11 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit}>
           <h2>Login</h2>
           <div className="login-form-group">
-            <label>Email:</label>
+            <label>Username or Email:</label>
             <input 
-              type="email" 
-              name="email" 
-              value={credentials.email} 
+              type="text" 
+              name="username" 
+              value={credentials.username} 
               onChange={handleChange} 
               className="login-form-control"
             />

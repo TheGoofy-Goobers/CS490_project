@@ -60,45 +60,25 @@ const TranslatePage = () => {
   };
 
   //sample function linked to flask backend
-  const [profileData, setProfileData] = useState(null)
-  const getData = () => {
-    axios({
-      method: "GET",
-      url:`${FLASK_URL}/profile`,
-    })
-    .then((response) => {
-      const res =response.data
-      setProfileData(({
-        profile_name: res.name,
-        about_me: res.about}))
-    }).catch((error) => {
-      if (error.response) {
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-        }
-    })
-  }
-
-  //TODO handle login response and redirection on front end
-  var res
-  const login = () => {
-    axios.post(`${FLASK_URL}/userLoginCredentials`, {
-      // TODO: Data should be passed in from form- this function will likely be moved to a different component
-      username: "sampleUser",
-      password: "somepassword"
-    }).then((response) => {
-      res = response.data
-      console.log(`Response has error: ${res.errors}`)
-      if(res.errors) console.log(`Error response: ${res.errorMessage}`)
-    }).catch((error) => {
-      if (error.response) {
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-        }
-    })
-  }
+  // const [profileData, setProfileData] = useState(null)
+  // const getData = () => {
+  //   axios({
+  //     method: "GET",
+  //     url:`${FLASK_URL}/profile`,
+  //   })
+  //   .then((response) => {
+  //     const res =response.data
+  //     setProfileData(({
+  //       profile_name: res.name,
+  //       about_me: res.about}))
+  //   }).catch((error) => {
+  //     if (error.response) {
+  //       console.log(error.response)
+  //       console.log(error.response.status)
+  //       console.log(error.response.headers)
+  //       }
+  //   })
+  // }
 
   return (
     <div className="translate-page">
