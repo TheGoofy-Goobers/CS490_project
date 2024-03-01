@@ -6,13 +6,33 @@ import feedbackIcon from './feedback.png';
 import githubIcon from './github-logo.png';
 import profileIcon from './Profile.png';
 import translatorIcon from './translator_icon.png';
+import { UnControlled as CodeMirror } from 'react-codemirror2';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/python/python.js';
+import 'codemirror/mode/clike/clike.js'; // for C++
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
-  const [targetLanguage, setTargetLanguage] = useState('Python');
+  const [sourceLanguage, setSourceLanguage] = useState('javascript');
+  const [targetLanguage, setTargetLanguage] = useState('python');
 
   const fileInputRef = useRef(null);
+
+  const getMode = (language) => {
+    switch (language) {
+      case 'JavaScript':
+        return 'javascript';
+      case 'Python':
+        return 'python';
+      case 'C++':
+        return 'text/x-c++src'; // Mode for C++
+      default:
+        return 'javascript';
+    }
+  };
 
   // Function to trigger the hidden file input
   const handleUploadClick = () => {
@@ -83,46 +103,60 @@ const TranslatePage = () => {
             <div className="input-header">
               <div className="form-group">
                 <label htmlFor="sourceLanguage">Source Language</label>
-                <select className="form-control" id="sourceLanguage">
-                  <option>JavaScript</option>
-                  <option>Python</option>
-                  <option>C++</option>
+                <select
+                  className="form-control"
+                  id="sourceLanguage"
+                  value={sourceLanguage}
+                  onChange={(e) => setSourceLanguage(e.target.value)}
+                >
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
                 </select>
               </div>
               <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileInputChange} 
-                style={{ display: 'none' }} 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileInputChange}
+                style={{ display: 'none' }}
               />
             </div>
-            <textarea 
-              value={inputText} 
-              onChange={(e) => setInputText(e.target.value)}
-              className="code-area" 
-              rows="12" 
-              placeholder="Enter some code..."
-            ></textarea>
+            <CodeMirror
+              value={inputText}
+              options={{
+                mode: getMode(sourceLanguage),
+                theme: 'material',
+                lineNumbers: true,
+              }}
+              onChange={(editor, data, value) => setInputText(value)}
+            />
           </div>
           <div className="code-box output-box">
             <h2>Output</h2>
             <div className="form-group">
               <label htmlFor="targetLanguage">Target Language</label>
-              <select className="form-control" id="targetLanguage" onChange={(e) => setTargetLanguage(e.target.value)}>
+              <select
+                className="form-control"
+                id="targetLanguage"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+              >
                 <option value="Python">Python</option>
                 <option value="JavaScript">JavaScript</option>
                 <option value="C++">C++</option>
               </select>
             </div>
             <div className="position-relative textarea-container">
-            <textarea 
-              value={outputText} 
-              className="code-area" 
-              rows="12" 
-              placeholder="Translated code will appear here..."
-              readOnly
-            ></textarea>
+              <CodeMirror
+                value={outputText}
+                options={{
+                  mode: getMode(targetLanguage),
+                  theme: 'material',
+                  lineNumbers: true,
+                  readOnly: true,
+                }}
+              />
               <div className="icons">
                 <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
                 <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
@@ -131,8 +165,8 @@ const TranslatePage = () => {
           </div>
         </div>
         <div className="translate-button-container">
-          <button 
-            id="translateBtn" 
+          <button
+            id="translateBtn"
             className="btn translate-button"
             onClick={handleTranslate}
           >

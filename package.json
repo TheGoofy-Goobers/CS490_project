@@ -1,5 +1,10 @@
 {
   "dependencies": {
-    "bootstrap": "^5.3.3"
+    "bootstrap": "^5.3.3",
+    "codemirror": "^5.65.16",
+    "react-codemirror2": "^7.3.0"
+  },
+  "devDependencies": {
+    "@types/codemirror": "^5.60.15"
   }
 }

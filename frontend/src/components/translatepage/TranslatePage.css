@@ -66,6 +66,16 @@ h1, h2 {
   padding: 2rem 0;
 }
 
+.CodeMirror {
+  text-align: left; /* Resets text alignment */
+  width: 100%;
+  height: auto; /* Resets height if being overridden */
+  min-height: 300px;
+  padding: 0; /* Resets padding if being overridden */
+  margin: 0; /* Resets margin if being overridden */
+  line-height: normal; /* Resets line height if being overridden */
+}
+
 .input-box {
   position: relative;
   /* Your styles for the input container */
@@ -83,8 +93,9 @@ h1, h2 {
   font-size: 1.5rem; /* Adjust the size to match the other icons */
   position: absolute; /* Position the icon absolutely within the .input-header */
   top: 160px; /* Adjust this value to align it with the top of the textarea */
-  right: -11px; /* Adjust this value to align it with the right of the textarea */
+  right: 5px; /* Adjust this value to align it with the right of the textarea */
   color: #bbb; /* Style the color to match other icons */
+  z-index: 10;
 }
 
 .code-container {
@@ -172,7 +183,7 @@ h1, h2 {
 .icons {
   position: absolute;
   top: 10px; /* Adjust as needed */
-  right: -10px; /* Keep this positive and as small as needed */
+  right: 6px; /* Keep this positive and as small as needed */
   display: flex;
   align-items: center;
   gap: 10px;
