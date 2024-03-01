@@ -128,11 +128,14 @@ def create_app(testing: bool):
             # TODO: set user session
             response["user_id"] = user['user_id']
             response["success"] = True
+            del user['password']
             return response
+        
         else:
             response["hasError"] = True
             response["errorMessage"] = "Invalid password"
-            
+            del user['password']
+
         return response
     
     @api.route('/userLogoffRequest')

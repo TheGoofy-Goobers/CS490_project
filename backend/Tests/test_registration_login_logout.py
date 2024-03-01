@@ -115,12 +115,31 @@ class TestRegistrationLoginLogout:
         assert not response["hasError"]
         assert "user_id" in response and response["user_id"] == '1'
 
-    
-    def test_user_login_unrecognized_username_or_email_returns_error_response(self, client):
-        pass
+    @pytest.mark.parametrize("username,password", [("unrecognizedUser", "validPassword")])
+    def test_user_login_unrecognized_username_or_email_returns_error_response(self, client, username, password, monkeypatch):
+        # mocks
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
+        response = response.json
 
-    def test_user_login_password_incorrect_returns_error_response(self, client):
-        pass
+        assert "success" not in response
+        assert response["hasError"]
+        assert "errorMessage" in response and response["errorMessage"] == "User not found"
+    @pytest.mark.parametrize("username,password", [("validUser", "incorrectPassword")])
+    def test_user_login_incorrect_password_returns_error_response(self, client, username, password, monkeypatch):
+        # mocks
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        def seededReturn(self):
+            return {"user_id": 1, "password": "correctPassword"}
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
+        response = response.json
+        
+        assert "success" not in response
+        assert response["hasError"]
+        assert "errorMessage" in response and response["errorMessage"] == "Invalid password"
     
     @pytest.mark.parametrize("username", [("bad@userOrEmail")])
     def test_user_login_invalid_username_or_email_returns_error_response(self, client, username):
@@ -134,5 +153,5 @@ class TestRegistrationLoginLogout:
 
     # TODO: This unit test
     def test_user_logout_success(self, client):
-        pass
+        assert False
 
