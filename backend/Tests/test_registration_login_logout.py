@@ -1,7 +1,8 @@
 import pytest
+from Tests.Mocks.MockFlaskMysql import MockFlaskMysqlConnection, MockFlaskMysqlCursor
 from app import create_app
 import json
-
+from flask_mysqldb import MySQL
 class TestRegistrationLoginLogout:
     @pytest.fixture()
     def app(self):
@@ -26,26 +27,34 @@ class TestRegistrationLoginLogout:
     def runner(self, app):
         return app.test_cli_runner()
     
-    def test_user_registration_success(self, client):
-        response = client.post("/registerNewUser", data=json.dumps({"username": "sampleUser", "email": "sample.example@example.com", "password": "somepassword"}))
+    # TODO: Remove mocks if possible by using test database
+    @pytest.mark.parametrize("username,email,password", [("sampleUser", "sample.example@example.com", "somepassword")])
+    def test_user_registration_success(self, client, username, email, password, monkeypatch):
+        # mocks connection
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+
+        response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": email, "password": password}))
         response = response.json
 
         assert response["success"]
         assert not response["hasError"]
 
-    def test_user_registration_leading_trailing_whitespace_passes(self, client):
-        response = client.post("/registerNewUser", data=json.dumps({"username": "    sampleUser    ", "email": "\nsample.example@example.com\t", "password": "somepassword"}))
+    @pytest.mark.parametrize("username,email", [("    sampleUser    ", "\nsample.example@example.com\t")])
+    def test_user_registration_leading_trailing_whitespace_passes(self, client, username, email, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+
+        response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": email, "password": "somepassword"}))
         response = response.json
 
         assert response["success"]
         assert not response["hasError"]
 
-    def test_user_registration_invalid_username_returns_error_response(self, client):
+    @pytest.mark.parametrize("username", [("short"), ("sampleUsernameIsFarTooLongAndThrowsError"), ("__------__"), ("this$is$bad$format")])
+    def test_user_registration_invalid_username_returns_error_response(self, client, username):
         valid_email = "sample.example@example.com"
         valid_password = "somepassword"
 
-        # test username is too short
-        response = client.post("/registerNewUser", data=json.dumps({"username": "short", "email": valid_email, "password": valid_password}))
+        response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": valid_email, "password": valid_password}))
         response = response.json
 
         assert "success" not in response
@@ -54,72 +63,13 @@ class TestRegistrationLoginLogout:
         assert "usernameErrors" in response
         assert len(response["usernameErrors"]) == 1
 
-        # test username too long
-        response = client.post("/registerNewUser", data=json.dumps({"username": "sampleUsernameIsFarTooLongAndThrowsError", "email": valid_email, "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "emailErrors" not in response
-        assert response["hasError"]
-        assert "usernameErrors" in response
-        assert len(response["usernameErrors"]) == 1
-
-        # test username uses no alphanumeric characters
-        response = client.post("/registerNewUser", data=json.dumps({"username": "__------__", "email": valid_email, "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "emailErrors" not in response
-        assert response["hasError"]
-        assert "usernameErrors" in response
-        assert len(response["usernameErrors"]) == 1
-
-        # test username does not follow username format
-        response = client.post("/registerNewUser", data=json.dumps({"username": "this$is$bad$format", "email": valid_email, "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "emailErrors" not in response
-        assert response["hasError"]
-        assert "usernameErrors" in response
-        assert len(response["usernameErrors"]) == 1
-
-    def test_user_registration_invalid_email_returns_error_response(self, client):
+    @pytest.mark.parametrize("email", [("this.email@is.wayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy.toooooooooo.long"),
+                                        ("thisemail@usesinvalidformat"), ("thisemail.also@usesinvalid-format"), ("thisemail@usesinvalidformat..also")])
+    def test_user_registration_invalid_email_returns_error_response(self, client, email):
         valid_username = "sampleUser"
         valid_password = "somepassword"
 
-        # test email length too long
-        response = client.post("/registerNewUser", data=json.dumps({"username": valid_username, "email": "this.email@is.wayyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy.toooooooooo.long", "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "usernameErrors" not in response
-        assert response["hasError"]
-        assert "emailErrors" in response
-        assert len(response["emailErrors"]) == 1
-
-        # test email invalid format 1
-        response = client.post("/registerNewUser", data=json.dumps({"username": valid_username, "email": "thisemail@usesinvalidformat", "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "usernameErrors" not in response
-        assert response["hasError"]
-        assert "emailErrors" in response
-        assert len(response["emailErrors"]) == 1
-
-        # test email invalid format 2
-        response = client.post("/registerNewUser", data=json.dumps({"username": valid_username, "email": "thisemail.also@usesinvalid-format", "password": valid_password}))
-        response = response.json
-
-        assert "success" not in response
-        assert "usernameErrors" not in response
-        assert response["hasError"]
-        assert "emailErrors" in response
-        assert len(response["emailErrors"]) == 1
-
-        # test email invalid format 3
-        response = client.post("/registerNewUser", data=json.dumps({"username": valid_username, "email": "thisemail@usesinvalidformat..also", "password": valid_password}))
+        response = client.post("/registerNewUser", data=json.dumps({"username": valid_username, "email": email, "password": valid_password}))
         response = response.json
 
         assert "success" not in response
@@ -129,41 +79,38 @@ class TestRegistrationLoginLogout:
         assert len(response["emailErrors"]) == 1
 
     # TODO: These unit tests
+    @pytest.mark.parametrize("username", [("duplicateUser")])
+    def test_user_registration_duplicate_username_fails(self, client, username, monkeypatch):
+        # mocks
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        def seededReturn(self):
+            return {"username": "duplicateUser", "email" : "valid@email.com"}
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+
+        response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": "sample.example@example.com", "password": "somepassword"}))
+        response = response.json
+        
+        assert "success" not in response
+        assert response["hasError"]
+        assert "sqlErrors" in response
+        assert len(response["sqlErrors"]) == 1 and response["sqlErrors"][0] == "Chosen username already in use"
+
+    @pytest.mark.parametrize("email", [("duplicate@email.com")])
+    def test_user_registration_duplicate_email_fails(self, client, email, monkeypatch):
+        pass
+
     def test_user_login_success(self, client):
         pass
-        # TODO: work on actual page first before thinking about what this test will look like
-        #will likely have to make a mock db
     
     def test_user_login_unrecognized_username_or_email_returns_error_response(self, client):
         pass
 
     def test_user_login_password_incorrect_returns_error_response(self, client):
         pass
-
-    def test_user_login_valid_username_passes_validation(self, client):
-        response = ""
-        with pytest.raises(AttributeError):
-            response = client.post("/userLoginCredentials", data=json.dumps({"username": "mockuser", "password": "mockpassword"}))
-        # TODO: This passing criteria should be changed after DB is set up
-        if "errorMessage" in response:
-            assert response["errorMessage"] != "Invalid format for username or email"
-        
-        #if there was no error message, then the username passed validation and the entire function did not return any error response
-        pass
-
-    def test_user_login_valid_email_passes_validation(self, client):
-        response = ""
-        with pytest.raises(AttributeError):
-            response = client.post("/userLoginCredentials", data=json.dumps({"username": "mock@email.com", "password": "mockpassword"}))
-        # TODO: This passing criteria should be changed after DB is set up
-        if "errorMessage" in response:
-            assert response["errorMessage"] != "Invalid format for username or email"
-        
-        #if there was no error message, then the username passed validation and the entire function did not return any error response
-        pass
-
-    def test_user_login_invalid_username_or_email_returns_error_response(self, client):
-        response = client.post("/userLoginCredentials", data=json.dumps({"username": "bad@userOrEmail", "password": "mockpassword"}))
+    
+    @pytest.mark.parametrize("username", [("bad@userOrEmail")])
+    def test_user_login_invalid_username_or_email_returns_error_response(self, client, username):
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": "mockpassword"}))
         response = response.json
         
         assert "success" not in response

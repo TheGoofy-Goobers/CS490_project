@@ -15,15 +15,14 @@ def create_app(testing: bool):
 
     # mysql configurations
     api.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+    api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
     if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
-        api.config['MYSQL_PASSWORD'] = ''
-        api.config['MYSQL_DB'] = 'codecraft'
+        api.config['MYSQL_DB'] = 'codecraft_testing'
     else:
         api.config['MYSQL_HOST'] = os.getenv('DB_URL')
         api.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
-        api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
         api.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
 
     mysql = MySQL(api)
@@ -68,7 +67,7 @@ def create_app(testing: bool):
         cur = mysql.connection.cursor()
         cur.execute("SELECT username, email FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
-
+    
         if existing_user:
             response["hasError"] = True
             response["sqlErrors"] = []
