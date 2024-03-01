@@ -1,10 +1,14 @@
 import mysql.connector
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # mysql connection parameters
 mysql_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': '',
+    'host': os.getenv('DB_URL'),
+    'user': os.getenv('MYSQL_USER'),
+    'password': os.getenv('MYSQL_PASSWORD'),
 }
 
 # connect to server

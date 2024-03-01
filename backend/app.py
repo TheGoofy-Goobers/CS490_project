@@ -66,12 +66,16 @@ def create_app(testing: bool):
         
         # query db to make sure email and username are unique
         cur = mysql.connection.cursor()
-        cur.execute("SELECT username FROM users WHERE username = %s OR email = %s", (username, email))
+        cur.execute("SELECT username, email FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
 
         if existing_user:
             response["hasError"] = True
-            response["sqlError"] = "Username or email already exists"
+            response["sqlErrors"] = []
+            if existing_user["username"] == username:
+                response["sqlErrors"].append("Chosen username already in use")
+            if existing_user["email"] == email:
+                response["sqlErrors"].append("Chosen email already in use")
             return response
         
         # insert new user into db
