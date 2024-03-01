@@ -13,8 +13,8 @@ def create_app(testing: bool):
     api = Flask(__name__)
     CORS(api)
 
-    #api.config["MYSQL_CURSORCLASS"] = "DictCursor"
     # mysql configurations
+    api.config['MYSQL_CURSORCLASS'] = 'DictCursor'
     if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
@@ -66,7 +66,7 @@ def create_app(testing: bool):
         
         # query db to make sure email and username are unique
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username, email))
+        cur.execute("SELECT username FROM users WHERE username = %s OR email = %s", (username, email))
         existing_user = cur.fetchone()
 
         if existing_user:
@@ -110,8 +110,9 @@ def create_app(testing: bool):
 
         # query the database to check if the user credentials are valid
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
+        cur.execute("SELECT user_id, password FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
         user = cur.fetchone()
+        print(user)
         cur.close()
 
         if not user:
@@ -120,9 +121,9 @@ def create_app(testing: bool):
             return response
 
         # make sure password matches
-        if encrypted_pw == user['encrypted_password']:
+        if encrypted_pw == user['password']:
             # TODO: set user session
-            response["user_id"] = user['id']
+            response["user_id"] = user['user_id']
             response["success"] = True
             return response
         else:
