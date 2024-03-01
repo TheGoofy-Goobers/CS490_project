@@ -38,6 +38,7 @@ const RegistrationPage = () => {
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
+      if(res.sqlErrors) console.log(`SQL Errors: ${res.sqlErrors}`)
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
