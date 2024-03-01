@@ -27,9 +27,11 @@ const LoginPage = () => {
   const login = () => {
     axios.post(`${FLASK_URL}/userLoginCredentials`, credentials)
     .then((response) => {
-      delete credentials.username
-      delete credentials.password
       res = response.data
+      if (response.success) {
+        delete credentials.username
+        delete credentials.password
+      }
       console.log(`Response has error: ${res.hasError}`)
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
     }).catch((error) => {
