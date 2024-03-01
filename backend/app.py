@@ -93,7 +93,7 @@ def create_app(testing: bool):
         responseJson = json.loads(request.data.decode())
 
         # accepts username or email for login
-        username_or_email = responseJson['username']
+        username_or_email = responseJson['username'].strip()
         # username/email validation
         is_username = False
         is_email = False
