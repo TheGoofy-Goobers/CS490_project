@@ -15,15 +15,16 @@ def create_app(testing: bool):
 
     # mysql configurations
     api.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-    api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
     if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
         api.config['MYSQL_DB'] = 'codecraft_testing'
+        api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD_TESTING')
     else:
         api.config['MYSQL_HOST'] = os.getenv('DB_URL')
         api.config['MYSQL_USER'] = os.getenv('MYSQL_USER')
         api.config['MYSQL_DB'] = os.getenv('MYSQL_DB')
+        api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
 
     mysql = MySQL(api)
 
