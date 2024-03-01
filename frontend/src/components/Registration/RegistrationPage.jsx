@@ -27,13 +27,14 @@ const RegistrationPage = () => {
     // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
     axios.post(`${FLASK_URL}/registerNewUser`, user)
     .then((response) => {
-      if (response.success) {
+      res = response.data
+      if (res.success) {
+        alert("Registration Success!")
         delete user.username 
         delete user.email
         delete user.password
       }
       // TODO: Handle registration response and redirection on front end
-      res = response.data
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
