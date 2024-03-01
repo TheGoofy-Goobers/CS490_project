@@ -22,6 +22,7 @@ const LoginPage = () => {
   };
 
   //TODO handle login response and redirection on front end
+  // TODO: frontend should encrypt password
   var res
   const login = () => {
     axios.post(`${FLASK_URL}/userLoginCredentials`, credentials)
@@ -29,8 +30,8 @@ const LoginPage = () => {
       delete credentials.username
       delete credentials.password
       res = response.data
-      console.log(`Response has error: ${res.errors}`)
-      if(res.errors) console.log(`Error response: ${res.errorMessage}`)
+      console.log(`Response has error: ${res.hasError}`)
+      if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
