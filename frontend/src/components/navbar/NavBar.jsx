@@ -1,19 +1,24 @@
-import {React, useState, Link} from 'react';
+import {React, useState} from 'react';
+import { Link } from 'react-router-dom';
 import logo3 from './logo3.png';
 import './NavBar.css';
-import profile from '/home/hk37/CS490/CS490_project/frontend/src/components/translatepage/Profile.png'
-import github from '/home/hk37/CS490/CS490_project/frontend/src/components/translatepage/github-logo.png';
+import profile from '../translatepage/Profile.png'
+import github from '../translatepage/github-logo.png';
 
 const NavBar = () => {
     return(
         <div>
             <div className="banner">
             <div className="logo-container">
+              <Link to={'/'}>
               <img src={logo3} height={80}/>
+              </Link>
             </div>
             <div className="links">
               <ul>
-              <li>Translator</li>  
+              <Link to={'/translate'}>
+                <li>Translator</li>  
+              </Link>
               <li>References</li> 
               <li>Feedback</li>
               </ul>     
