@@ -1,0 +1,71 @@
+.h1{
+  color: white;
+  background-color: #343a40;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+}
+
+.h2{
+  color: white;
+  background-color: #343a40;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: left;
+}
+
+.background-page {
+  background-color: #343a40;
+  color: white;
+  min-height: 100vh;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.questions-container {
+  background-color: #23272B; 
+  /* display: flex;
+  flex-direction: column;  */
+  display: block;
+  float: left;
+  width: 40%;
+  border-radius: 10%;
+}
+
+.question {
+  margin-bottom: 80px; /* Add margin between questions */
+  align-items: left;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.submit-button {
+  background-color: #007bff; /* Change the background color */
+  color: white;
+  border: none;
+  border-radius: 20px; /* Make the button rounded */
+  padding: 10px 20px; /* Add padding to the button */
+  cursor: pointer;
+  transition: background-color 0.3s ease; /* Add transition effect */
+}
+
+.submit-button:hover {
+  background-color: #5E9351; /* Change the background color on hover */
+}
+
+.radio-buttons {
+  display: flex;
+  flex-direction: row-reverse; /* Align radio buttons horizontally to the right */
+  margin-bottom: 10px;
+}
+
+.radio-buttons label {
+  margin-right: 50px;
+}
+
+.radio-buttons input[type="radio"] {
+  margin-right: 5px; 
+}
+
+.textbox{
+    color: #23272B;
+}

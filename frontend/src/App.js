@@ -8,8 +8,7 @@ function App() {
 
   return (
     <div className="App">
-      {/* <TranslatePage /> */}
-      <FeedbackForm />
+      <TranslatePage />
     </div>
   );
 }
