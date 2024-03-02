@@ -2,7 +2,7 @@
   background-color: #343a40;
   color: white;
   min-height: 100vh;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Proxima Nova';
 }
 
 .container {
@@ -11,62 +11,41 @@
   padding: 0 15px;
 }
 
-.banner {
-  background-color: #23272b; /* Darker banner background */
-  padding: 20px 0; /* Increased padding for a larger banner */
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  /* Other styles for logo container */
-}
-
-.banner-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.icon-container {
-  display: flex;
-  align-items: center;
-  /* Adjust the gap to your preference */
-  gap: 10px;
-}
-
-.icon-container img {
-  height: 32px; /* Adjust the size as needed */
-  cursor: pointer;
-}
-
-.logo-butterfly {
-  height: 55px;
-  width: 55px;
-  /* Adjust margins as needed to position the butterfly */
-}
-
-/* Adjust the left margin of the h1 to bring it closer to the butterfly icon */
-h1 {
-  margin-left: -30px; /* Reduce this value to bring it closer to the butterfly icon */
-  margin-bottom: 0;
-  padding: 0;
-  font-size: 2rem;
-  display: inline-block;
-}
-
 h1, h2 {
   color: #fff;
 }
 
 .main-content {
   padding: 2rem 0;
+}
+
+.CodeMirror {
+  text-align: left;
+  width: 100%;
+  height: auto;
+  min-height: 300px;
+  padding: 0;
+  margin: 0;
+  line-height: normal;
+}
+
+.input-box {
+  position: relative;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.upload-icon {
+  cursor: pointer;
+  font-size: 1.5rem;
+  position: absolute;
+  top: 160px;
+  right: 5px;
+  color: #bbb;
+  z-index: 10;
 }
 
 .code-container {
@@ -78,22 +57,6 @@ h1, h2 {
 
 .code-box {
   width: calc(50% - 15px);
-}
-
-.code-area {
-  width: 100%;
-  background-color: #23272b;
-  color: #fff;
-  border: 1px solid #343a40;
-  border-radius: 4px;
-  padding: 10px;
-  font-family: inherit;
-  margin-bottom: 1rem;
-  min-height: 300px; /* Increased min-height */
-}
-
-.code-area::placeholder {
-  color: #bbb;
 }
 
 .form-group {
@@ -114,8 +77,6 @@ h1, h2 {
   height: 38px;
   margin-bottom: 1rem;
   border-radius: 4px;
-  /* Set a specific height to match the code areas */
-  min-height: 38px; /* Adjust the height to match the text areas */
 }
 
 .form-control:focus {
@@ -126,7 +87,7 @@ h1, h2 {
 
 .translate-button-container {
   text-align: center;
-  margin-top: 20px; /* Added margin-top for spacing */
+  margin-top: 20px;
 }
 
 .translate-button {
@@ -138,7 +99,7 @@ h1, h2 {
   line-height: 1.5;
   border-radius: .3rem;
   cursor: pointer;
-  display: inline-block; /* Make the button inline-block for a smaller width */
+  display: inline-block;
 }
 
 .translate-button:hover {
@@ -153,18 +114,11 @@ h1, h2 {
 
 .icons {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 10px;
+  right: 6px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px;
-}
-
-.icon {
-  color: #bbb;
-  font-size: 1.5rem;
-  cursor: pointer;
 }
 
 .icon:hover {
@@ -184,15 +138,10 @@ h1, h2 {
 
   .icons {
     right: 10px;
-    top: -40px; /* Adjust if necessary for mobile layout */
+    top: -40px;
   }
 
   .translate-button {
     padding: .5rem 1rem;
-  }
-
-  .header-content {
-    justify-content: center; /* Center the header content on smaller screens */
-    padding-left: 0; /* Remove padding to center the content */
   }
 }

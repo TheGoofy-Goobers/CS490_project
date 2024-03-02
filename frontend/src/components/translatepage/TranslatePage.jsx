@@ -1,91 +1,176 @@
-import {React, useState} from 'react';
-import axios from "axios";
-import { FLASK_URL } from '../../vars.js'
+import React, { useState, useRef } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload } from 'react-icons/fa';
-import aboutUsIcon from './about_us.png'; // Assuming the images are in the same directory
-import feedbackIcon from './feedback.png';
-import githubIcon from './github-logo.png';
-import profileIcon from './Profile.png';
-import translatorIcon from './translator_icon.png';
+import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
+import { UnControlled as CodeMirror } from 'react-codemirror2';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/material.css';
+import 'codemirror/mode/javascript/javascript.js';
+import 'codemirror/mode/python/python.js';
+import 'codemirror/mode/clike/clike.js'; // for C++
 
 const TranslatePage = () => {
-  // Functions to handle icon click events
+  const [inputText, setInputText] = useState('');
+  const [outputText, setOutputText] = useState('');
+  const [sourceLanguage, setSourceLanguage] = useState('javascript');
+  const [targetLanguage, setTargetLanguage] = useState('python');
+
+  const fileInputRef = useRef(null);
+
+  const getMode = (language) => {
+    switch (language) {
+      case 'JavaScript':
+        return 'javascript';
+      case 'Python':
+        return 'python';
+      case 'C++':
+        return 'text/x-c++src'; // Mode for C++
+      default:
+        return 'javascript';
+    }
+  };
+
+  // Function to trigger the hidden file input
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+
+  // Function to handle file input change
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Handle the file upload here
+      console.log('File uploaded:', file.name);
+      // You can read the file and set it to inputText or perform other actions
+    }
+  };
+
+  const handleTranslate = () => {
+    setOutputText(inputText);
+  };
+
   const handleCopyToClipboard = () => {
-    // Logic to copy text to clipboard
+    navigator.clipboard.writeText(outputText).then(() => {
+      // You can display some message to the user indicating the text was copied
+      console.log('Copied to clipboard');
+    });
   };
-
+  
   const handleDownloadCode = () => {
-    // Logic to download the code
+    // Determine the MIME type based on the target language
+    let type = 'text/plain'; // Default MIME type
+    switch (targetLanguage) {
+      case 'JavaScript':
+        type = 'text/javascript';
+        break;
+      case 'Python':
+        type = 'text/x-python';
+        break;
+      case 'C++':
+        type = 'text/x-c++src';
+        break;
+      default:
+        break;
+    }
+  
+    const blob = new Blob([outputText], { type });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = href;
+  
+    // Use the selected target language to determine the file extension
+    const extension = targetLanguage === 'JavaScript' ? 'js' :
+                      targetLanguage === 'Python' ? 'py' :
+                      targetLanguage === 'C++' ? 'cpp' :
+                      'txt'; // Fallback for unrecognized languages
+  
+    link.download = `translated_code.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(href);
   };
-
-  const [profileData, setProfileData] = useState(null)
-  const getData = () => {
-    axios({
-      method: "GET",
-      url:`${FLASK_URL}/profile`,
-    })
-    .then((response) => {
-      const res =response.data
-      setProfileData(({
-        profile_name: res.name,
-        about_me: res.about}))
-    }).catch((error) => {
-      if (error.response) {
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
-        }
-    })
-
-  }
 
   return (
     <div className="translate-page">
-      <div className="container main-content">
+       
+        <div className="container main-content">
         <div className="code-container">
           <div className="code-box input-box">
             <h2>Input</h2>
-            <div className="form-group">
-              <label htmlFor="sourceLanguage">Source Language</label>
-              <select className="form-control" id="sourceLanguage">
-                <option>JavaScript</option>
-                <option>Python</option>
-                <option>C++</option>
-              </select>
+            <div className="input-header">
+              <div className="form-group">
+                <label htmlFor="sourceLanguage">Source Language</label>
+                <select
+                  className="form-control"
+                  id="sourceLanguage"
+                  value={sourceLanguage}
+                  onChange={(e) => setSourceLanguage(e.target.value)}
+                >
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
+                </select>
+              </div>
+              <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileInputChange}
+                style={{ display: 'none' }}
+              />
             </div>
-            <textarea id="inputCode" className="code-area" rows="12" placeholder="Enter some code..."></textarea>
+            <CodeMirror
+              value={inputText}
+              options={{
+                mode: getMode(sourceLanguage),
+                theme: 'material',
+                lineNumbers: true,
+              }}
+              onChange={(editor, data, value) => setInputText(value)}
+            />
           </div>
           <div className="code-box output-box">
             <h2>Output</h2>
             <div className="form-group">
               <label htmlFor="targetLanguage">Target Language</label>
-              <select className="form-control" id="targetLanguage">
-                <option>Python</option>
-                <option>JavaScript</option>
-                <option>C++</option>
+              <select
+                className="form-control"
+                id="targetLanguage"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+              >
+                <option value="Python">Python</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="C++">C++</option>
               </select>
             </div>
             <div className="position-relative textarea-container">
-              <textarea id="outputCode" className="code-area" rows="12" placeholder="Translated code will appear here..." readOnly></textarea>
+              <CodeMirror
+                value={outputText}
+                options={{
+                  mode: getMode(targetLanguage),
+                  theme: 'material',
+                  lineNumbers: true,
+                  readOnly: true,
+                }}
+              />
               <div className="icons">
-                <FaRegClipboard className="icon" onClick={handleCopyToClipboard} />
-                <FaDownload className="icon" onClick={handleDownloadCode} />
+                <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
+                <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
               </div>
             </div>
           </div>
         </div>
         <div className="translate-button-container">
-          <button id="translateBtn" className="btn translate-button" onClick={getData}>Translate</button>
+          <button
+            id="translateBtn"
+            className="btn translate-button"
+            onClick={handleTranslate}
+          >
+            Translate
+          </button>
         </div>
       </div>
-      <p>To get your profile details: </p><br />
-        {profileData && <div>
-              <p>Profile name: {profileData.profile_name}</p>
-              <p>About me: {profileData.about_me}</p>
-              <br />
-            </div>
-        }
     </div>
   );
 }
