@@ -61,16 +61,34 @@ const TranslatePage = () => {
   };
   
   const handleDownloadCode = () => {
-    const blob = new Blob([outputText], { type: 'text/plain' });
+    // Determine the MIME type based on the target language
+    let type = 'text/plain'; // Default MIME type
+    switch (targetLanguage) {
+      case 'JavaScript':
+        type = 'text/javascript';
+        break;
+      case 'Python':
+        type = 'text/x-python';
+        break;
+      case 'C++':
+        type = 'text/x-c++src';
+        break;
+      default:
+        break;
+    }
+  
+    const blob = new Blob([outputText], { type });
     const href = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = href;
+  
     // Use the selected target language to determine the file extension
     const extension = targetLanguage === 'JavaScript' ? 'js' :
                       targetLanguage === 'Python' ? 'py' :
                       targetLanguage === 'C++' ? 'cpp' :
-                      'txt'; // Default or any other condition for C++
-    link.download = `code.${extension}`;
+                      'txt'; // Fallback for unrecognized languages
+  
+    link.download = `translated_code.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
