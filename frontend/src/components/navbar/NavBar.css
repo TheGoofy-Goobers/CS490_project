@@ -1,0 +1,49 @@
+.nav-bar-banner {
+    background-color: #23272b;
+    padding: 20px 0;
+  }
+  
+  .nav-bar-container {
+    max-width: 1rem;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  .nav-bar-links ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    color: white;
+    float: left;
+  }
+  
+  .nav-bar-links li {
+    margin: 0;
+    padding-top: 30px;
+    padding-left: 20px;
+    font-size: 1.2rem;
+    color: white;
+  }
+  
+  .nav-bar-logo-container {
+    display: block;
+    float: left;
+    padding-left: 2%;
+  }
+
+.nav-bar-log-in {
+    padding-left: 80%;
+    padding-right: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: right;
+}
+
+.nav-bar-log-in img {
+    padding-top: 0.5%;
+    padding-left: 0;
+    padding-right: 5%;
+    padding-bottom: 1%;
+    margin-bottom: 0%;
+}

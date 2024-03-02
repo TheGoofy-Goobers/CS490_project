@@ -11,53 +11,6 @@
   padding: 0 15px;
 }
 
-.banner {
-  background-color: #23272b; /* Darker banner background */
-  padding: 10px 0; /* Increased padding for a larger banner */
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo-container {
-  display: flex;
-  align-items: center;
-  margin-right: auto;
-}
-
-.logo-butterfly {
-  margin-right: -19px; /* Adjust this to control space between butterfly and text */
-  height: 65px; /* Size of butterfly */
-  width: auto;
-}
-
-h1 {
-  font-size: 3rem;
-  margin: 0;
-  padding: 0;
-  line-height: 70px;
-  display: inline-block;
-}
-
-.icon-container {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end; /* Aligns the icons to the right */
-  flex-grow: 1;
-  /* Remove flex-grow if you don't want icons to take up all available space */
-  gap: 15px; /* Adjust the space between the icons */
-}
-
-.icon-container img {
-  height: 70px; /* Adjust the size of icons */
-  cursor: pointer;
-  /* Adjust margin-bottom to align icons with the codeCraft text */
-  margin-top: -66px; /* This is an example value; you may need to adjust it */
-}
-
 h1, h2 {
   color: #fff;
 }
@@ -67,34 +20,31 @@ h1, h2 {
 }
 
 .CodeMirror {
-  text-align: left; /* Resets text alignment */
+  text-align: left;
   width: 100%;
-  height: auto; /* Resets height if being overridden */
+  height: auto;
   min-height: 300px;
-  padding: 0; /* Resets padding if being overridden */
-  margin: 0; /* Resets margin if being overridden */
-  line-height: normal; /* Resets line height if being overridden */
+  padding: 0;
+  margin: 0;
+  line-height: normal;
 }
 
 .input-box {
   position: relative;
-  /* Your styles for the input container */
 }
 
 .icon {
-  /* Shared styles for icons */
   cursor: pointer;
-  font-size: 1.5em; /* Example size, adjust as needed to match other icons */
+  font-size: 1.5em;
 }
-
 
 .upload-icon {
   cursor: pointer;
-  font-size: 1.5rem; /* Adjust the size to match the other icons */
-  position: absolute; /* Position the icon absolutely within the .input-header */
-  top: 160px; /* Adjust this value to align it with the top of the textarea */
-  right: 5px; /* Adjust this value to align it with the right of the textarea */
-  color: #bbb; /* Style the color to match other icons */
+  font-size: 1.5rem;
+  position: absolute;
+  top: 160px;
+  right: 5px;
+  color: #bbb;
   z-index: 10;
 }
 
@@ -107,22 +57,6 @@ h1, h2 {
 
 .code-box {
   width: calc(50% - 15px);
-}
-
-.code-area {
-  width: 100%;
-  background-color: #23272b;
-  color: #fff;
-  border: 1px solid #343a40;
-  border-radius: 4px;
-  padding: 10px;
-  font-family: inherit;
-  margin-bottom: 1rem;
-  min-height: 300px; /* Increased min-height */
-}
-
-.code-area::placeholder {
-  color: #bbb;
 }
 
 .form-group {
@@ -143,8 +77,6 @@ h1, h2 {
   height: 38px;
   margin-bottom: 1rem;
   border-radius: 4px;
-  /* Set a specific height to match the code areas */
-  min-height: 38px; /* Adjust the height to match the text areas */
 }
 
 .form-control:focus {
@@ -155,7 +87,7 @@ h1, h2 {
 
 .translate-button-container {
   text-align: center;
-  margin-top: 20px; /* Added margin-top for spacing */
+  margin-top: 20px;
 }
 
 .translate-button {
@@ -167,7 +99,7 @@ h1, h2 {
   line-height: 1.5;
   border-radius: .3rem;
   cursor: pointer;
-  display: inline-block; /* Make the button inline-block for a smaller width */
+  display: inline-block;
 }
 
 .translate-button:hover {
@@ -182,17 +114,11 @@ h1, h2 {
 
 .icons {
   position: absolute;
-  top: 10px; /* Adjust as needed */
-  right: 6px; /* Keep this positive and as small as needed */
+  top: 10px;
+  right: 6px;
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.icon {
-  color: #bbb;
-  font-size: 1.5rem;
-  cursor: pointer;
 }
 
 .icon:hover {
@@ -212,15 +138,10 @@ h1, h2 {
 
   .icons {
     right: 10px;
-    top: -40px; /* Adjust if necessary for mobile layout */
+    top: -40px;
   }
 
   .translate-button {
     padding: .5rem 1rem;
-  }
-
-  .header-content {
-    justify-content: center; /* Center the header content on smaller screens */
-    padding-left: 0; /* Remove padding to center the content */
   }
 }
