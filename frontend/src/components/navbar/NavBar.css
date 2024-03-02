@@ -1,0 +1,71 @@
+.banner {
+    background-color: #23272b; /* Darker banner background */
+     /* Increased padding for a larger banner */
+}
+
+.container {
+max-width: 1rem;
+margin: 0 auto;
+padding: 0 ;
+}
+
+.links ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    font-family: 'Proxima Nova';    
+    color: white;
+    float: left;
+}
+
+.links li {
+    margin: 0; /* Remove default margin */
+    padding-top: 30px;
+    padding-left: 20px ;
+    font-family: 'Proxima Nova';  /* Add padding to each list item */
+    font-size: 1.2rem; /* Customize font size */
+    color: white; /* Customize text color */
+    /* Add any other styles you need */
+}
+
+.banner {
+background-color: #23272b; /* Darker banner background */
+padding: 20px 0; /* Increased padding for a larger banner */
+}
+
+.header-content {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.logo-container {
+display: block;
+float: left;
+padding-left: 2%;
+align-items: center;
+/* Other styles for logo container */
+}
+
+.banner-content {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.log-in {
+    padding-left: 80%;
+    padding-right: 0;
+    padding: 10px;
+    display: flex;
+    justify-content: right;
+}
+
+.log-in img {
+    padding-top: 0.5%;
+    padding-left: 0;
+    padding-right: 5%;
+    padding-bottom: 1%;
+    margin-bottom: 0%;
+}
