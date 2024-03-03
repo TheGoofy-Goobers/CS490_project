@@ -126,5 +126,5 @@ python db_setup.py
 Make sure the server is running  
 For UNIX users:
 `sudo service mysql status`
-For Windows users:
+For Windows users:  
 Try `Get-Service -Name 'mysql*'` in PowerShell (untested)
