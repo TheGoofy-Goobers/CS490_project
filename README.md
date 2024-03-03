@@ -116,6 +116,7 @@ MYSQL_PASSWORD=''
 ```
 pip install mysql
 pip install mysql-connector
+pip install python-dotenv
 ```
 Run the DB setup script
 ```
