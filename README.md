@@ -81,3 +81,39 @@ or, if that does not work, run
 
 You may need to run `npm install axios`, I'm not sure.
 
+## DATABASE SETUP:
+For more information consult https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/
+
+Install MySQL
+For UNIX users (Debian/Ubuntu-based):
+```
+sudo apt update
+sudo apt install mysql-server
+```
+Start MySQL server
+`sudo service mysql start`
+You can check the status with
+`sudo service mysql status`
+For Windows users:
+Visit the following page
+`https://dev.mysql.com/downloads/installer/`
+Download the installer and go through the setup wizard with default settings
+Make sure to select full install
+If you are prompted to set a password, take note of it for the `.env` file later
+
+Install the python dependencies
+```
+pip install mysql
+pip install mysql-connector
+```
+Run the DB setup script
+```
+cd backend
+python db_setup.py
+```
+
+Make sure the server is running
+For UNIX users:
+`sudo service mysql status`
+For Windows users:
+Try `Get-Service -Name 'mysql*'` in PowerShell (untested)
