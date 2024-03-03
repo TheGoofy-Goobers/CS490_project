@@ -16,7 +16,7 @@ const NavBar = () => {
         </div>
         <div className="nav-bar-links">
           <ul>
-            <Link to={'/translate'}>
+            <Link to={'/translate'} style={{ textDecoration: 'none' }}>
               <li>Translator</li>
             </Link>
             <li>References</li>
