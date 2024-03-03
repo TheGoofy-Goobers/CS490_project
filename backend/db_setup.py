@@ -35,6 +35,28 @@ CREATE TABLE IF NOT EXISTS users (
 """
 cursor.execute(create_user_table_query)
 
+# create sessions table
+create_sessions_table_query = """
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(128) COLLATE utf8mb4_bin NOT NULL,
+  expires INT(11) UNSIGNED NOT NULL,
+  data MEDIUMTEXT COLLATE utf8mb4_bin,
+  PRIMARY KEY (session_id)
+) ENGINE=InnoDB
+"""
+cursor.execute(create_sessions_table_query)
+
+# create sessions table
+create_sessions_table_query = """
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id VARCHAR(128) COLLATE utf8mb4_bin NOT NULL,
+  expires INT(11) UNSIGNED NOT NULL,
+  data MEDIUMTEXT COLLATE utf8mb4_bin,
+  PRIMARY KEY (session_id)
+) ENGINE=InnoDB
+"""
+cursor.execute(create_sessions_table_query)
+
 # create feedback form table
 create_feedback_table_query = """
 CREATE TABLE IF NOT EXISTS user_feedback (
