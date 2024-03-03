@@ -94,12 +94,23 @@ Start MySQL server
 `sudo service mysql start`
 You can check the status with
 `sudo service mysql status`
+
 For Windows users:
 Visit the following page
 `https://dev.mysql.com/downloads/installer/`
-Download the installer and go through the setup wizard with default settings
-Make sure to select full install
-If you are prompted to set a password, take note of it for the `.env` file later
+Download the installer and go through the setup wizard with default settings  
+Make sure to select full install  
+
+Set up the `.env` file  
+Create a new file named `.env` in backend  
+Add the following information  
+Make sure to update the MYSQL_PASSWORD if you set one for root  
+```
+MYSQL_HOST='localhost'
+MYSQL_USER='root'
+MYSQL_DB='codecraft'
+MYSQL_PASSWORD=''
+```
 
 Install the python dependencies
 ```
@@ -112,7 +123,7 @@ cd backend
 python db_setup.py
 ```
 
-Make sure the server is running
+Make sure the server is running  
 For UNIX users:
 `sudo service mysql status`
 For Windows users:
