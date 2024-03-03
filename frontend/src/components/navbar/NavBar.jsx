@@ -20,7 +20,9 @@ const NavBar = () => {
               <li>Translator</li>
             </Link>
             <li>References</li>
+            <Link to={'/feedback'} style={{ textDecoration: 'none' }}>
             <li>Feedback</li>
+            </Link>
           </ul>
         </div>
         <div className='nav-bar-log-in'>

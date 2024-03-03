@@ -21,7 +21,7 @@ const Home = () => {
                 <div className="step1">
                     <h3>Choose Input and Output Language</h3>
                     <img src={javascr}/>
-                    <img src={cprog}/>
+                    <img src={cprog}/>  
                 </div>
                 <img src={arrow}/>
                 <div className="step2">

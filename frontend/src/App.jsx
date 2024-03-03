@@ -6,6 +6,7 @@ import './App.css'; // Assuming you have global styles here
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
 import Register from './components/Registration/RegistrationPage.jsx'
+import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path='/translate' element={<TranslatePage />}/>
             <Route path='/login' element={<LoginPage />}/>
             <Route path='/register' element={<Register />}/>
+            <Route path='/feedback' element={<Feedback />}/>
           </Routes>
       </div>
     </div>
