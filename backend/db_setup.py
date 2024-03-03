@@ -14,12 +14,11 @@ mysql_config = {
 # connect to server
 connection = mysql.connector.connect(**mysql_config)
 
-# create database if it doesn't exist
+# create and switch to the database
 create_database_query = "CREATE DATABASE IF NOT EXISTS codecraft"
 cursor = connection.cursor()
 cursor.execute(create_database_query)
 
-# switch to the 'codecraft' database
 mysql_config['database'] = 'codecraft'
 connection.close()
 connection = mysql.connector.connect(**mysql_config)
@@ -36,9 +35,22 @@ CREATE TABLE IF NOT EXISTS users (
 """
 cursor.execute(create_user_table_query)
 
-# commit changes
-connection.commit()
+# create feedback form table
+create_feedback_table_query = """
+CREATE TABLE IF NOT EXISTS user_feedback (
+    user_id INT NOT NULL PRIMARY KEY,
+    precision_rating INT CHECK (precision_rating BETWEEN 1 AND 5),
+    ease_rating INT CHECK (ease_rating BETWEEN 1 AND 5),
+    speed_rating INT CHECK (speed_rating BETWEEN 1 AND 5),
+    future_use_rating INT CHECK (future_use_rating BETWEEN 1 AND 5),
+    note VARCHAR(300),
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT user_exists FOREIGN KEY (user_id) REFERENCES users(user_id)
+)
+"""
+cursor.execute(create_feedback_table_query)
 
-# close cursor and connection
+# save changes and close
+connection.commit()
 cursor.close()
 connection.close()
