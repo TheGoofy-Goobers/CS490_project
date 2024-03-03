@@ -84,7 +84,7 @@ You may need to run `npm install axios`, I'm not sure.
 ## DATABASE SETUP:
 For more information consult https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/
 
-Install MySQL  
+### Install MySQL  
 For UNIX users (Debian/Ubuntu-based):
 ```
 sudo apt update
@@ -101,7 +101,7 @@ Visit the following page
 Download the installer and go through the setup wizard with default settings  
 Make sure to select full install  
 
-Set up the `.env` file  
+### Set up the `.env` file  
 Create a new file named `.env` in backend  
 Add the following information  
 Make sure to update the MYSQL_PASSWORD if you set one for root  
@@ -112,7 +112,7 @@ MYSQL_DB='codecraft'
 MYSQL_PASSWORD=''
 ```
 
-Install the python dependencies
+### Install the python dependencies
 ```
 pip install mysql
 pip install mysql-connector
@@ -123,7 +123,7 @@ cd backend
 python db_setup.py
 ```
 
-Make sure the server is running  
+### Make sure the server is running (debugging)  
 For UNIX users:  
 `sudo service mysql status`  
 For Windows users:  
