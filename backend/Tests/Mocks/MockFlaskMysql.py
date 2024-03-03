@@ -9,6 +9,9 @@ class MockFlaskMysqlConnection:
     def commit(self = None):
         pass
 
+    def rollback(self = None):
+        pass
+
 class MockFlaskMysqlCursor:
 
     def __init__(self):
