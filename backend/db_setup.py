@@ -38,6 +38,7 @@ cursor.execute(create_user_table_query)
 # create feedback form table
 create_feedback_table_query = """
 CREATE TABLE IF NOT EXISTS user_feedback (
+    feedback_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     precision_rating INT CHECK (precision_rating BETWEEN 1 AND 5),
     ease_rating INT CHECK (ease_rating BETWEEN 1 AND 5),
