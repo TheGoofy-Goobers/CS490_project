@@ -1,5 +1,5 @@
 import React from 'react';
-import TranslatePage from './components/translatepage/TranslatePage.jsx';
+import TranslatePage from './components/translatepage/TranslatePage';
 import NavBar from './components/navbar/NavBar';
 import Home from './components/homepage/Home' 
 import './App.css'; // Assuming you have global styles here

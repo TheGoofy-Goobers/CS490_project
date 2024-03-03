@@ -42,7 +42,12 @@ root/
 ## Serve the app
 `cd frontend`
 `npm start` starts frontend
-`npm run start-backend` starts backend
+For UNIX, `npm run start-backend` starts backend
+For Windows, `npm run run-backend` starts backend
+
+## Run test suite
+`cd frontend`
+`npm run test-backend`
 
 ## PROJECT SETUP:
 Follow https://dev.to/nagatodev/how-to-connect-flask-to-reactjs-1k8i for more extensive details

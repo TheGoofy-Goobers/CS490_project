@@ -7,15 +7,20 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
+    "codemirror": "^5.65.16",
     "react": "^18.2.0",
+    "react-codemirror2": "^7.3.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
+    "react-router-dom": "^6.22.2",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-backend": "cd ../backend && python -m flask run --no-debugger",
+    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger", 
+    "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger",
+    "test-backend": "cd ../backend && python -m pytest Tests/",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
