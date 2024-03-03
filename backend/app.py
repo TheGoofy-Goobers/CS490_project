@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, redirect, session
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 import json
 from functions import validate_email, validate_username
 import os
 from dotenv import load_dotenv
+from flask_session import Session
 
 load_dotenv()
 
@@ -12,6 +13,14 @@ load_dotenv()
 def create_app(testing: bool):
     api = Flask(__name__)
     CORS(api)
+
+     # Session Configuration
+    api.config['SESSION_TYPE'] = 'mysql'
+    api.config['SESSION_PERMANENT'] = True
+    api.config['SESSION_USE_SIGNER'] = True
+    api.config['SESSION_KEY_PREFIX'] = 'cc'
+
+    Session(api)  # Initialize session object
 
     # mysql configurations
     api.config['MYSQL_CURSORCLASS'] = 'DictCursor'
@@ -125,7 +134,9 @@ def create_app(testing: bool):
 
         # make sure password matches
         if encrypted_pw == user['password']:
-            # TODO: set user session
+            session['user_id'] = user['user_id']
+            session['username'] = username
+            session.permanent = True
             response["user_id"] = user['user_id']
             response["success"] = True
             del user['password']
@@ -140,7 +151,9 @@ def create_app(testing: bool):
     
     @api.route('/userLogoffRequest')
     def user_logoff():
-        # TODO: cancel user session
-        pass
-        
+        session.clear()
+        return redirect('/login')
+        # replace w redirect
+    
     return api
+
