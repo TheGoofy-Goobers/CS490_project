@@ -1,39 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-import TranslatePage from './components/translatepage/TranslatePage.jsx'
-import RegistrationPage from './components/Registration/RegistrationPage.jsx'; // Adjust the path as necessary
-import LoginPage from './components/LoginPage/LoginPage.jsx'; // Adjust the path as necessary
+import TranslatePage from './components/translatepage/TranslatePage';
+import NavBar from './components/navbar/NavBar';
+import Home from './components/homepage/Home' 
 import './App.css'; // Assuming you have global styles here
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-const Navigation = () => {
-  const location = useLocation();
-
-  // Only show the navigation bar on the register and login pages
-  if (location.pathname === '/register' || location.pathname === '/login') {
-    return (
-      <nav>
-        <Link to="/register">Register</Link> | 
-        <Link to="/login">Login</Link>
-      </nav>
-    );
-  }
-
-  return null;
-};
 
 function App() {
-
   return (
-    <Router>
-      <div className="App">
-        <Navigation />
-        <Routes>
-          <Route path="/" element={<TranslatePage />} />
-          <Route path="/register" element={<RegistrationPage />} />
-          <Route path="/login" element={<LoginPage />} />
-        </Routes>
+    <div className="App">
+      <NavBar />
+      <div className='routing'>
+          <Routes>
+            <Route path='/' element={<Home />}/>
+            <Route path='/translate' element={<TranslatePage />}/>
+          </Routes>
       </div>
-    </Router>
+    </div>
   );
 }
 
