@@ -19,6 +19,7 @@
   }
   
   .nav-bar-links li {
+    font-family: "Proxima Nova", sans-serif;
     margin: 0;
     padding-top: 30px;
     padding-left: 20px;
@@ -26,24 +27,40 @@
     color: white;
   }
   
-  .nav-bar-logo-container {
+  /* .nav-bar-logo-container {
     display: block;
     float: left;
     padding-left: 2%;
   }
 
 .nav-bar-log-in {
-    padding-left: 80%;
+    padding-left: 90%;
     padding-right: 0;
     padding: 10px;
-    display: flex;
-    justify-content: right;
+    display: block;
 }
 
 .nav-bar-log-in img {
     padding-top: 0.5%;
-    padding-left: 0;
-    padding-right: 5%;
+    padding-right: 2%;
     padding-bottom: 1%;
     margin-bottom: 0%;
+    align-items: right;
+} */
+
+.nav-bar-container {
+    max-width: 1200px; /* Adjust the max-width to your desired value */
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+.nav-bar-log-in {
+    margin-left: auto; /* Push icons to the right */
+    padding: 10px; /* You don't need padding-left and padding-right separately */
+    display: flex; /* Ensure flex layout */
+    align-items: center; /* Align items vertically */
+}
+
+.nav-bar-log-in img {
+    margin-left: 10px; /* Add some space between icons */
 }
