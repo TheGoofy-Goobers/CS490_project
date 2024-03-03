@@ -95,9 +95,9 @@ Start MySQL server
 You can check the status with
 `sudo service mysql status`
 
-For Windows users:
-Visit the following page
-`https://dev.mysql.com/downloads/installer/`
+For Windows users:  
+Visit the following page  
+`https://dev.mysql.com/downloads/installer/`  
 Download the installer and go through the setup wizard with default settings  
 Make sure to select full install  
 
