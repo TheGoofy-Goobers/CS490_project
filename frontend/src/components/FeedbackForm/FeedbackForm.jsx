@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './FeedbackForm.css';
-import { FLASK_URL } from '../../vars.js'
+import { FLASK_URL } from '../../vars.js';
+import axios from 'axios';
 
 function FeedbackForm() {
   const [limit, setLimit] = useState(300);
@@ -14,15 +15,39 @@ function FeedbackForm() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // reset
-    setOpenEnded('');
-    setRatings({
-      question1: '',
-      question2: '',
-      question3: '',
-      question4: ''
+
+    const feedbackData = {
+      // TODO: sync user_id with session variables
+      user_id: 1,
+      precision_rating: parseInt(ratings.question1),
+      ease_rating: parseInt(ratings.question2),
+      speed_rating: parseInt(ratings.question3),
+      future_use_rating: parseInt(ratings.question4),
+      note: openended
+    };
+
+    axios.post(`${FLASK_URL}/submitFeedback`, feedbackData)
+    .then((response) => {
+      const res = response.data;
+      console.log(`Response has error: ${res.hasError}`);
+      if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+      else console.log('Feedback submitted successfully');
+      // reset form state here if successful
+      setOpenEnded('');
+      setRatings({
+        question1: '',
+        question2: '',
+        question3: '',
+        question4: ''
+      });
+      setLimit(300);
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response);
+        console.log(error.response.status);
+        console.log(error.response.headers);
+      }
     });
-    setLimit(300);
   };
 
   const handleRatingChange = (question, value) => {
