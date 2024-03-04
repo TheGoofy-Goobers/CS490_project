@@ -136,11 +136,6 @@ def create_app(testing: bool):
             del user['password']
 
         return response
-    
-    @api.route('/userLogoffRequest')
-    def user_logoff():
-        # TODO: cancel user session
-        pass
         
     @api.route('/submitFeedback', methods=['POST'])
     def submit_feedback():

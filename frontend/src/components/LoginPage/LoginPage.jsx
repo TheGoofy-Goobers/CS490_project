@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginPage.css';
 import { FLASK_URL } from '../../vars';
 import axios from 'axios';
+import SHA256 from 'crypto-js/sha256';
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
@@ -25,7 +26,13 @@ const LoginPage = () => {
   // TODO: frontend should encrypt password
   var res
   const login = () => {
-    axios.post(`${FLASK_URL}/userLoginCredentials`, credentials)
+    const hashedPassword = SHA256(credentials.password).toString();
+    const loginData = {
+      ...credentials,
+      password: hashedPassword, // Use the hashed password
+    };
+
+    axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)
     .then((response) => {
       res = response.data
       if (res.success) {
