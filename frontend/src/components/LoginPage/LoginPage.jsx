@@ -3,6 +3,7 @@ import './LoginPage.css';
 import { FLASK_URL } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
+import { v4 as uuidv4 } from 'uuid';
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
@@ -22,14 +23,13 @@ const LoginPage = () => {
     console.log('Login credentials:', credentials);
   };
 
-  //TODO handle login response and redirection on front end
-  // TODO: frontend should encrypt password
+  // TODO: handle login response and redirection on front end
   var res
   const login = () => {
     const hashedPassword = SHA256(credentials.password).toString();
     const loginData = {
       ...credentials,
-      password: hashedPassword, // Use the hashed password
+      password: hashedPassword,
     };
 
     axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)
@@ -38,6 +38,8 @@ const LoginPage = () => {
       if (res.success) {
         sessionStorage.setItem('isLoggedIn', 'true')
         sessionStorage.setItem('userId', res.user_id.toString())
+        const sessionToken = uuidv4();
+        sessionStorage.setItem('sessionToken', sessionToken)
         delete credentials.username
         delete credentials.password
       }
