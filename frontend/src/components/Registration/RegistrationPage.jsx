@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios'
 import { FLASK_URL } from '../../vars';
 import './RegistrationPage.css';
+import SHA256 from 'crypto-js/sha256';
 
 const RegistrationPage = () => {
   const [user, setUser] = useState({
@@ -25,7 +26,13 @@ const RegistrationPage = () => {
   var res
   const register = () => {
     // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
-    axios.post(`${FLASK_URL}/registerNewUser`, user)
+    const hashedPassword = SHA256(user.password).toString()
+    const userData = {
+      ...user,
+      password: hashedPassword,
+    };
+
+    axios.post(`${FLASK_URL}/registerNewUser`, userData)
     .then((response) => {
       res = response.data
       if (res.success) {

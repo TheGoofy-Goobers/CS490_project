@@ -125,7 +125,6 @@ def create_app(testing: bool):
 
         # make sure password matches
         if encrypted_pw == user['password']:
-            # TODO: set user session
             response["user_id"] = user['user_id']
             response["success"] = True
             del user['password']
@@ -137,11 +136,6 @@ def create_app(testing: bool):
             del user['password']
 
         return response
-    
-    @api.route('/userLogoffRequest')
-    def user_logoff():
-        # TODO: cancel user session
-        pass
         
     @api.route('/submitFeedback', methods=['POST'])
     def submit_feedback():

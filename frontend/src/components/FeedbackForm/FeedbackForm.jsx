@@ -18,7 +18,7 @@ function FeedbackForm() {
 
     const feedbackData = {
       // TODO: sync user_id with session variables
-      user_id: 1,
+      user_id: parseInt(sessionStorage.getItem("userId")),
       precision_rating: parseInt(ratings.question1),
       ease_rating: parseInt(ratings.question2),
       speed_rating: parseInt(ratings.question3),

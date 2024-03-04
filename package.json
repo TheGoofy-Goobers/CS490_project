@@ -3,6 +3,7 @@
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
     "codemirror": "^5.65.16",
+    "crypto-js": "^4.2.0",
     "react-codemirror2": "^7.3.0"
   }
 }

@@ -150,8 +150,3 @@ class TestRegistrationLoginLogout:
         assert response["hasError"]
         assert "errorMessage" in response
         assert response["errorMessage"] == "Invalid format for username or email"
-
-    # TODO: This unit test
-    def test_user_logout_success(self, client):
-        assert False
-
