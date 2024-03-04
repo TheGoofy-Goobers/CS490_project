@@ -26,12 +26,13 @@ const NavBar = () => {
           </ul>
         </div>
         <div className='nav-bar-log-in'>
-          <Link to={'/register'}>
+          {/* <Link to={'/register'}>
           <img src={github} height={40} alt="GitHub"/>
-          </Link>
+          </Link> */}
           <Link to={'/login'}>
           <img src={profile} height={40} alt="Profile"/>
           </Link>
+          
         </div>
       </div>
     </div>

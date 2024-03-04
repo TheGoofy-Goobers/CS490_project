@@ -23,6 +23,13 @@ const LoginPage = () => {
     console.log('Login credentials:', credentials);
   };
 
+  const handleLogout = (e) => {
+    e.preventDefault();
+    // Handle logout logic here
+    logout();
+    console.log('User logged out');
+};
+
   // TODO: handle login response and redirection on front end
   var res
   const login = () => {
@@ -54,6 +61,11 @@ const LoginPage = () => {
     })
   }
 
+
+  const logout = () => {
+    sessionStorage.clear();
+  }
+
   return (
     <div className="login-page-container">
       <div className="login-form-box">
@@ -79,10 +91,21 @@ const LoginPage = () => {
               className="login-form-control"
             />
           </div>
+          <a href='/register'>
+            Don't have an account? Register here
+          </a>
           <div className="login-button-container">
             <button type="submit" className="login-form-button">Login</button>
           </div>
         </form>
+        {sessionStorage.getItem("isLoggedIn") && 
+        <form onSubmit={handleLogout}>
+            <div className="login-button-container">
+              <button type="submit" className="login-form-button">Logout</button>
+            </div>
+          </form>}
+          
+        
       </div>
     </div>
   );
