@@ -28,7 +28,9 @@ const LoginPage = () => {
     axios.post(`${FLASK_URL}/userLoginCredentials`, credentials)
     .then((response) => {
       res = response.data
-      if (response.success) {
+      if (res.success) {
+        sessionStorage.setItem('isLoggedIn', 'true')
+        sessionStorage.setItem('userId', res.user_id.toString())
         delete credentials.username
         delete credentials.password
       }

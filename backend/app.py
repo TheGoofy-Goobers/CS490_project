@@ -125,7 +125,6 @@ def create_app(testing: bool):
 
         # make sure password matches
         if encrypted_pw == user['password']:
-            # TODO: set user session
             response["user_id"] = user['user_id']
             response["success"] = True
             del user['password']
