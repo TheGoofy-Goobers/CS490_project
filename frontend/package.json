@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
     "codemirror": "^5.65.16",
@@ -18,7 +16,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger", 
+    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger",
     "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger",
     "test-backend": "cd ../backend && python -m pytest Tests/",
     "build": "react-scripts build",
@@ -42,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1"
   }
 }
