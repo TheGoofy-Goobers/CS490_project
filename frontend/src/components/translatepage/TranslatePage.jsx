@@ -76,28 +76,36 @@ const TranslatePage = () => {
 
   // Example validation functions for each language
   const validateJavaScript = (text) => {
-    // Very basic example: check if text includes a function keyword or semicolon
-    return text.includes('function') || text.includes(';');
+    // Check for common JavaScript patterns and syntax
+    return /function|var|let|const|=>|console\.log\(/.test(text);
   };
-
+  
   const validatePython = (text) => {
-    // Basic example: check for Python-specific keywords
-    return text.includes('def') || text.includes('import');
+    // Enhanced Python validation to exclude non-Python code and include Python-specific syntax
+    // Check for clear signs of Python code
+    const pythonSigns = /def |import |print\(|if |elif |else:|for |in |range\(|class |self/.test(text);
+    // Check for patterns common in JavaScript/JSX, indicating it's likely not Python
+    const nonPythonSigns = /import .* from '.*'|class .* extends|return \(<\/?[\w\s="/.]+>\);|export default /.test(text);
+    
+    // Consider valid if it looks like Python and doesn't contain patterns common in JavaScript/JSX
+    return pythonSigns && !nonPythonSigns;
   };
-
+  
   const validateCpp = (text) => {
-    // Basic example: check for C++ specific indicators
-    return text.includes('#include') || text.includes('int main');
+    // Check for C++ specific indicators, including common library includes and main function
+    return /#include <iostream>|using namespace std;|int main\(\)|cout <<|cin >>/.test(text);
   };
-
+  
   const validateJava = (text) => {
-    return text.includes('class') || text.includes('import java.');
+    // Enhanced to include class definition, main method, and common print statement
+    return /class |import java.|public static void main|System\.out\.println\(/.test(text);
   };
   
   const validateRust = (text) => {
-    return text.includes('fn') || text.includes('use ');
+    // Check for Rust-specific syntax, including function declaration and common imports
+    return /fn |use |let |println!\(|struct |enum |impl |mod |pub /.test(text);
   };
-
+  
   const isValidInput = (text, language) => {
     switch (language) {
       case 'JavaScript':
@@ -114,21 +122,26 @@ const TranslatePage = () => {
         return false; // Consider invalid if language is not recognized
     }
   };
+  
 
   const handleTranslate = () => {
+    if (typeof inputText !== 'string' || inputText.trim() === '') {
+      console.error('inputText is undefined, not a string, or empty');
+      return;
+    }
+  
     // Validate input text before translating
     if (!isValidInput(inputText, sourceLanguage)) {
       alert(`Invalid ${sourceLanguage} code. Please check your input and try again.`);
       return; // Prevent translation from proceeding
     }
-
+  
     // Proceed with translation if input is valid
     setOutputText(inputText); // Placeholder for actual translation logic
   };
 
-  const handleCopyToClipboard = () => {
+  const handleCopyToClipboard = (onSuccess) => {
     navigator.clipboard.writeText(outputText).then(() => {
-      // You can display some message to the user indicating the text was copied
       console.log('Copied to clipboard');
     });
   };
