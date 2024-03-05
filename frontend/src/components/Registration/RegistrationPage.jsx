@@ -4,7 +4,10 @@ import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { v4 as uuidv4 } from 'uuid';
+<<<<<<< HEAD
 
+=======
+>>>>>>> 17416d7cf851bc766a1914f816f9ce12d2199530
 
 const RegistrationPage = () => {
   //TODO: Improve the logic here so the page doesnt actually load before redirecting
@@ -38,7 +41,7 @@ const RegistrationPage = () => {
     delete user.password
     const userData = {
       ...user,
-      password: hashedPassword,
+      password: hashedPassword
     };
 
     axios.post(`${FLASK_URL}/registerNewUser`, userData)
