@@ -5,7 +5,7 @@ import './NavBar.css';
 import profile from '../translatepage/Profile.png';
 import github from '../translatepage/github-logo.png';
 
-const NavBar = () => {
+const NavBar = ({loggedInUser}) => {
   return (
     <div className="nav-bar">
       <div className="nav-bar-banner">
@@ -26,12 +26,21 @@ const NavBar = () => {
           </ul>
         </div>
         <div className='nav-bar-log-in'>
-          <Link to={'/register'}>
+          {/* <Link to={'/register'}>
           <img src={github} height={40} alt="GitHub"/>
-          </Link>
+          </Link> */}
+          {loggedInUser &&
+            <div>
+              <span>Welcome, {loggedInUser}!</span>
+              <Link to={'/logout'}>
+                <button>Logout</button>
+              </Link>
+            </div>
+          }
           <Link to={'/login'}>
-          <img src={profile} height={40} alt="Profile"/>
+            <img src={profile} height={40} alt="Profile"/>
           </Link>
+          <div></div>
         </div>
       </div>
     </div>
