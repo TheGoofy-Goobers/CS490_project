@@ -81,9 +81,15 @@ def create_app(testing: bool):
         # insert new user into db
         cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, encrypted_pw))
         mysql.connection.commit()
+
+        # return user id
+        cur.execute("SELECT user_id FROM users WHERE username=%s", (username))
+        user = cur.fetchone()
+        user_id = user["user_id"]
         cur.close()
-        
+
         response["success"] = True
+        response["user_id"] = user_id
         return response
 
     @api.route('/userLoginCredentials', methods=['POST'])
