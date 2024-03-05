@@ -4,4 +4,105 @@ body {
 
 h2 h3 h1 {
     font-family: 'Proxima Nova', sans-serif;
+    color: white;
+}
+.title {
+    padding-top: 5%;
+    padding-right: 5%;
+    height: 80%;
+    width: 50%%;
+}
+
+.intro {
+    padding-right: 1%;
+}
+
+.four{
+    padding: 5% 0;
+}
+
+.steps {
+    font-family: 'Proxima Nova', sans-serif;
+    color: white;
+    display: flexbox;
+    padding-right: 8%;
+}
+
+.translate_now {
+    background-color: #ff7200;
+    border: none;
+    color: white;
+    padding: 0.5% 1%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 2em;
+    margin: 0.5% 1%;
+    border-radius: 1rem; /* Rounded edges */
+    font-family: "Proxima Nova", sans-serif; /* Use Proxima Nova font */
+}
+
+.steps {
+    display: flex;
+    justify-content: center;
+}
+
+.step1 {
+    background-color: #23272b;
+    border-radius: 10px;
+    width: 40%;
+    margin-top: 4%;
+}
+
+#langs {
+    padding-top: 0;
+    margin-bottom: 4%;
+    padding: 5%;
+    width: 40%;
+    height: 60%;
+    float: left;
+}
+
+#langs2 {
+    padding-top: 9%;
+    width: 35%;
+}
+
+.arrows {
+    padding-top: 6%;
+    padding-left: 5%;
+    padding-right: 5%;
+}
+
+.step1 {
+    width: 20%;
+    height: 20%;
+}
+
+.step2 {
+    width: 20%;
+    background-color: #23272b;
+    border-radius: 10px;
+    margin-top: 4%;
+}
+
+.step3 {
+    width: 20%;
+    background-color: #23272b;
+    border-radius: 10px;
+    margin-top: 4%;
+}
+
+.finished {
+    width: 50%;
+    height: 70%;
+}
+
+.finished {
+    width: 100%;
+}
+
+.paste {
+    width: 30%;
+    height: 60%;
 }
