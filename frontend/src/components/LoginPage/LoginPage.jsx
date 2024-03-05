@@ -20,6 +20,7 @@ const LoginPage = () => {
     e.preventDefault();
     // Handle login logic here
     login()
+    window.location.reload();
     console.log('Login credentials:', credentials);
   };
 
@@ -28,6 +29,8 @@ const LoginPage = () => {
     // Handle logout logic here
     logout();
     console.log('User logged out');
+    window.location.reload();
+
 };
 
   // TODO: handle login response and redirection on front end
@@ -61,7 +64,6 @@ const LoginPage = () => {
     })
   }
 
-
   const logout = () => {
     sessionStorage.clear();
   }
@@ -69,6 +71,7 @@ const LoginPage = () => {
   return (
     <div className="login-page-container">
       <div className="login-form-box">
+        {!sessionStorage.getItem("isLoggedIn") &&
         <form onSubmit={handleSubmit}>
           <h2>Login</h2>
           <div className="login-form-group">
@@ -98,14 +101,18 @@ const LoginPage = () => {
             <button type="submit" className="login-form-button">Login</button>
           </div>
         </form>
-        {sessionStorage.getItem("isLoggedIn") && 
-        <form onSubmit={handleLogout}>
-            <div className="login-button-container">
-              <button type="submit" className="login-form-button">Logout</button>
-            </div>
-          </form>}
-          
-        
+        }
+        {
+        sessionStorage.getItem("isLoggedIn") &&
+        <div>
+          <h2>Hello there {sessionStorage.getItem("userId")}</h2> 
+          <form onSubmit={handleLogout}>
+              <div className="login-button-container">
+                <button type="submit" className="login-form-button">Logout</button>
+              </div>
+          </form>
+        </div>
+        }
       </div>
     </div>
   );
