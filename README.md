@@ -128,3 +128,9 @@ For UNIX users:
 `sudo service mysql status`  
 For Windows users:  
 Try `Get-Service -Name 'mysql*'` in PowerShell (untested)
+
+### Troubleshooting
+If you are having issues on UNIX, run:
+`sudo mysql`
+Once in MySQL:
+`ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';`
