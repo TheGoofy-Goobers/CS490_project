@@ -3,7 +3,8 @@ from Tests.Mocks.MockFlaskMysql import MockFlaskMysqlConnection, MockFlaskMysqlC
 from app import create_app
 import json
 from flask_mysqldb import MySQL
-class TestRegistrationLoginLogout:
+from mock import Mock
+class TestRegistrationLogin:
     @pytest.fixture()
     def app(self):
         app = create_app(True)
@@ -31,6 +32,8 @@ class TestRegistrationLoginLogout:
     def test_user_registration_success(self, client, username, email, password, monkeypatch):
         # mocks connection
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        test_mock = Mock(side_effect=[None, {"user_id": 1}])
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", test_mock)
 
         response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": email, "password": password}))
         response = response.json
@@ -72,9 +75,7 @@ class TestRegistrationLoginLogout:
     def test_user_registration_duplicate_username_fails(self, client, username, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        def seededReturn(self):
-            return {"username": "duplicateUser", "email" : "valid@email.com"}
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"username": "duplicateUser", "email" : "valid@email.com"})
 
         response = client.post("/registerNewUser", data=json.dumps({"username": username, "email": "sample.example@example.com", "password": "somepassword"}))
         response = response.json
@@ -88,9 +89,7 @@ class TestRegistrationLoginLogout:
     def test_user_registration_duplicate_email_fails(self, client, email, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        def seededReturn(self):
-            return {"username": "validUser", "email" : "duplicate@email.com"}
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"username": "validUser", "email" : "duplicate@email.com"})
 
         response = client.post("/registerNewUser", data=json.dumps({"username": "sampleUser", "email": email, "password": "somepassword"}))
         response = response.json
@@ -104,9 +103,7 @@ class TestRegistrationLoginLogout:
     def test_user_login_success(self, client, username, password, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        def seededReturn(self):
-            return {"user_id": "1", "password" : "validPassword"}
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": "1", "password" : "validPassword"})
 
         response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
         response = response.json
@@ -130,9 +127,7 @@ class TestRegistrationLoginLogout:
     def test_user_login_incorrect_password_returns_error_response(self, client, username, password, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        def seededReturn(self):
-            return {"user_id": 1, "password": "correctPassword"}
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", seededReturn)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1, "password": "correctPassword"})
 
         response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
         response = response.json

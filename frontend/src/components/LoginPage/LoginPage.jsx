@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
-import { FLASK_URL } from '../../vars';
+import { FLASK_URL, setSessionLogin } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { v4 as uuidv4 } from 'uuid';
@@ -50,7 +50,6 @@ const LoginPage = () => {
   // TODO: handle login response and redirection on front end
   var res
   const login = () => {
-
     const hashedPassword = SHA256(credentials.password + "CS490!").toString();
     const loginData = {
       ...credentials,
@@ -61,11 +60,7 @@ const LoginPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        sessionStorage.setItem('isLoggedIn', 'true')
-        sessionStorage.setItem('userId', res.user_id.toString())
-        const sessionToken = uuidv4();
-        sessionStorage.setItem('sessionToken', sessionToken)
-        setLoggedInUser(credentials.username);
+        setSessionLogin(res.user_id.toString())
         delete credentials.username
         delete credentials.password
         //history.push('/');

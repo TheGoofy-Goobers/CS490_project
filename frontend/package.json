@@ -3,12 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.3",
     "codemirror": "^5.65.16",
+    "enzyme": "^3.11.0",
     "react": "^18.2.0",
     "react-codemirror2": "^7.3.0",
     "react-dom": "^18.2.0",
@@ -45,10 +44,8 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.24.0",
-    "@babel/preset-env": "^7.24.0",
-    "@babel/preset-react": "^7.23.3",
-    "babel-jest": "^29.7.0",
-    "jest-fetch-mock": "^3.0.3"
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.1",
+    "enzyme-adapter-react-15": "^1.4.4"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
 import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
@@ -11,9 +11,12 @@ import 'codemirror/mode/clike/clike.js'; // for C++
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
-  const [sourceLanguage, setSourceLanguage] = useState('javascript');
-  const [targetLanguage, setTargetLanguage] = useState('python');
+  const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
+  const [targetLanguage, setTargetLanguage] = useState('Python');
 
+  useEffect(() => {
+    setInputText('');
+  }, [sourceLanguage]);
   const fileInputRef = useRef(null);
 
   const getMode = (language) => {
@@ -37,53 +40,133 @@ const TranslatePage = () => {
   // Function to handle file input change
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Handle the file upload here
-      console.log('File uploaded:', file.name);
-      // You can read the file and set it to inputText or perform other actions
+    if (!file) return;
+  
+    // Extensions based on the source language
+    const extensions = {
+      'JavaScript': ['.js'],
+      'Python': ['.py'],
+      'C++': ['.cpp', '.cxx', '.cc', '.h'],
+      'Java': ['.java'],
+      'Rust': ['.rs'],
+    };
+  
+    // Ensure the sourceLanguage matches the keys in the extensions object
+    const expectedExtensions = extensions[sourceLanguage];
+    
+    if (!expectedExtensions) {
+      console.error('No expected extensions found for the selected source language.');
+      return;
+    }
+  
+    const fileExtension = `.${file.name.split('.').pop()}`;
+  
+    if (!expectedExtensions.includes(fileExtension)) {
+      alert(`Please upload a file with the following extensions: ${expectedExtensions.join(', ')}`);
+      return;
+    }
+  
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setInputText(event.target.result);
+    };
+    reader.readAsText(file);
+  };
+  
+
+  // Example validation functions for each language
+  const validateJavaScript = (text) => {
+    // Check for common JavaScript patterns and syntax
+    return /function|var|let|const|=>|console\.log\(/.test(text);
+  };
+  
+  const validatePython = (text) => {
+    // Enhanced Python validation to exclude non-Python code and include Python-specific syntax
+    // Check for clear signs of Python code
+    const pythonSigns = /def |import |print\(|if |elif |else:|for |in |range\(|class |self/.test(text);
+    // Check for patterns common in JavaScript/JSX, indicating it's likely not Python
+    const nonPythonSigns = /import .* from '.*'|class .* extends|return \(<\/?[\w\s="/.]+>\);|export default /.test(text);
+    
+    // Consider valid if it looks like Python and doesn't contain patterns common in JavaScript/JSX
+    return pythonSigns && !nonPythonSigns;
+  };
+  
+  const validateCpp = (text) => {
+    // Check for C++ specific indicators, including common library includes and main function
+    return /#include <iostream>|using namespace std;|int main\(\)|cout <<|cin >>/.test(text);
+  };
+  
+  const validateJava = (text) => {
+    // Enhanced to include class definition, main method, and common print statement
+    return /class |import java.|public static void main|System\.out\.println\(/.test(text);
+  };
+  
+  const validateRust = (text) => {
+    // Check for Rust-specific syntax, including function declaration and common imports
+    return /fn |use |let |println!\(|struct |enum |impl |mod |pub /.test(text);
+  };
+  
+  const isValidInput = (text, language) => {
+    switch (language) {
+      case 'JavaScript':
+        return validateJavaScript(text);
+      case 'Python':
+        return validatePython(text);
+      case 'C++':
+        return validateCpp(text);
+      case 'Java':
+        return validateJava(text);
+      case 'Rust':
+        return validateRust(text);
+      default:
+        return false; // Consider invalid if language is not recognized
     }
   };
+  
 
   const handleTranslate = () => {
-    setOutputText(inputText);
+    if (typeof inputText !== 'string' || inputText.trim() === '') {
+      console.error('inputText is undefined, not a string, or empty');
+      return;
+    }
+  
+    // Validate input text before translating
+    if (!isValidInput(inputText, sourceLanguage)) {
+      alert(`Invalid ${sourceLanguage} code. Please check your input and try again.`);
+      return; // Prevent translation from proceeding
+    }
+  
+    // Proceed with translation if input is valid
+    setOutputText(inputText); // Placeholder for actual translation logic
   };
 
-  const handleCopyToClipboard = () => {
+  const handleCopyToClipboard = (onSuccess) => {
     navigator.clipboard.writeText(outputText).then(() => {
-      // You can display some message to the user indicating the text was copied
       console.log('Copied to clipboard');
     });
   };
   
   const handleDownloadCode = () => {
-    // Determine the MIME type based on the target language
-    let type = 'text/plain'; // Default MIME type
-    switch (targetLanguage) {
-      case 'JavaScript':
-        type = 'text/javascript';
-        break;
-      case 'Python':
-        type = 'text/x-python';
-        break;
-      case 'C++':
-        type = 'text/x-c++src';
-        break;
-      default:
-        break;
-    }
+    // Mapping of target language to file extension
+    const extensions = {
+      'JavaScript': 'js',
+      'Python': 'py',
+      'C++': 'cpp',
+      'Java': 'java',
+      'Rust': 'rs',
+    };
   
-    const blob = new Blob([outputText], { type });
+    // Determine the file extension based on the target language
+    const extension = extensions[targetLanguage] || 'txt';
+  
+    // Create a blob with the output text
+    const blob = new Blob([outputText], { type: 'text/plain' });
     const href = URL.createObjectURL(blob);
+  
+    // Create a temporary link to trigger the download
     const link = document.createElement('a');
     link.href = href;
-  
-    // Use the selected target language to determine the file extension
-    const extension = targetLanguage === 'JavaScript' ? 'js' :
-                      targetLanguage === 'Python' ? 'py' :
-                      targetLanguage === 'C++' ? 'cpp' :
-                      'txt'; // Fallback for unrecognized languages
-  
-    link.download = `translated_code.${extension}`;
+    link.download = `translated_code.${extension}`; // Use the extension directly
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -109,6 +192,8 @@ const TranslatePage = () => {
                   <option value="JavaScript">JavaScript</option>
                   <option value="Python">Python</option>
                   <option value="C++">C++</option>
+                  <option value="Java">Java</option>
+                  <option value="Rust">Rust</option>
                 </select>
               </div>
               <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
@@ -142,6 +227,8 @@ const TranslatePage = () => {
                 <option value="Python">Python</option>
                 <option value="JavaScript">JavaScript</option>
                 <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Rust">Rust</option>
               </select>
             </div>
             <div className="position-relative textarea-container">
