@@ -1,45 +1,69 @@
 // NavBar.test.js
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import NavBar from './NavBar'; // Import your NavBar component
+import NavBar from './NavBar';  // Replace with your actual NavBar component
+import { BrowserRouter } from 'react-router-dom';
 
 describe('NavBar', () => {
-    it('renders navigation links', () => {
-        render(<NavBar />);
+    it('renders the logo image with src correctly', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
 
-        // Check if the navigation links are rendered
-        const aboutLink = screen.getByText('About');
-        const contactLink = screen.getByText('Contact');
+        // Find the logo image
+        const logoImg = screen.getByAltText('Logo');
 
-        expect(aboutLink).toBeInTheDocument();
-        expect(contactLink).toBeInTheDocument();
+        // Assert that the image src matches your expected value
+        expect(logoImg.src).toContain('logo3.png');
     });
 
-    it('has correct href attributes', () => {
-        render(<NavBar />);
+    it('renders the logo image with src correctly', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
 
-        // Check if the href attributes are correct
-        const aboutLink = screen.getByText('About');
-        const contactLink = screen.getByText('Contact');
+        // Find the logo image
+        const logoImg = screen.getByAltText('Logo');
+        const link = screen.getAllByTestId('lin')
 
-        expect(aboutLink).toHaveAttribute('href', '/about');
-        expect(contactLink).toHaveAttribute('href', '/contact');
+        // Assert that the image src matches your expected value
+        expect(logoImg.src).toContain('logo3.png');
+        expect(link.href).toContain('/');
     });
 
-    it('should render a home link with an image', () => {
-        const wrapper = shallow(<NavBar />);  // Replace with your actual NavBar component
+    it('has correct href attributes for Translate and Feedback links', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
 
-        // Find the home link
-        const homeLink = wrapper.find(Link);
+        // Find the Translate and Feedback links
+        const transLink = screen.getByTestId('translink');
 
-        // Assert that the home link exists
-        expect(homeLink).toHaveLength(1);
+        // Assert that the href attributes are correct
+        expect(transLink.href).toContain('/translate');
+    });
 
-        // Assert that the home link contains an image
-        const homeImage = homeLink.find('img');
-        expect(homeImage).toHaveLength(1);
+    it('has correct href attributes for Translate and Feedback links', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
 
-        // Assert that the image has the correct src (replace with your actual image source)
-        expect(homeImage.prop('src')).toEqual('logo3.png');
+        // Find the Translate and Feedback links
+        const feedLink = screen.getByTestId('feedlink');
+
+        // Assert that the href attributes are correct
+        expect(feedLink.href).toContain('/feedback');
+    });
+
+    it('renders the profile image and sees it has link', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
+
+        // Find the logo image
+        const logoImg = screen.getByAltText('Profile');
+
+        // Assert that the image src matches your expected value
+        expect(logoImg.src).toContain('Profile.png');
     });
 });

@@ -14,7 +14,7 @@ const Home = () => {
     return (
         <div className="back">
             <div>
-            <img className="title" src={logo3}/>
+            <img className="title" src={logo3} alt='Logo'/>
 
             <div className="intro">
             <h2>codeCraft is where all your code translating needs are met!</h2>
@@ -40,12 +40,6 @@ const Home = () => {
                     <h3>ALL DONE!!! 
                         ENJOY YOUR NEW CODE</h3>
                     <img className="finished" src={congrats}/>
-                </div>
-                {/* remove later */}
-                <div>
-                    <p>Logged in? (THIS IS A FIELD FOR TESTING)</p>
-                    {sessionStorage.getItem("isLoggedIn") && <p>Yes</p>}
-                    {!sessionStorage.getItem("isLoggedIn") && <p>No</p>}
                 </div>
             </div>
             </div>

@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
 import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
+import References from './components/References/References.jsx';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState('');
@@ -20,6 +21,7 @@ function App() {
             <Route path='/login' element={<LoginPage  setLoggedInUser={setLoggedInUser}/>}/>
             <Route path='/register' element={<Register />}/>
             <Route path='/feedback' element={<Feedback />}/>
+            <Route path='/refernces' element={<References />}/>
           </Routes>
       </div>
     </div>
