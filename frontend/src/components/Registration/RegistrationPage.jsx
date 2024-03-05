@@ -3,6 +3,7 @@ import axios from 'axios'
 import { FLASK_URL } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
+import { v4 as uuidv4 } from 'uuid';
 
 const RegistrationPage = () => {
   const [user, setUser] = useState({
@@ -25,11 +26,14 @@ const RegistrationPage = () => {
 
   var res
   const register = () => {
+    const salt = uuidv4(); // Generate random salt NEW
+    const saltedPassword = user.password + salt; // Combine salt and password NEW
     // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
-    const hashedPassword = SHA256(user.password).toString()
+    const hashedPassword = SHA256(saltedPassword).toString()
+    // was const hashedPassword = SHA256(saltedPassword).toString();
     const userData = {
       ...user,
-      password: hashedPassword,
+      password: hashedPassword
     };
 
     axios.post(`${FLASK_URL}/registerNewUser`, userData)
