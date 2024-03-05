@@ -1,6 +1,5 @@
 import { mount } from 'enzyme'; // Import Enzyme's mount function
 import Home from './Home'; // Import your component
-import { mount } from 'enzyme';
 import { BrowserRouter } from 'react-router-dom';
 
 describe('Button Redirect Test', () => {
