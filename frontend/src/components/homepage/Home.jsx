@@ -32,6 +32,12 @@ const Home = () => {
                 <div className="step3">
                     <h3>ALL DONE!!!</h3>
                 </div>
+                {/* remove later */}
+                <div>
+                    <p>Logged in? (THIS IS A FIELD FOR TESTING)</p>
+                    {sessionStorage.getItem("isLoggedIn") && <p>Yes</p>}
+                    {!sessionStorage.getItem("isLoggedIn") && <p>No</p>}
+                </div>
             </div>
         </div>
     )

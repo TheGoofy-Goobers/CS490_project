@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
-import { FLASK_URL } from '../../vars';
+import { FLASK_URL, SITE_URL } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const RegistrationPage = () => {
+  //TODO: Improve the logic here so the page doesnt actually load before redirecting
+  if (sessionStorage.getItem("isLoggedIn")) {
+    window.location.assign(`${SITE_URL}`);
+  }
+
   const [user, setUser] = useState({
     username: '',
     email: '',
@@ -26,7 +33,9 @@ const RegistrationPage = () => {
   var res
   const register = () => {
     // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
-    const hashedPassword = SHA256(user.password).toString()
+    // TODO: Load added string from env variables
+    const hashedPassword = SHA256(user.password + "CS490!").toString()
+    delete user.password
     const userData = {
       ...user,
       password: hashedPassword,
@@ -39,7 +48,10 @@ const RegistrationPage = () => {
         alert("Registration Success!")
         delete user.username 
         delete user.email
-        delete user.password
+        sessionStorage.setItem('isLoggedIn', 'true')
+        sessionStorage.setItem("user_id", res.user_id.toString())
+        const sessionToken = uuidv4();
+        sessionStorage.setItem("sessionToken", sessionToken)
       }
       // TODO: Handle registration response and redirection on front end
       console.log(`Response has error: ${res.hasError}`)
