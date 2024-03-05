@@ -12,19 +12,7 @@ describe('NavBar', () => {
 
         // Find the logo image
         const logoImg = screen.getByAltText('Logo');
-
-        // Assert that the image src matches your expected value
-        expect(logoImg.src).toContain('logo3.png');
-    });
-
-    it('renders the logo image with src correctly', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
-
-        // Find the logo image
-        const logoImg = screen.getByAltText('Logo');
-        const link = screen.getAllByTestId('lin')
+        const link = screen.getByTestId('lin')
 
         // Assert that the image src matches your expected value
         expect(logoImg.src).toContain('logo3.png');
@@ -62,8 +50,23 @@ describe('NavBar', () => {
 
         // Find the logo image
         const logoImg = screen.getByAltText('Profile');
+        const link = screen.getByTestId('prof');
 
         // Assert that the image src matches your expected value
         expect(logoImg.src).toContain('Profile.png');
+        expect(link.href).toContain('/login');
+    });
+
+    it('renders refernce page correctly', () => {
+        render(<BrowserRouter>
+            <NavBar />
+          </BrowserRouter>);
+
+        // Find the logo image
+        
+        const link = screen.getByTestId('reflink')
+
+        // Assert that the image src matches your expected value
+        expect(link.href).toContain('/');
     });
 });
