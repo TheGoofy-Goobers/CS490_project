@@ -3,6 +3,12 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import NavBar from './NavBar';  // Replace with your actual NavBar component
 import { BrowserRouter } from 'react-router-dom';
+// Your test file
+import 'CS490_project/frontend/src/setupTests.js'; // Import the setup file first
+import { shallow } from 'enzyme';
+import React from 'react';
+
+// Your test cases go here
 
 describe('NavBar', () => {
     it('renders the logo image with src correctly', () => {

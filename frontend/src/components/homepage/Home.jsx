@@ -9,23 +9,12 @@ import jav from './Image 12.png'
 import { Link } from 'react-router-dom';
 import paste from './computer-icons-clipboard-cut-copy-and-paste-symbol-removebg-preview.png'
 import congrats from './confetti.png'
-import { useHistory } from 'react-router-dom';
-
 
 const Home = () => {
-
-function Button() {
-  const history = useHistory();
-
-  const handleButtonClick = () => {
-    // Replace '/target-page' with the actual path you want to redirect to
-    history.push('/translate');
-  };
-
     return (
         <div className="back">
             <div>
-            <img className="title" src={logo3} alt='Logo'/>
+            <img className="title" src={logo3}/>
 
             <div className="intro">
             <h2>codeCraft is where all your code translating needs are met!</h2>
@@ -62,10 +51,12 @@ function Button() {
                 <img src={jav}/>
             </div>
             <div>
-                <Button onClick={handleButtonClick} className="translate_now" >Try it out !!!</Button>
+                <Link to="/translate">
+                <button className="translate_now" >Try it out !!!</button>
+                </Link>
             </div>
         </div>
     )
 }
-}
+
 export default Home;
