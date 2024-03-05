@@ -54,3 +54,8 @@ describe('LoginPage Component', () => {
     expect(sessionStorageSpy).toHaveBeenCalled();
   });
 });
+
+// despite configuring Jest and Babel according to best practices, the tests are still failing due to unexpected token errors
+// reviewed Jest and Babel configurations, checked for syntax errors, verified dependencies, and attempted to clear the Jest cache
+// unexpected token errors can occur due to configuration mismatches, incompatible versions, file path issues, or conflicts within the project setup
+// 

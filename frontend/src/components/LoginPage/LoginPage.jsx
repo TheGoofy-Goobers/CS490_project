@@ -50,7 +50,8 @@ const LoginPage = () => {
   // TODO: handle login response and redirection on front end
   var res
   const login = () => {
-    const hashedPassword = SHA256(credentials.password).toString();
+
+    const hashedPassword = SHA256(credentials.password + "CS490!").toString();
     const loginData = {
       ...credentials,
       password: hashedPassword,
