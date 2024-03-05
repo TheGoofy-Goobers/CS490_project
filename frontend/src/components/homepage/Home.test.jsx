@@ -1,21 +1,16 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import NavBar from './NavBar';  // Replace with your actual NavBar component
-import { BrowserRouter } from 'react-router-dom';
+import { shallow } from 'enzyme'; // Import shallow rendering
+import Button from './Button'; // Import your button component
 
-describe('Home', () => {
-    it('Makes sure the button works', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
+describe('Button Component', () => {
+  it('should call the onClick handler when clicked', () => {
+    const mockClickHandler = jest.fn();
+    const wrapper = shallow(<Button onClick={mockClickHandler}>Click Me</Button>);
 
-        // Find the logo image
-        const logoImg = screen.getByAltText('Logo');
-        const link = screen.getByTestId('lin')
+    // Simulate a button click
+    wrapper.find('button').simulate('click');
 
-        // Assert that the image src matches your expected value
-        expect(logoImg.src).toContain('logo3.png');
-        expect(link.href).toContain('/');
-    });
-
+    // Check if the mockClickHandler was called
+    expect(mockClickHandler).toHaveBeenCalled();
+  });
 });
