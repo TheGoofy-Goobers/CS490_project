@@ -83,7 +83,7 @@ def create_app(testing: bool):
         mysql.connection.commit()
 
         # return user id
-        cur.execute("SELECT user_id FROM users WHERE username=%s", (username))
+        cur.execute("SELECT user_id FROM users WHERE username=%s", (username,))
         user = cur.fetchone()
         user_id = user["user_id"]
         cur.close()
