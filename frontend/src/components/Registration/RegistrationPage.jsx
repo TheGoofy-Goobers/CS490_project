@@ -3,7 +3,7 @@ import axios from 'axios'
 import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom'
 
 const RegistrationPage = () => {
 
@@ -12,6 +12,8 @@ const RegistrationPage = () => {
     email: '',
     password: '',
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,7 +46,7 @@ const RegistrationPage = () => {
         delete user.username 
         delete user.email
         setSessionLogin(res.user_id.toString())
-        window.location.href = SITE_URL + "/"
+        navigate('/')
       }
       // TODO: Handle registration response and redirection on front end
       console.log(`Response has error: ${res.hasError}`)
