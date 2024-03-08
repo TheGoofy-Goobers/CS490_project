@@ -3,7 +3,6 @@ import './LoginPage.css';
 import { FLASK_URL, setSessionLogin } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
-import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -14,21 +13,17 @@ const LoginPage = () => {
 
   const [loggedInUser, setLoggedInUser] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate hook
-  const [sessionTimer, setSessionTimer] = useState(null); // State to store the session timer
 
   useEffect(() => {
     // Check if user is already logged in
     if (sessionStorage.getItem('isLoggedIn')) {
       setLoggedInUser(sessionStorage.getItem('username'));
-      startSessionTimer(); // Start the session timer when the user is logged in
     }
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
-
-    resetSessionTimer();
   };
 
   const handleSubmit = (e) => {
@@ -63,10 +58,7 @@ const LoginPage = () => {
         setSessionLogin(res.user_id.toString())
         delete credentials.username
         delete credentials.password
-        //history.push('/');
         navigate('/'); 
-
-        startSessionTimer();
       }
       console.log(`Response has error: ${res.hasError}`)
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
@@ -81,34 +73,9 @@ const LoginPage = () => {
 
   const logout = () => {
     sessionStorage.clear();
-    clearSessionTimer();
+    //TODO: Find a new way to clear the session timer
+    //clearSessionTimer();
   }
-
-  const startSessionTimer = () => {
-    // Set a timeout for one hour (in milliseconds)
-    const timer = setTimeout(() => {
-      // Automatically log out the user after one hour
-      logout();
-      console.log('User timed out');
-    }, 60 * 60 * 1000); // 1 hour
-
-    // Store the timer ID in the state
-    setSessionTimer(timer);
-  };
-
-  const resetSessionTimer = () => {
-    // Clear the existing timer and start a new one on user interaction
-    clearSessionTimer();
-    startSessionTimer();
-  };
-
-  const clearSessionTimer = () => {
-    // Clear the session timer if it exists
-    if (sessionTimer) {
-      clearTimeout(sessionTimer);
-      setSessionTimer(null);
-    }
-  };
 
   return (
     <div>

@@ -6,10 +6,6 @@ import SHA256 from 'crypto-js/sha256';
 import { v4 as uuidv4 } from 'uuid';
 
 const RegistrationPage = () => {
-  //TODO: Improve the logic here so the page doesnt actually load before redirecting
-  if (sessionStorage.getItem("isLoggedIn")) {
-    window.location.assign(`${SITE_URL}?`);
-  }
 
   const [user, setUser] = useState({
     username: '',
@@ -55,6 +51,7 @@ const RegistrationPage = () => {
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       if(res.sqlErrors) console.log(`SQL Errors: ${res.sqlErrors}`)
+      if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
@@ -64,51 +61,55 @@ const RegistrationPage = () => {
     })
   }
 
-  return (
-    <div className="registration-page-container">
-      <div className="registration-form-box">
-        <form onSubmit={handleSubmit}>
-          <h2 className="registration-form-title">Register</h2>
-          <div className="registration-form-group">
-            <label>Username:</label>
-            <input 
-              type="text" 
-              name="username" 
-              value={user.username} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-form-group">
-            <label>Email:</label>
-            <input 
-              type="email" 
-              name="email" 
-              value={user.email} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-form-group">
-            <label>Password:</label>
-            <input 
-              type="password" 
-              name="password" 
-              value={user.password} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-button-container">
-            <button type="submit" className="registration-form-button">Register</button>
-          </div>
-        </form>
+  if(sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}?redirect=true`)
+  else
+  {  
+    return (
+      <div className="registration-page-container">
+        <div className="registration-form-box">
+          <form onSubmit={handleSubmit}>
+            <h2 className="registration-form-title">Register</h2>
+            <div className="registration-form-group">
+              <label>Username:</label>
+              <input 
+                type="text" 
+                name="username" 
+                value={user.username} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-form-group">
+              <label>Email:</label>
+              <input 
+                type="email" 
+                name="email" 
+                value={user.email} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-form-group">
+              <label>Password:</label>
+              <input 
+                type="password" 
+                name="password" 
+                value={user.password} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-button-container">
+              <button type="submit" className="registration-form-button">Register</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default RegistrationPage;
