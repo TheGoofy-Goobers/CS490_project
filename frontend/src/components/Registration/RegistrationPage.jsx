@@ -3,19 +3,17 @@ import axios from 'axios'
 import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom'
 
 const RegistrationPage = () => {
-  //TODO: Improve the logic here so the page doesnt actually load before redirecting
-  if (sessionStorage.getItem("isLoggedIn")) {
-    window.location.assign(`${SITE_URL}?`);
-  }
 
   const [user, setUser] = useState({
     username: '',
     email: '',
     password: '',
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,13 +46,14 @@ const RegistrationPage = () => {
         delete user.username 
         delete user.email
         setSessionLogin(res.user_id.toString())
-        window.location.href = SITE_URL + "/"
+        navigate('/')
       }
       // TODO: Handle registration response and redirection on front end
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       if(res.sqlErrors) console.log(`SQL Errors: ${res.sqlErrors}`)
+      if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
@@ -64,51 +63,55 @@ const RegistrationPage = () => {
     })
   }
 
-  return (
-    <div className="registration-page-container">
-      <div className="registration-form-box">
-        <form onSubmit={handleSubmit}>
-          <h2 className="registration-form-title">Register</h2>
-          <div className="registration-form-group">
-            <label>Username:</label>
-            <input 
-              type="text" 
-              name="username" 
-              value={user.username} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-form-group">
-            <label>Email:</label>
-            <input 
-              type="email" 
-              name="email" 
-              value={user.email} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-form-group">
-            <label>Password:</label>
-            <input 
-              type="password" 
-              name="password" 
-              value={user.password} 
-              onChange={handleChange} 
-              className="registration-form-control"
-              required
-            />
-          </div>
-          <div className="registration-button-container">
-            <button type="submit" className="registration-form-button">Register</button>
-          </div>
-        </form>
+  if(sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}?redirect=true`)
+  else
+  {  
+    return (
+      <div className="registration-page-container">
+        <div className="registration-form-box">
+          <form onSubmit={handleSubmit}>
+            <h2 className="registration-form-title">Register</h2>
+            <div className="registration-form-group">
+              <label>Username:</label>
+              <input 
+                type="text" 
+                name="username" 
+                value={user.username} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-form-group">
+              <label>Email:</label>
+              <input 
+                type="email" 
+                name="email" 
+                value={user.email} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-form-group">
+              <label>Password:</label>
+              <input 
+                type="password" 
+                name="password" 
+                value={user.password} 
+                onChange={handleChange} 
+                className="registration-form-control"
+                required
+              />
+            </div>
+            <div className="registration-button-container">
+              <button type="submit" className="registration-form-button">Register</button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default RegistrationPage;

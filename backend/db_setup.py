@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS user_feedback (
     future_use_rating INT CHECK (future_use_rating BETWEEN 1 AND 5),
     note VARCHAR(300),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT user_exists FOREIGN KEY (user_id) REFERENCES users(user_id)
+    CONSTRAINT user_exists FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """
 cursor.execute(create_feedback_table_query)
