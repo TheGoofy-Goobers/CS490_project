@@ -22,7 +22,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         gpt_response = gpt_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                { "role": "system", "content": "You are a helpful assistent who translates code from one language to another. Refrain from saying anything other than the translated code. The response can also omit the name of the language."},
+                { "role": "system", "content": "You are a helpful assistant who translates code from one language to another. Refrain from saying anything other than the translated code. The response can also omit the name of the language."},
                 { "role": "user", "content": f"Translate this code from {srcLang} to {toLang}:\n{message}"}
                 ],
             max_tokens=500,
