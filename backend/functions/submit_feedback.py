@@ -2,7 +2,7 @@ from flask_mysqldb import MySQL
 import json
 from flask import request
 
-def submit(mysql: MySQL) -> dict:
+def submit_feedback(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
     try:

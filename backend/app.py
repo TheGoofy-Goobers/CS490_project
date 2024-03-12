@@ -5,7 +5,7 @@ import json
 import os
 from dotenv import load_dotenv
 
-from functions import register_user as register, user_login as login, submit_feedback as feedback
+from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
 
 load_dotenv()
 
@@ -45,6 +45,19 @@ def create_app(testing: bool):
     #feedback page
     @api.route('/submitFeedback', methods=['POST'])
     def submit_feedback():
-        return feedback.submit(mysql)
+        return feedback.submit_feedback(mysql)
+
+
+    # code translation backend
+    @api.route('/translate', methods=['POST'])
+    def translate_code():
+        return translate.translate(mysql)
+
+
+    # translation feedback
+    @api.route('/translationFeedback', methods=['POST'])
+    def translation_feedback():
+        return translationFeedback.submit_feedback(mysql)
+
 
     return api
