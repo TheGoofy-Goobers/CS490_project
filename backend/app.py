@@ -1,7 +1,7 @@
 from flask import Flask, request
 from flask_cors import CORS
 from flask_mysqldb import MySQL
-import json
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
@@ -29,6 +29,7 @@ def create_app(testing: bool):
 
     mysql = MySQL(api)
     
+    gpt_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     # registration page
     @api.route('/registerNewUser', methods = ["POST"])
@@ -51,7 +52,7 @@ def create_app(testing: bool):
     # code translation backend
     @api.route('/translate', methods=['POST'])
     def translate_code():
-        return translate.translate(mysql)
+        return translate.translate(mysql, gpt_client)
 
 
     # translation feedback

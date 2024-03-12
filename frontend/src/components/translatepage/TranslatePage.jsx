@@ -7,6 +7,8 @@ import 'codemirror/theme/material.css';
 import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/clike/clike.js'; // for C++
+import axios from 'axios'
+import { FLASK_URL } from '../../vars'
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -135,9 +137,33 @@ const TranslatePage = () => {
       alert(`Invalid ${sourceLanguage} code. Please check your input and try again.`);
       return; // Prevent translation from proceeding
     }
-  
+
     // Proceed with translation if input is valid
-    setOutputText(inputText); // Placeholder for actual translation logic
+    getTranslation(inputText, sourceLanguage);
+  };
+
+  var res
+  const getTranslation = (inputText, sourceLanguage) => {
+    const message = {text: inputText, srcLang: sourceLanguage, toLang: targetLanguage}
+    alert("Starting translate")
+
+    axios.post(`${FLASK_URL}/translate`, message)
+    .then((response) => {
+      res = response.data
+      if (res.success) {
+        alert("Translate Success!")
+        setOutputText(res.output)
+      }
+      // TODO: Handle registration response and redirection on front end
+      console.log(`Response has error: ${res.hasError}`)
+      if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
+        }
+    })
   };
 
   const handleCopyToClipboard = (onSuccess) => {
