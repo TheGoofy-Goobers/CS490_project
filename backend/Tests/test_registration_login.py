@@ -4,6 +4,7 @@ from app import create_app
 import json
 from flask_mysqldb import MySQL
 from mock import Mock
+
 class TestRegistrationLogin:
     @pytest.fixture()
     def app(self):
@@ -70,7 +71,6 @@ class TestRegistrationLogin:
         assert "emailErrors" in response
         assert len(response["emailErrors"]) == 1
 
-    # TODO: These unit tests
     @pytest.mark.parametrize("username", [("duplicateUser")])
     def test_user_registration_duplicate_username_fails(self, client, username, monkeypatch):
         # mocks

@@ -9,7 +9,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'text' not in responseJson:
+    if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
