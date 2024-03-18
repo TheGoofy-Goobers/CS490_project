@@ -16,16 +16,22 @@ const NavBar = () => {
         </div>
         <div className="nav-bar-links">
           <ul>
-            <Link to={'/translate'}>
+            <Link to={'/translate'} style={{ textDecoration: 'none' }}>
               <li>Translator</li>
             </Link>
             <li>References</li>
+            <Link to={'/feedback'} style={{ textDecoration: 'none' }}>
             <li>Feedback</li>
+            </Link>
           </ul>
         </div>
         <div className='nav-bar-log-in'>
+          <Link to={'/register'}>
           <img src={github} height={40} alt="GitHub"/>
+          </Link>
+          <Link to={'/login'}>
           <img src={profile} height={40} alt="Profile"/>
+          </Link>
         </div>
       </div>
     </div>
