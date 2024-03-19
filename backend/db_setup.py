@@ -59,9 +59,9 @@ CREATE TABLE IF NOT EXISTS translation_history (
     original_code VARCHAR(2000),
     target_language VARCHAR(10),
     translated_code VARCHAR(2000),
-    status VARCHAR2(16),
+    status VARCHAR(16),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT user_exists FOREIN KEY (user_id) REFERENCES users(uder_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """
 cursor.execute(create_translation_table_query)
