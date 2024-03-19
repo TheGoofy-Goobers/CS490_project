@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
+from functions import api_status as status
 
 load_dotenv()
 
@@ -30,7 +31,7 @@ def create_app(testing: bool):
     mysql = MySQL(api)
     
     gpt_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+    
     # registration page
     @api.route('/registerNewUser', methods = ["POST"])
     def register_user():
@@ -60,5 +61,9 @@ def create_app(testing: bool):
     def translation_feedback():
         return translationFeedback.submit_feedback(mysql)
 
+
+    @api.route('/getApiStatus')
+    def get_status():
+        return status.get_status(gpt_client.api_key)
 
     return api

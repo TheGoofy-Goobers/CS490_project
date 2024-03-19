@@ -30,6 +30,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         )
         response["output"] = gpt_response.choices[0].message.content
         response["success"] = True
+        response["finish_reason"] = gpt_response.choices[0].finish_reason
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = str(e)

@@ -16,6 +16,19 @@ const TranslatePage = () => {
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
 
+  // TODO: Display the status on the page
+  axios.get(`${FLASK_URL}/getApiStatus`)
+  .then((response) => {
+    const res = response.data
+    console.log(`Status: ${res.code} ${res.reason}`)
+  }).catch((error) => {
+    if (error.response) {
+      console.log(error.response)
+      console.log(error.response.status)
+      console.log(error.response.headers)
+      }
+  })
+
   useEffect(() => {
     setInputText('');
   }, [sourceLanguage]);
@@ -145,16 +158,16 @@ const TranslatePage = () => {
   var res
   const getTranslation = (inputText, sourceLanguage) => {
     const message = {text: inputText, srcLang: sourceLanguage, toLang: targetLanguage}
-    alert("Starting translate")
 
     axios.post(`${FLASK_URL}/translate`, message)
     .then((response) => {
       res = response.data
+      // TODO: Handle other data being sent from backend
       if (res.success) {
-        alert("Translate Success!")
         setOutputText(res.output)
+        console.log(`Finish reason: ${res.finish_reason}`)
       }
-      // TODO: Handle registration response and redirection on front end
+      
       console.log(`Response has error: ${res.hasError}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
     }).catch((error) => {
