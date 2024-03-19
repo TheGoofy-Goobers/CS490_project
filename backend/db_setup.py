@@ -51,6 +51,21 @@ CREATE TABLE IF NOT EXISTS user_feedback (
 """
 cursor.execute(create_feedback_table_query)
 
+# create translation table
+create_translation_table_query = """
+CREATE TABLE IF NOT EXISTS translation_history (
+    user_id INT NOT NULL,
+    source_language VARCHAR2(10),
+    original_code VARCHAR2(2000),
+    target_language VARCHAR2(10),
+    translated_code VARCHAR2(2000),
+    status VARCHAR2(100),
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT user_exists FOREIN KEY (user_id) REFERENCES users(uder_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_translation_table_query)
+
 # save changes and close
 connection.commit()
 cursor.close()
