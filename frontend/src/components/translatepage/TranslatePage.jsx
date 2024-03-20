@@ -171,6 +171,8 @@ const TranslatePage = () => {
       if (res.success) {
         setOutputText(res.output)
         console.log(`Finish reason: ${res.finish_reason}`)
+        // TODO: handle potential errors from finish_reason (content_filter, length)
+        // Errors should be displayed 
       }
       
       console.log(`Response has error: ${res.hasError}`)

@@ -4,7 +4,6 @@ import Tests.Mocks.MockGptApi as MockGpt
 from app import create_app
 import json
 from flask_mysqldb import MySQL
-from mock import Mock
 from openai import resources
 
 
