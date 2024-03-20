@@ -30,15 +30,17 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
             lastSubmit = lastSubmit['submission_date']
             difference = datetime.datetime.now() - lastSubmit
             rate_limit = datetime.timedelta(seconds=5) # rate limit of 5 seconds
-            
+
             if difference < rate_limit:
                 response["hasError"] = True
                 response["errorMessage"] = "Rate limited: Wait another {:.2f} seconds".format(5 - difference.total_seconds())
+                cur.close()
                 return response
             
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = str(e)
+        cur.close()
         return response
 
     try:
