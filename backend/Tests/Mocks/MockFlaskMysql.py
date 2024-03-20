@@ -18,7 +18,7 @@ class MockFlaskMysqlCursor:
         pass
 
     def execute(self, query, format = None):
-        pass
+        return None
 
     def fetchone(self = None):
         return None

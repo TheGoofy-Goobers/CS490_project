@@ -37,7 +37,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
             "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
             (user_id, srcLang, message, toLang, response["output"], response["finish_reason"], gpt_response.usage.total_tokens)
         )
-        cur.connection.commit()
+        mysql.connection.commit()
         cur.close()
 
         response["success"] = True
