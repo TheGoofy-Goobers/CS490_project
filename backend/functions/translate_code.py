@@ -17,6 +17,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     message = responseJson['text']
     srcLang = responseJson['srcLang']
     toLang = responseJson['toLang']
+    user_id = responseJson['user_id']
 
     try:
         gpt_response = gpt_client.chat.completions.create(
@@ -29,8 +30,17 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
             temperature=0
         )
         response["output"] = gpt_response.choices[0].message.content
-        response["success"] = True
         response["finish_reason"] = gpt_response.choices[0].finish_reason
+
+        cur = mysql.connection.cursor()
+        cur.execute(
+            "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
+            (user_id, srcLang, message, toLang, response["output"], response["finish_reason"], gpt_response.usage.total_tokens)
+        )
+        cur.connection.commit()
+        cur.close()
+
+        response["success"] = True
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = str(e)

@@ -8,7 +8,7 @@ import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/clike/clike.js'; // for C++
 import axios from 'axios'
-import { FLASK_URL } from '../../vars'
+import { SITE_URL, FLASK_URL } from '../../vars'
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -152,12 +152,17 @@ const TranslatePage = () => {
     }
 
     // Proceed with translation if input is valid
-    getTranslation(inputText, sourceLanguage);
+    getTranslation();
   };
 
   var res
-  const getTranslation = (inputText, sourceLanguage) => {
-    const message = {text: inputText, srcLang: sourceLanguage, toLang: targetLanguage}
+  const getTranslation = () => {
+    const message = {
+      text: inputText, 
+      srcLang: sourceLanguage, 
+      toLang: targetLanguage, 
+      user_id: parseInt(sessionStorage.getItem("user_id"))
+    }
 
     axios.post(`${FLASK_URL}/translate`, message)
     .then((response) => {
@@ -211,95 +216,96 @@ const TranslatePage = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
-  // TODO: Might want to add this later? 
-  // if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
-  return (
-    <div className="translate-page">
-       
-        <div className="container main-content">
-        <div className="code-container">
-          <div className="code-box input-box">
-            <h2>Input</h2>
-            <div className="input-header">
+  if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  else{
+    return (
+      <div className="translate-page">
+        
+          <div className="container main-content">
+          <div className="code-container">
+            <div className="code-box input-box">
+              <h2>Input</h2>
+              <div className="input-header">
+                <div className="form-group">
+                  <label htmlFor="sourceLanguage">Source Language</label>
+                  <select
+                    className="form-control"
+                    id="sourceLanguage"
+                    value={sourceLanguage}
+                    onChange={(e) => setSourceLanguage(e.target.value)}
+                  >
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="C++">C++</option>
+                    <option value="Java">Java</option>
+                    <option value="Rust">Rust</option>
+                  </select>
+                </div>
+                <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileInputChange}
+                  style={{ display: 'none' }}
+                />
+              </div>
+              <CodeMirror
+                value={inputText}
+                options={{
+                  mode: getMode(sourceLanguage),
+                  theme: 'material',
+                  lineNumbers: true,
+                }}
+                onChange={(editor, data, value) => setInputText(value)}
+              />
+            </div>
+            <div className="code-box output-box">
+              <h2>Output</h2>
               <div className="form-group">
-                <label htmlFor="sourceLanguage">Source Language</label>
+                <label htmlFor="targetLanguage">Target Language</label>
                 <select
                   className="form-control"
-                  id="sourceLanguage"
-                  value={sourceLanguage}
-                  onChange={(e) => setSourceLanguage(e.target.value)}
+                  id="targetLanguage"
+                  value={targetLanguage}
+                  onChange={(e) => setTargetLanguage(e.target.value)}
                 >
-                  <option value="JavaScript">JavaScript</option>
                   <option value="Python">Python</option>
+                  <option value="JavaScript">JavaScript</option>
                   <option value="C++">C++</option>
                   <option value="Java">Java</option>
                   <option value="Rust">Rust</option>
                 </select>
               </div>
-              <FaUpload className="icon upload-icon" onClick={handleUploadClick} title="Upload File" />
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileInputChange}
-                style={{ display: 'none' }}
-              />
-            </div>
-            <CodeMirror
-              value={inputText}
-              options={{
-                mode: getMode(sourceLanguage),
-                theme: 'material',
-                lineNumbers: true,
-              }}
-              onChange={(editor, data, value) => setInputText(value)}
-            />
-          </div>
-          <div className="code-box output-box">
-            <h2>Output</h2>
-            <div className="form-group">
-              <label htmlFor="targetLanguage">Target Language</label>
-              <select
-                className="form-control"
-                id="targetLanguage"
-                value={targetLanguage}
-                onChange={(e) => setTargetLanguage(e.target.value)}
-              >
-                <option value="Python">Python</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="C++">C++</option>
-                <option value="Java">Java</option>
-                <option value="Rust">Rust</option>
-              </select>
-            </div>
-            <div className="position-relative textarea-container">
-              <CodeMirror
-                value={outputText}
-                options={{
-                  mode: getMode(targetLanguage),
-                  theme: 'material',
-                  lineNumbers: true,
-                  readOnly: true,
-                }}
-              />
-              <div className="icons">
-                <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
-                <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
+              <div className="position-relative textarea-container">
+                <CodeMirror
+                  value={outputText}
+                  options={{
+                    mode: getMode(targetLanguage),
+                    theme: 'material',
+                    lineNumbers: true,
+                    readOnly: true,
+                  }}
+                />
+                <div className="icons">
+                  <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
+                  <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="translate-button-container">
-          <button
-            id="translateBtn"
-            className="btn translate-button"
-            onClick={handleTranslate}
-          >
-            Translate
-          </button>
+          <div className="translate-button-container">
+            <button
+              id="translateBtn"
+              className="btn translate-button"
+              onClick={handleTranslate}
+            >
+              Translate
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default TranslatePage;

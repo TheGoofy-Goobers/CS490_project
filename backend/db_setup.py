@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS translation_history (
     translated_code VARCHAR(2000),
     status VARCHAR(16),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_tokens INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """
