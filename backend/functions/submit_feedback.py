@@ -35,6 +35,7 @@ def submit_feedback(mysql: MySQL) -> dict:
         cur.close()
 
         response["success"] = True
+        
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
