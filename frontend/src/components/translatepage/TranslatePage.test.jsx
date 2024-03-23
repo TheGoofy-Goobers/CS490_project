@@ -146,12 +146,6 @@ describe('TranslatePage Component', () => {
   });
 
   
-  
-  
-  
-
-  // Additional tests could include checking the file upload functionality,
-  // copying to clipboard, downloading code, etc., depending on the level of detail you want to test.
 });
 
 
