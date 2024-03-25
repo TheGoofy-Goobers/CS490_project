@@ -260,7 +260,9 @@ const TranslatePage = () => {
                   theme: 'material',
                   lineNumbers: true,
                 }}
-                onChange={(editor, data, value) => setInputText(value)}
+                onChange={(editor, data, value) => {
+                  setInputText(value); // This is the right approach for handling changes
+                }}
               />
             </div>
             <div className="code-box output-box">
