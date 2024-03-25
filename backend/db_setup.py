@@ -6,7 +6,7 @@ load_dotenv()
 
 # mysql connection parameters
 mysql_config = {
-    'host': os.getenv('MYSQL_HOST'),
+    'host': os.getenv('DB_URL'),
     'user': os.getenv('MYSQL_USER'),
     'password': os.getenv('MYSQL_PASSWORD'),
 }
