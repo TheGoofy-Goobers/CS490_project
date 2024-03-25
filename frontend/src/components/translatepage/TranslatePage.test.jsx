@@ -1,7 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TranslatePage from './TranslatePage'; // Adjust the import path as necessary
+import axios from 'axios';
 
+// Mock Axios
+jest.mock('axios');
 
 // Mock for getBoundingClientRect
 beforeAll(() => {
@@ -15,8 +18,15 @@ beforeAll(() => {
   }));
 });
 
+beforeAll(() => {
+  // Mock the window.location.assign with a jest function
+  delete window.location;
+  window.location = { assign: jest.fn() };
+});
+
 // Reset the clipboard mock before each test with improved setup
 beforeEach(() => {
+  axios.get.mockResolvedValue({ data: { code: 200, reason: 'OK' } });
   Object.assign(navigator, {
     clipboard: {
       writeText: jest.fn().mockResolvedValue(), // Ensure it returns a resolved promise for chaining `.then()`
@@ -24,7 +34,9 @@ beforeEach(() => {
   });
 });
 
-
+beforeEach(() => {
+  Storage.prototype.getItem = jest.fn(() => "true"); // Adjust the returned value as needed for your tests
+});
 
 // Mock for react-codemirror2
 jest.mock('react-codemirror2', () => ({
@@ -45,39 +57,19 @@ describe('TranslatePage Component', () => {
 
   test('copies text to clipboard', async () => {
     render(<TranslatePage />);
-    // Simulate input and translation logic as needed
-    // Now, simulate clicking the copy button
     fireEvent.click(screen.getByTitle('Copy to Clipboard'));
-  
-    // Use await within waitFor to ensure the clipboard's writeText mock is awaited
     await waitFor(() => expect(navigator.clipboard.writeText).toHaveBeenCalled());
   });
 
   test('downloads the code', () => {
-    // Mock for creating URLs
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
-
     render(<TranslatePage />);
-
-    // Simulate setting some output text that should be downloaded
-    // This may involve simulating user input or directly invoking the translation functionality
-    // For simplicity, let's assume the output is directly set as part of the component's state
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
-    fireEvent.change(inputCodeMirror, { target: { value: ';' } });
     const translateButton = screen.getByText('Translate');
     fireEvent.click(translateButton);
-
-    // Simulate clicking the download button
     const downloadButton = screen.getByTitle('Download Code');
     fireEvent.click(downloadButton);
-
-    // Assertions to check if the URL.createObjectURL was called can be made here
-    // However, as mentioned, directly testing the download behavior can be challenging
-    // Instead, ensure the createObjectURL was called which indirectly implies download was triggered
     expect(global.URL.createObjectURL).toHaveBeenCalled();
-
-    // Cleanup mock to prevent leakage
     global.URL.createObjectURL.mockRestore();
     global.URL.revokeObjectURL.mockRestore();
   });
@@ -85,18 +77,12 @@ describe('TranslatePage Component', () => {
   test('allows code input and language selection', async () => {
     render(<TranslatePage />);
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
-    const sourceLanguageSelect = screen.getByLabelText('Source Language');
-    const targetLanguageSelect = screen.getByLabelText('Target Language');
-  
-    // Simulate typing into the input
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
-  
-    // Change source language selection
+    const sourceLanguageSelect = screen.getByLabelText('Source Language');
     fireEvent.change(sourceLanguageSelect, { target: { value: 'Python' } });
     expect(sourceLanguageSelect.value).toBe('Python');
-  
-    // Change target language selection
+    const targetLanguageSelect = screen.getByLabelText('Target Language');
     fireEvent.change(targetLanguageSelect, { target: { value: 'C++' } });
     expect(targetLanguageSelect.value).toBe('C++');
   });
@@ -104,73 +90,34 @@ describe('TranslatePage Component', () => {
   test('validates language selection and code input', async () => {
     render(<TranslatePage />);
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
-  
-    // Simulate typing into the input
     fireEvent.change(inputCodeMirror, { target: { value: 'console.log("Hello World");' } });
-  
-    // Ensure the input is correctly updated
     expect(inputCodeMirror.value).toBe('console.log("Hello World");');
-  
     const translateButton = screen.getByText('Translate');
     fireEvent.click(translateButton);
-  
-    // Add further assertions as necessary
   });
 
-  const longText = `This is a very long text. `.repeat(50); // Adjust repetition for desired length
-
-  
+  const longText = `This is a very long text. `.repeat(50);
 
   test('downloads long text as a file', () => {
-    // Mock for creating URLs
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
-
     render(<TranslatePage />);
-
-    // Set the long text in the component's state as if it was the result of translation
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
     fireEvent.change(inputCodeMirror, { target: { value: longText } });
-    // You might need to simulate the translation action if your component works that way
-
-    // Simulate clicking the download button
     const downloadButton = screen.getByTitle('Download Code');
     fireEvent.click(downloadButton);
-
-    // Expect createObjectURL to have been called, implying a download was initiated
     expect(global.URL.createObjectURL).toHaveBeenCalled();
-
-    // Cleanup
     global.URL.createObjectURL.mockRestore();
     global.URL.revokeObjectURL.mockRestore();
   });
-  
-  
 
   test('triggers file input when upload button is clicked', () => {
     render(<TranslatePage />);
-    
-    // Spy on the click method of the file input
-    const fileInput = screen.getByTestId('fileInput'); // You might need to add 'data-testid="fileInput"' to your input element
+    const fileInput = screen.getByTestId('fileInput');
     const clickSpy = jest.spyOn(fileInput, 'click');
-  
-    // Simulate click on the upload button
     const uploadButton = screen.getByTitle('Upload File');
     fireEvent.click(uploadButton);
-  
-    // Verify that the file input's click method was called
     expect(clickSpy).toHaveBeenCalled();
-  
-    // Cleanup
     clickSpy.mockRestore();
   });
-  
-  
-  
-
-  
 });
-
-
-
-
