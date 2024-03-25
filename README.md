@@ -46,16 +46,16 @@ For UNIX, `npm run start-backend` starts backend <br>
 For Windows, `npm run run-backend` starts backend
 
 ## Run test suite
-`cd frontend`
+`cd frontend` <br>
 `npm run test-backend`
 
 ## PROJECT SETUP:
-Follow https://dev.to/nagatodev/how-to-connect-flask-to-reactjs-1k8i for more extensive details
+Follow https://dev.to/nagatodev/how-to-connect-flask-to-reactjs-1k8i for more extensive details <br>
 
-Navigate to frontend directory
-`cd frontend`
-run `npm start`
-This may require some debugging
+Navigate to frontend directory <br>
+`cd frontend` <br>
+run `npm start`<br>
+This may require some debugging <br>
 
 In a new terminal, navigate to backend
 `cd backend`
