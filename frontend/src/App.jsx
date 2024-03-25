@@ -7,6 +7,7 @@ import LoginPage from './components/LoginPage/LoginPage.jsx';
 import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
 import References from './components/References/References.jsx';
+import Help from './components/Help/Help.jsx';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState('');
@@ -22,6 +23,7 @@ function App() {
             <Route path='/register' element={<Register />}/>
             <Route path='/feedback' element={<Feedback />}/>
             <Route path='/refernces' element={<References />}/>
+            <Route path='/help' element={<Help />}/>
           </Routes>
       </div>
     </div>
