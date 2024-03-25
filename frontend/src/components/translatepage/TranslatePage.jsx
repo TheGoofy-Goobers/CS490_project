@@ -203,6 +203,7 @@ const TranslatePage = () => {
                 ref={fileInputRef}
                 onChange={handleFileInputChange}
                 style={{ display: 'none' }}
+                data-testid="fileInput"
               />
             </div>
             <CodeMirror

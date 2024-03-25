@@ -144,6 +144,29 @@ describe('TranslatePage Component', () => {
     global.URL.createObjectURL.mockRestore();
     global.URL.revokeObjectURL.mockRestore();
   });
+  
+  
+
+  test('triggers file input when upload button is clicked', () => {
+    render(<TranslatePage />);
+    
+    // Spy on the click method of the file input
+    const fileInput = screen.getByTestId('fileInput'); // You might need to add 'data-testid="fileInput"' to your input element
+    const clickSpy = jest.spyOn(fileInput, 'click');
+  
+    // Simulate click on the upload button
+    const uploadButton = screen.getByTitle('Upload File');
+    fireEvent.click(uploadButton);
+  
+    // Verify that the file input's click method was called
+    expect(clickSpy).toHaveBeenCalled();
+  
+    // Cleanup
+    clickSpy.mockRestore();
+  });
+  
+  
+  
 
   
 });
