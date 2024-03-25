@@ -38,6 +38,7 @@ cursor.execute(create_user_table_query)
 # create translation table
 create_translation_table_query = """
 CREATE TABLE IF NOT EXISTS translation_history (
+    translation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     source_language VARCHAR(10),
     original_code VARCHAR(2000),
