@@ -29,17 +29,19 @@ def submit_feedback(mysql: MySQL) -> dict:
         INSERT INTO user_feedback (user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note) 
         VALUES (%s, %s, %s, %s, %s, %s)
         """
-
         cur = mysql.connection.cursor()
         cur.execute(insertion, (user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note))
         mysql.connection.commit()
         cur.close()
 
         response["success"] = True
+        
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
         response["errorMessage"] = str(e)
+        if cur:
+            cur.close()
         return response
 
     return response

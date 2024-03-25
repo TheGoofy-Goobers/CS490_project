@@ -35,6 +35,22 @@ CREATE TABLE IF NOT EXISTS users (
 """
 cursor.execute(create_user_table_query)
 
+# create translation table
+create_translation_table_query = """
+CREATE TABLE IF NOT EXISTS translation_history (
+    user_id INT NOT NULL,
+    source_language VARCHAR(10),
+    original_code VARCHAR(2000),
+    target_language VARCHAR(10),
+    translated_code VARCHAR(2000),
+    status VARCHAR(16),
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_tokens INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_translation_table_query)
+
 # create feedback form table
 create_feedback_table_query = """
 CREATE TABLE IF NOT EXISTS user_feedback (
@@ -46,10 +62,23 @@ CREATE TABLE IF NOT EXISTS user_feedback (
     future_use_rating INT CHECK (future_use_rating BETWEEN 1 AND 5),
     note VARCHAR(300),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT user_exists FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """
 cursor.execute(create_feedback_table_query)
+
+# create translation feedback table
+create_translation_feedback_table_query = """
+CREATE TABLE IF NOT EXISTS translation_feedback (
+    translation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    star_rating INT CHECK (star_rating BETWEEN 1 AND 5),
+    note VARCHAR(150),
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_translation_feedback_table_query)
 
 # save changes and close
 connection.commit()

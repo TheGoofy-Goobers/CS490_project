@@ -26,6 +26,9 @@ const NavBar = ({loggedInUser}) => {
             <Link to={'/feedback'} style={{ textDecoration: 'none' }} data-testid='feedlink'>
             <li>Feedback</li>
             </Link>
+             <Link to={'/help'} style={{ textDecoration: 'none' }} data-testid='helplink'>
+            <li>Help</li>
+            </Link>
           </ul>
         </div>
         <div className='nav-bar-log-in'>
