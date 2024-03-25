@@ -43,6 +43,11 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         cur.close()
         return response
 
+    cur.execute(
+        "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (user_id, srcLang, message, toLang, user_id, "in progress", 0)
+    )
+
     try:
         gpt_response = gpt_client.chat.completions.create(
             model="gpt-3.5-turbo",
@@ -57,8 +62,8 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response["finish_reason"] = gpt_response.choices[0].finish_reason
 
         cur.execute(
-            "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)", 
-            (user_id, srcLang, message, toLang, response["output"], response["finish_reason"], gpt_response.usage.total_tokens)
+            "UPDATE translation_history SET translated_code = %s, status = %s, total_tokens = %s WHERE translated_code = %s AND status = %s", 
+            (response["output"], response["finish_reason"], gpt_response.usage.total_tokens, user_id, "in progress")
         )
         mysql.connection.commit()
 
