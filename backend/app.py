@@ -77,4 +77,8 @@ def create_app(testing: bool):
         return profile.change_password(mysql)
 
 
+    @api.route('/deleteAccount', methods=['POST'])
+    def delete_account():
+        return profile.delete_user(mysql)
+
     return api

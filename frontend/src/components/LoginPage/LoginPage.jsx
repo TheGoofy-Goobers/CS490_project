@@ -180,13 +180,10 @@ const LoginPage = () => {
   const deleteAccount = () => {
     const user = parseInt(sessionStorage.getItem("user_id"));
 
-    axios.post(`${FLASK_URL}/deleteAccount`, user)
+    axios.post(`${FLASK_URL}/deleteAccount`, {user_id: user})
     .then((response) => {
       res = response.data
       if (res.success) {
-        setSessionLogin(res.user_id.toString())
-        delete credentials.password
-        delete credentials.email
         alert(`Account deleted!`)
         logout()
         navigate('/'); 
