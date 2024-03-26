@@ -93,7 +93,7 @@ const LoginPage = () => {
         }
     }).catch((error) => {
       if (error.response) {
-        alert(`${res.errorMessage}`)
+        alert(`${error.response}}`)
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -247,8 +247,8 @@ const LoginPage = () => {
                 onChange={handlePassChange} 
                 className="login-form-control"
               />
-            </div>
-            <div className="login-form-group">
+              </div>
+              <div className="login-form-group">
               <label>New Password:</label>
               <input 
                 type="password" 
@@ -257,8 +257,8 @@ const LoginPage = () => {
                 onChange={handlePassChange} 
                 className="login-form-control"
               />
-            </div>
-            <div className="login-form-group">
+              </div>
+              <div className="login-form-group">
               <label>Confirm Password:</label>
               <input 
                 type="password" 
@@ -312,13 +312,13 @@ const LoginPage = () => {
                   <button type="submit" className="login-form-button">Logout</button>
                 </div>
             </form>
-            <form className='space'>
+            <div className='space'>
             <form onSubmit={deleteAccount}>
               <div>
                 <button type='submit' className='delete-form-button'>Delete Account</button>
               </div>
             </form>
-            </form>
+            </div>
           </div>
           }
         </div>
