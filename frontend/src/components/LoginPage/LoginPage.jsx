@@ -126,7 +126,9 @@ const LoginPage = () => {
       }
     }).catch((error) => {
       if (error.response) {
-        alert(`${res.errorMessage}`)
+        if(error.response==500){
+          alert(`BACKEND FAILED`)
+        }
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
