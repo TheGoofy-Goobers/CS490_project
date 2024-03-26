@@ -19,6 +19,7 @@ def change_username(mysql: MySQL) -> dict:
 
     valid, errors = validate_username(new_user)
     if not valid:
+        response["hasError"] = True
         response["errorMessage"] = errors
         return response
     
@@ -50,7 +51,6 @@ def change_username(mysql: MySQL) -> dict:
     else:
         response["hasError"] = True
         response["errorMessage"] = "Incorrect Username"
-        del user['password']
 
     return response
 
@@ -111,6 +111,7 @@ def delete_user(mysql: MySQL) -> dict:
         return response
     
     user_id = responseJson["user_id"]
+    
     # query the database to check if the user credentials are valid
     cur = mysql.connection.cursor()
     cur.execute("SELECT user_id FROM users WHERE user_id=%s", (user_id,))
