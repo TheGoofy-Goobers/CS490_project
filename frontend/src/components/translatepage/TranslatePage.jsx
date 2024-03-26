@@ -16,6 +16,7 @@ const TranslatePage = () => {
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
   const [isLoading, setIsLoading] = useState(false);
+  let goodapi;
 
 
   // TODO: Display the status on the page
@@ -37,10 +38,15 @@ const TranslatePage = () => {
   function setBackgroundStats(res) {
     if (res.code === 200) {
       return 'green';
+      goodapi=true
     }
-    else
+    else {
+      goodapi=false
       return 'red';
+    }
   }
+
+
   useEffect(() => {
     setInputText('');
   }, [sourceLanguage]);
@@ -165,10 +171,12 @@ const TranslatePage = () => {
 
     // Proceed with translation if input is valid
     getTranslation();
+    
   };
 
   var res
   const getTranslation = () => {
+    setIsLoading(true);
     const message = {
       text: inputText, 
       srcLang: sourceLanguage, 
@@ -191,11 +199,13 @@ const TranslatePage = () => {
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
     }).catch((error) => {
       if (error.response) {
+        alert(`Error enocuntered: ${res.errorMessage}`)
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
         }
     })
+    setIsLoading(false);
   };
 
   const handleCopyToClipboard = (onSuccess) => {
@@ -319,7 +329,7 @@ const TranslatePage = () => {
             id="translateBtn"
             className="btn translate-button"
             onClick={handleTranslate}
-            disabled={isLoading}
+            disabled={ goodapi && isLoading }
           >
             Translate
           </button>
