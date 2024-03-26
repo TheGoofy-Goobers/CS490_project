@@ -19,7 +19,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-backend": "cd ../backend && python3 -m flask --app 'app:create_app(testing=False)' run --no-debugger",
+    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger",
     "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger",
     "test-backend": "cd ../backend && python -m pytest Tests/",
     "build": "react-scripts build",
