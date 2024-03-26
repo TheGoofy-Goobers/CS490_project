@@ -12,8 +12,9 @@ const LoginPage = () => {
   });
 
   const [newPass, setPass] = useState({
+    current: '',
     new: '',
-    conf: ''
+    conf: '',
   });
 
   const [loggedInUser, setLoggedInUser] = useState('');
@@ -50,8 +51,11 @@ const LoginPage = () => {
     logout();
     console.log('User logged out');
     window.location.reload();
-
 };
+
+  const handlePassChange = (e) => {
+    
+  };
 
   // TODO: handle login response and redirection on front end
   var res
@@ -134,10 +138,10 @@ const LoginPage = () => {
               <div className="login-form-group">
               <label>Current Password:</label>
               <input 
-                type="text" 
+                type="password" 
                 name="current" 
-                value={credentials.password} 
-                onChange={handleChange} 
+                value={newPass.current} 
+                onChange={handlePassChange} 
                 className="login-form-control"
               />
             </div>
@@ -146,8 +150,8 @@ const LoginPage = () => {
               <input 
                 type="password" 
                 name="new_password" 
-                value={credentials.password} 
-                onChange={handleChange} 
+                value={newPass.new} 
+                onChange={handlePassChange} 
                 className="login-form-control"
               />
             </div>
@@ -156,8 +160,8 @@ const LoginPage = () => {
               <input 
                 type="password" 
                 name="new_password" 
-                value={credentials.password} 
-                onChange={handleChange} 
+                value={newPass.conf} 
+                onChange={handlePassChange} 
                 className="login-form-control"
               />
               <div className="login-button-container">
