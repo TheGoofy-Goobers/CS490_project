@@ -15,12 +15,16 @@ const TranslatePage = () => {
   const [outputText, setOutputText] = useState('');
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
+  const [isLoading, setIsLoading] = useState(false);
+
 
   // TODO: Display the status on the page
   axios.get(`${FLASK_URL}/getApiStatus`)
   .then((response) => {
     const res = response.data
     console.log(`Status: ${res.code} ${res.reason}`)
+    // by javascript selects background
+    document.querySelector('.status').style.background = setBackgroundStats(res);
   }).catch((error) => {
     if (error.response) {
       console.log(error.response)
@@ -29,6 +33,14 @@ const TranslatePage = () => {
       }
   })
 
+// checks response to determine background clor
+  function setBackgroundStats(res) {
+    if (res.code === 200) {
+      return 'green';
+    }
+    else
+      return 'red';
+  }
   useEffect(() => {
     setInputText('');
   }, [sourceLanguage]);
@@ -224,6 +236,9 @@ const TranslatePage = () => {
       <div className="translate-page">
         
           <div className="container main-content">
+	  <div className="status">
+            <a className='status_display' >Chat-GPT Status</a>
+          </div>
           <div className="code-container">
             <div className="code-box input-box">
               <h2>Input</h2>
@@ -301,12 +316,14 @@ const TranslatePage = () => {
           </div>
           <div className="translate-button-container">
             <button
-              id="translateBtn"
-              className="btn translate-button"
-              onClick={handleTranslate}
-            >
-              Translate
-            </button>
+            id="translateBtn"
+            className="btn translate-button"
+            onClick={handleTranslate}
+            disabled={isLoading}
+          >
+            Translate
+          </button>
+          {isLoading && <p>Loading...</p>}
           </div>
         </div>
       </div>
@@ -315,5 +332,3 @@ const TranslatePage = () => {
 }
 
 export default TranslatePage;
-
-//comment to push
