@@ -93,7 +93,9 @@ const LoginPage = () => {
         }
     }).catch((error) => {
       if (error.response) {
-        alert(`${error.response}}`)
+        if(error.response=='500 (INTERNAL SERVER ERROR)'){
+          alert(`BACKEND FAILED`)
+        }
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -116,7 +118,7 @@ const LoginPage = () => {
       ...newUser,
       user_id: user
     }
-    axios.post(`${FLASK_URL}/userChangePassword`, sendUser)
+    axios.post(`${FLASK_URL}/userChangeUsername`, sendUser)
     .then((response) => {
       res = response.data
       if (res.success) {
@@ -183,7 +185,8 @@ const LoginPage = () => {
         setSessionLogin(res.user_id.toString())
         delete credentials.password
         delete credentials.email
-        alert(`Welcome to codeCraft!`)
+        alert(`Account deleted!`)
+        logout()
         navigate('/'); 
       }
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
