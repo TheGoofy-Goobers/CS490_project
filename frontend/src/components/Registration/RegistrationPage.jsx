@@ -4,6 +4,9 @@ import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './customToast.css';
 
 const RegistrationPage = () => {
 
@@ -12,6 +15,9 @@ const RegistrationPage = () => {
     email: '',
     password: '',
   });
+
+  const [error, setError] = useState(null);
+  // use this if toast breaks again lmfao
 
   const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -22,15 +28,64 @@ const RegistrationPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     // Handle registration logic here
+    if (!validateUsername()) {
+      // toast.error("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.", {
+      //   className: 'custom-toast custom-toast-error', // Apply custom styles
+      // });
+      alert("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.");
+      return;
+    }
+    if (!validateEmail()) {
+      // toast.error("Please enter a valid email address.", {
+      //   className: 'custom-toast custom-toast-error', // Apply custom styles
+      // });
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+     if (!validatePassword(user.password)) {
+       // If password doesn't meet the criteria, show popup
+      //  toast.error('Password must be at least 8 characters long.', {
+      //    className: 'custom-toast custom-toast-error', // Apply custom styles
+      //  });
+      alert('Password must be at least 8 characters long, have a special character, and number.')
+      return;
+     }
+
     register();
     console.log('Registration details:', user);
   };
 
+  const validateUsername = () => {
+    return /^(?=[a-zA-Z0-9_])(?!.*?_{2,})[a-zA-Z0-9_-]{8,24}$/.test(user.username);
+  }
+
+  const validateEmail = () => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email);
+  }
+
+  const validatePassword = () => {
+    const password = user.password || '';
+    // Check if password length is at least 8 characters
+    if (password.length < 8) {
+      return false;
+    }
+    // Check if password contains at least one number
+    if (!/\d/.test(password)) {
+      return false;
+    }
+    // Check if password contains at least one special character
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      return false;
+    }
+    return true;
+  }
+
   var res
   const register = () => {
-    // TODO: client side validation for username/email/password- password should be encrypted client side before being sent to the server
-    // TODO: Load added string from env variables
+    
     const hashedPassword = SHA256(user.password + "CS490!").toString()
     delete user.password
     const userData = {
@@ -42,7 +97,8 @@ const RegistrationPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        alert("Registration Success!")
+        alert("Registration Success!");
+        // edit this somehow
         delete user.username 
         delete user.email
         setSessionLogin(res.user_id.toString())
@@ -52,8 +108,11 @@ const RegistrationPage = () => {
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
-      if(res.sqlErrors) console.log(`SQL Errors: ${res.sqlErrors}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+      if(res.sqlErrors) {
+        alert(`${res.sqlErrors}`)
+        console.log(`SQL Errors: ${res.sqlErrors}`)
+      }
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
