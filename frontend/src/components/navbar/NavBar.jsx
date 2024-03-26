@@ -6,7 +6,11 @@ import profile from '../translatepage/Profile.png';
 import github from '../translatepage/github-logo.png';
 
 
-const NavBar = ({loggedInUser}) => {
+const NavBar = () => {
+
+const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const username = localStorage.getItem("username");
+
   return (
     <div className="nav-bar">
       <div className="nav-bar-banner">
@@ -20,9 +24,9 @@ const NavBar = ({loggedInUser}) => {
             <Link to={'/translate'} style={{ textDecoration: 'none' }} data-testid='translink'>
               <li>Translator</li>
             </Link>
-            <Link to={'/refernces'} style={{ textDecoration: 'none' }} data-testid='reflink'>
+            {/* <Link to={'/refernces'} style={{ textDecoration: 'none' }} data-testid='reflink'>
             <li>References</li>
-            </Link>
+            </Link> */}
             <Link to={'/feedback'} style={{ textDecoration: 'none' }} data-testid='feedlink'>
             <li>Feedback</li>
             </Link>
@@ -32,19 +36,15 @@ const NavBar = ({loggedInUser}) => {
           </ul>
         </div>
         <div className='nav-bar-log-in'>
-          {loggedInUser &&
-            <div>
-              <span>Welcome, {loggedInUser}!</span>
-              <Link to={'/logout'}>
-                <button>Logout</button>
-              </Link>
-            </div>
-          }
           <Link to={'/login'} data-testid='prof'>
             <img src={profile} height={40} alt="Profile"/>
           </Link>
-          <div></div>
+          {
+            isLoggedIn &&
+            <p className="username">{username}</p>
+          }
         </div>
+        
       </div>
     </div>
   );

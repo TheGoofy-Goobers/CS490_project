@@ -18,7 +18,7 @@ function FeedbackForm() {
 
     const feedbackData = {
       // TODO: sync user_id with session variables
-      user_id: parseInt(sessionStorage.getItem("user_id")),
+      user_id: parseInt(localStorage.getItem("user_id")),
       precision_rating: parseInt(ratings.question1),
       ease_rating: parseInt(ratings.question2),
       speed_rating: parseInt(ratings.question3),
@@ -66,7 +66,7 @@ function FeedbackForm() {
     }
   }
 
-  if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
   else
   {
     return (

@@ -4,11 +4,15 @@ import { FLASK_URL, setSessionLogin } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
+import NavBar from '../navbar/NavBar';
+import { setLocal, isExpired } from '../../vars';
+
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
+    rememberMe: false
   });
 
   const [newPass, setPass] = useState({
@@ -36,9 +40,9 @@ const LoginPage = () => {
       });
     }
   }, []);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value; 
     setCredentials({ ...credentials, [name]: value });
   };
 
@@ -154,11 +158,12 @@ const LoginPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        setSessionLogin(res.user_id.toString())
+        setLocal(res.user_id.toString(), credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe)
+        delete credentials.username
         delete credentials.password
-        delete credentials.email
         alert(`Welcome to codeCraft!`)
-        navigate('/'); 
+        navigate('/');
+        window.location.reload();
       }
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
       console.log(`Response has error: ${res.hasError}`)
@@ -172,9 +177,11 @@ const LoginPage = () => {
   }
 
   const logout = () => {
-    sessionStorage.clear();
-    //TODO: Find a new way to clear the session timer
-    //clearSessionTimer();
+    localStorage.clear();
+  }
+
+  const remember = () => {
+    
   }
 
   const deleteAccount = () => {
@@ -227,6 +234,16 @@ const LoginPage = () => {
                 className="login-form-control"
               />
             </div>
+             <div className="login-form-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="rememberMe"
+                    checked={credentials.rememberMe}
+                    onChange={handleChange}
+                  /> Remember Me
+                </label>
+              </div>
             <a href='/register'>
               Don't have an account? Register here
             </a>
@@ -236,7 +253,7 @@ const LoginPage = () => {
           </form>
           }
           {
-          sessionStorage.getItem("isLoggedIn") &&
+          localStorage.getItem("isLoggedIn") &&
           <div>
             <div className='col_holder'>
             <form onSubmit={handlePassSubmit}>

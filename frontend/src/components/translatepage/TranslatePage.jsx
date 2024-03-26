@@ -9,6 +9,7 @@ import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/clike/clike.js'; // for C++
 import axios from 'axios'
 import { SITE_URL, FLASK_URL } from '../../vars'
+import { isExpired } from '../../vars';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -181,7 +182,7 @@ const TranslatePage = () => {
       text: inputText, 
       srcLang: sourceLanguage, 
       toLang: targetLanguage, 
-      user_id: parseInt(sessionStorage.getItem("user_id"))
+      user_id: parseInt(localStorage.getItem("user_id"))
     }
 
     axios.post(`${FLASK_URL}/translate`, message)
@@ -240,11 +241,10 @@ const TranslatePage = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
-  if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
   else{
     return (
       <div className="translate-page">
-        
           <div className="container main-content">
 	  <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
@@ -254,7 +254,7 @@ const TranslatePage = () => {
               <h2>Input</h2>
               <div className="input-header">
                 <div className="form-group">
-                  <label htmlFor="sourceLanguage">Source Language</label>
+                  <label>Source Language</label>
                   <select
                     className="form-control"
                     id="sourceLanguage"
@@ -336,6 +336,7 @@ const TranslatePage = () => {
           {isLoading && <p>Loading...</p>}
           </div>
         </div>
+       <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a> 
       </div>
     );
   }
