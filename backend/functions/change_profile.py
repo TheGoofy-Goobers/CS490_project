@@ -11,7 +11,7 @@ def change_password(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if "user_id" not in response.json or 'currPass' not in responseJson or 'newPass' not in responseJson:
+    if "user_id" not in responseJson or 'currPass' not in responseJson or 'newPass' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
@@ -36,8 +36,10 @@ def change_password(mysql: MySQL) -> dict:
         print(newPass)
         try:
             cur.execute("UPDATE users SET password=%s WHERE user_id=%s", (newPass, user_id))
-            cur.commit()
+            mysql.connection.commit()
             cur.close()
+            response["success"] = True
+            return response
         except Exception as e:
             response["hasError"] = True
             response["errorMessage"] = str(e)

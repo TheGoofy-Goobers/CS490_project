@@ -91,6 +91,8 @@ const LoginPage = () => {
           delete newPass.new
           alert(`NEW PASSWORD CHANGED SUCCESSFUL!`)
         }
+        if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
+        console.log(`Response has error: ${res.hasError}`)
     }).catch((error) => {
       if (error.response) {
         alert(`${error.response}}`)
@@ -116,7 +118,7 @@ const LoginPage = () => {
       ...newUser,
       user_id: user
     }
-    axios.post(`${FLASK_URL}/userChangePassword`, sendUser)
+    axios.post(`${FLASK_URL}/userChangeUsername`, sendUser)
     .then((response) => {
       res = response.data
       if (res.success) {
