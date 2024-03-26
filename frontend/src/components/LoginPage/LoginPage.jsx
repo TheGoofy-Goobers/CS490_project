@@ -120,7 +120,8 @@ const LoginPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        delete 
+        delete newUser.current
+        delete newUser.new
         alert(`USERNAME CHANGED!`)
       }
     }).catch((error) => {
@@ -251,7 +252,7 @@ const LoginPage = () => {
               <label>New Password:</label>
               <input 
                 type="password" 
-                name="new_password" 
+                name="new" 
                 value={newPass.new} 
                 onChange={handlePassChange} 
                 className="login-form-control"
@@ -261,7 +262,7 @@ const LoginPage = () => {
               <label>Confirm Password:</label>
               <input 
                 type="password" 
-                name="new_password" 
+                name="conf" 
                 value={newPass.conf} 
                 onChange={handlePassChange} 
                 className="login-form-control"
@@ -282,7 +283,7 @@ const LoginPage = () => {
               <label>Current Username:</label>
               <input 
                 type="text" 
-                name="current_username" 
+                name="current" 
                 value={newUser.current} 
                 onChange={handleUserChange} 
                 className="login-form-control"
@@ -292,7 +293,7 @@ const LoginPage = () => {
               <label>New Username:</label>
               <input 
                 type="text" 
-                name="new_username" 
+                name="new" 
                 value={newUser.new} 
                 onChange={handleUserChange} 
                 className="login-form-control"
