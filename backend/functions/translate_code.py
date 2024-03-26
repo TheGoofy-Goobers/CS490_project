@@ -71,6 +71,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response["success"] = True
     
     except openai.APIError as e:
+        mysql.connection.rollback()
         response["hasError"] = True
         response["apiErrorMessage"] = e.message
         response["errorCode"] = e.code
