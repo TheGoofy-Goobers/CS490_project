@@ -95,7 +95,9 @@ const LoginPage = () => {
         console.log(`Response has error: ${res.hasError}`)
     }).catch((error) => {
       if (error.response) {
-        alert(`${error.response}}`)
+        if(error.response=='500 (INTERNAL SERVER ERROR)'){
+          alert(`BACKEND FAILED`)
+        }
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -185,7 +187,8 @@ const LoginPage = () => {
         setSessionLogin(res.user_id.toString())
         delete credentials.password
         delete credentials.email
-        alert(`Welcome to codeCraft!`)
+        alert(`Account deleted!`)
+        logout()
         navigate('/'); 
       }
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
