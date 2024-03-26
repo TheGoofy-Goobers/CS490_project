@@ -9,6 +9,7 @@ import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
 import References from './components/References/References.jsx';
 import Help from './components/Help/Help.jsx';
+import Report from './components/report/Report.jsx';
 import { isExpired } from './vars.js';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
             <Route path='/feedback' element={<Feedback />}/>
             <Route path='/refernces' element={<References />}/>
             <Route path='/help' element={<Help />}/>
+            <Route path='/report' element={<Report />}/>
           </Routes>
       </div>
     </div>

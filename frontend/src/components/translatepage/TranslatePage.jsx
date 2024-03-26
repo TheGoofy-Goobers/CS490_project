@@ -223,14 +223,13 @@ const TranslatePage = () => {
   else{
     return (
       <div className="translate-page">
-        
           <div className="container main-content">
           <div className="code-container">
             <div className="code-box input-box">
               <h2>Input</h2>
               <div className="input-header">
                 <div className="form-group">
-                  <label htmlFor="sourceLanguage">Source Language</label>
+                  <label>Source Language</label>
                   <select
                     className="form-control"
                     id="sourceLanguage"
@@ -310,6 +309,7 @@ const TranslatePage = () => {
             </button>
           </div>
         </div>
+       <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a> 
       </div>
     );
   }

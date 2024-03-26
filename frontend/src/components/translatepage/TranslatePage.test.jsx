@@ -51,8 +51,8 @@ describe('TranslatePage Component', () => {
     render(<TranslatePage />);
     expect(screen.getByText('Input')).toBeInTheDocument();
     expect(screen.getByText('Output')).toBeInTheDocument();
-    expect(screen.getByLabelText('Source Language')).toBeInTheDocument();
-    expect(screen.getByLabelText('Target Language')).toBeInTheDocument();
+    expect(screen.getByText('Source Language')).toBeInTheDocument();
+    expect(screen.getByText('Target Language')).toBeInTheDocument();
   });
 
   test('copies text to clipboard', async () => {
@@ -79,10 +79,10 @@ describe('TranslatePage Component', () => {
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
-    const sourceLanguageSelect = screen.getByLabelText('Source Language');
+    const sourceLanguageSelect = screen.getByText('Source Language');
     fireEvent.change(sourceLanguageSelect, { target: { value: 'Python' } });
     expect(sourceLanguageSelect.value).toBe('Python');
-    const targetLanguageSelect = screen.getByLabelText('Target Language');
+    const targetLanguageSelect = screen.getByText('Target Language');
     fireEvent.change(targetLanguageSelect, { target: { value: 'C++' } });
     expect(targetLanguageSelect.value).toBe('C++');
   });
