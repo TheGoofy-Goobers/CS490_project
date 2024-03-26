@@ -4,9 +4,6 @@ import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './customToast.css';
 
 const RegistrationPage = () => {
 

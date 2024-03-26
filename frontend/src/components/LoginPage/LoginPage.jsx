@@ -143,7 +143,7 @@ const LoginPage = () => {
       password: hashedPassword,
     };
 
-    axios.post(`${FLASK_URL}/userChangeUsername`, loginData)
+    axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)
     .then((response) => {
       res = response.data
       if (res.success) {
@@ -157,7 +157,6 @@ const LoginPage = () => {
       console.log(`Response has error: ${res.hasError}`)
     }).catch((error) => {
       if (error.response) {
-        alert(`${res.errorMessage}`)
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)

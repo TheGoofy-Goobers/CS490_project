@@ -8,14 +8,12 @@ import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
 import References from './components/References/References.jsx';
 import Help from './components/Help/Help.jsx';
-import { ToastContainer } from 'react-toastify';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState('');
 
   return (
     <div className="App">
-      <ToastContainer/>
       <NavBar loggedInUser={loggedInUser} />
       <div className='routing'>
           <Routes>
