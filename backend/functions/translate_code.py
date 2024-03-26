@@ -3,6 +3,7 @@ import json
 from flask import request
 from openai import OpenAI
 import datetime
+import openai
 
 #TODO: THIS
 def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
@@ -68,6 +69,12 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         mysql.connection.commit()
 
         response["success"] = True
+    
+    except openai.APIError as e:
+        response["hasError"] = True
+        response["apiErrorMessage"] = e.message
+        response["errorCode"] = e.code
+        return response
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
