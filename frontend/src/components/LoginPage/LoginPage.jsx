@@ -35,8 +35,8 @@ const LoginPage = () => {
     if (sessionStorage.getItem('isLoggedIn')) {
       setLoggedInUser(sessionStorage.getItem('username'));
       setWidth({
-        maxWidth: '80rem',
-        height: '40rem',
+        maxWidth: '100rem',
+        height: '50rem',
       });
     }
   }, []);
@@ -207,11 +207,13 @@ const LoginPage = () => {
     })
   }
 
+  
   return (
+
     <div>
       <div className="login-page-container">
         <div className="login-form-box" style={width}>
-          {!sessionStorage.getItem("isLoggedIn") &&
+          {!localStorage.getItem("isLoggedIn") &&
           <form onSubmit={handleSubmit}>
             <h2>Login</h2>
             <div className="login-form-group">
@@ -253,7 +255,8 @@ const LoginPage = () => {
           </form>
           }
           {
-          localStorage.getItem("isLoggedIn") &&
+          localStorage.getItem("isLoggedIn") && 
+          
           <div>
             <div className='col_holder'>
             <form onSubmit={handlePassSubmit}>
@@ -340,7 +343,7 @@ const LoginPage = () => {
               </div>
             </form>
             </div>
-          </div>
+          </div> 
           }
         </div>
       </div>

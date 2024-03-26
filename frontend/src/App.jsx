@@ -20,7 +20,7 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar loggedInUser={loggedInUser} />
+      <NavBar />
       <div className='routing'>
           <Routes>
             <Route path='/' element={<Home />}/>
