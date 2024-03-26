@@ -4,25 +4,22 @@ import { FLASK_URL, setSessionLogin } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
+import NavBar from '../navbar/NavBar';
+import { setLocal, isExpired } from '../../vars';
+
 
 const LoginPage = () => {
   const [credentials, setCredentials] = useState({
     email: '',
     password: '',
+    rememberMe: false
   });
 
-  const [loggedInUser, setLoggedInUser] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate hook
 
-  useEffect(() => {
-    // Check if user is already logged in
-    if (sessionStorage.getItem('isLoggedIn')) {
-      setLoggedInUser(sessionStorage.getItem('username'));
-    }
-  }, []);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value; 
     setCredentials({ ...credentials, [name]: value });
   };
 
@@ -39,7 +36,6 @@ const LoginPage = () => {
     logout();
     console.log('User logged out');
     window.location.reload();
-
 };
 
   // TODO: handle login response and redirection on front end
@@ -55,10 +51,12 @@ const LoginPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        setSessionLogin(res.user_id.toString())
+        // setUser(credentials.username)
+        setLocal(res.user_id.toString(), credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe)
         delete credentials.username
         delete credentials.password
-        navigate('/'); 
+        navigate('/');
+        window.location.reload();
       }
       console.log(`Response has error: ${res.hasError}`)
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
@@ -72,17 +70,18 @@ const LoginPage = () => {
   }
 
   const logout = () => {
-    sessionStorage.clear();
-    //TODO: Find a new way to clear the session timer
-    //clearSessionTimer();
+    localStorage.clear();
+  }
+
+  const remember = () => {
+    
   }
 
   return (
-    <div>
-      
+    <div> 
       <div className="login-page-container">
         <div className="login-form-box">
-          {!sessionStorage.getItem("isLoggedIn") &&
+          {!localStorage.getItem("isLoggedIn") &&
           <form onSubmit={handleSubmit}>
             <h2>Login</h2>
             <div className="login-form-group">
@@ -105,6 +104,16 @@ const LoginPage = () => {
                 className="login-form-control"
               />
             </div>
+             <div className="login-form-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="rememberMe"
+                    checked={credentials.rememberMe}
+                    onChange={handleChange}
+                  /> Remember Me
+                </label>
+              </div>
             <a href='/register'>
               Don't have an account? Register here
             </a>
@@ -114,14 +123,15 @@ const LoginPage = () => {
           </form>
           }
           {
-          sessionStorage.getItem("isLoggedIn") &&
+          localStorage.getItem("isLoggedIn") &&
           <div>
-            <h2>Sorry to see you go{loggedInUser}!</h2> 
+            <h2>Sorry to see you go!</h2> 
             <form onSubmit={handleLogout}>
                 <div className="login-button-container">
                   <button type="submit" className="login-form-button">Logout</button>
                 </div>
             </form>
+
           </div>
           }
         </div>
