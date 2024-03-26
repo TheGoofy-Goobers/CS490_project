@@ -12,6 +12,7 @@ import Help from './components/Help/Help.jsx';
 import Report from './components/report/Report.jsx';
 import { isExpired } from './vars.js';
 
+
 function App() {
   
  setInterval(isExpired(), 1000); //checks every second
@@ -19,7 +20,7 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar/>
+      <NavBar loggedInUser={loggedInUser} />
       <div className='routing'>
           <Routes>
             <Route path='/' element={<Home />}/>

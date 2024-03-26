@@ -32,6 +32,7 @@ function FeedbackForm() {
       console.log(`Response has error: ${res.hasError}`);
       if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
       else console.log('Feedback submitted successfully');
+      alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
       // reset form state here if successful
       setOpenEnded('');
       setRatings({
@@ -43,6 +44,7 @@ function FeedbackForm() {
       setLimit(300);
     }).catch((error) => {
       if (error.response) {
+        alert(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`)
         console.log(error.response);
         console.log(error.response.status);
         console.log(error.response.headers);

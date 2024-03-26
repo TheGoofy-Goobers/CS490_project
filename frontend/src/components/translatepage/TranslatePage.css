@@ -125,6 +125,15 @@ h1, h2 {
   color: white;
 }
 
+.status {
+  font-size: 1.25rem;
+  font-family: 'Proxima Nova',sans-serif;
+  width: 15%;
+  height: 10%;
+  border-radius: 2rem;
+  align-items: center;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .code-container {

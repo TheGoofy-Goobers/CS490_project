@@ -16,12 +16,17 @@ const TranslatePage = () => {
   const [outputText, setOutputText] = useState('');
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
+  const [isLoading, setIsLoading] = useState(false);
+  let goodapi;
+
 
   // TODO: Display the status on the page
   axios.get(`${FLASK_URL}/getApiStatus`)
   .then((response) => {
     const res = response.data
     console.log(`Status: ${res.code} ${res.reason}`)
+    // by javascript selects background
+    document.querySelector('.status').style.background = setBackgroundStats(res);
   }).catch((error) => {
     if (error.response) {
       console.log(error.response)
@@ -29,6 +34,19 @@ const TranslatePage = () => {
       console.log(error.response.headers)
       }
   })
+
+// checks response to determine background clor
+  function setBackgroundStats(res) {
+    if (res.code === 200) {
+      return 'green';
+      goodapi=true
+    }
+    else {
+      goodapi=false
+      return 'red';
+    }
+  }
+
 
   useEffect(() => {
     setInputText('');
@@ -154,10 +172,12 @@ const TranslatePage = () => {
 
     // Proceed with translation if input is valid
     getTranslation();
+    
   };
 
   var res
   const getTranslation = () => {
+    setIsLoading(true);
     const message = {
       text: inputText, 
       srcLang: sourceLanguage, 
@@ -180,11 +200,13 @@ const TranslatePage = () => {
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
     }).catch((error) => {
       if (error.response) {
+        alert(`Error enocuntered: ${res.errorMessage}`)
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
         }
     })
+    setIsLoading(false);
   };
 
   const handleCopyToClipboard = (onSuccess) => {
@@ -224,6 +246,9 @@ const TranslatePage = () => {
     return (
       <div className="translate-page">
           <div className="container main-content">
+	  <div className="status">
+            <a className='status_display' >Chat-GPT Status</a>
+          </div>
           <div className="code-container">
             <div className="code-box input-box">
               <h2>Input</h2>
@@ -301,12 +326,14 @@ const TranslatePage = () => {
           </div>
           <div className="translate-button-container">
             <button
-              id="translateBtn"
-              className="btn translate-button"
-              onClick={handleTranslate}
-            >
-              Translate
-            </button>
+            id="translateBtn"
+            className="btn translate-button"
+            onClick={handleTranslate}
+            disabled={ goodapi && isLoading }
+          >
+            Translate
+          </button>
+          {isLoading && <p>Loading...</p>}
           </div>
         </div>
        <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a> 
@@ -316,5 +343,3 @@ const TranslatePage = () => {
 }
 
 export default TranslatePage;
-
-//comment to push
