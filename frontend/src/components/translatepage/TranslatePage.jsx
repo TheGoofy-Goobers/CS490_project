@@ -192,12 +192,18 @@ const TranslatePage = () => {
       if (res.success) {
         setOutputText(res.output)
         console.log(`Finish reason: ${res.finish_reason}`)
-        // TODO: handle potential errors from finish_reason (content_filter, length)
-        // Errors should be displayed 
+        if(res.finish_reason != "stop") {
+          var message = "Translate halted because"
+          if(res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
+          if(res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
+        }
       }
       
       console.log(`Response has error: ${res.hasError}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+      if(res.apiErrorMessage) {
+        alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
+      } 
     }).catch((error) => {
       if (error.response) {
         alert(`Error enocuntered: ${res.errorMessage}`)
