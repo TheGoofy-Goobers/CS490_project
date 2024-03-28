@@ -74,7 +74,7 @@ const LoginPage = () => {
   const changePass = () => {
     const hashedPassword = SHA256(newPass.current + "CS490!").toString();
     const newhash = SHA256(newPass.new + "CS490!").toString();
-    const user = parseInt(sessionStorage.getItem("user_id"));
+    const user = parseInt(localStorage.getItem("user_id"));
     const check = {
       currPass: hashedPassword,
       newPass: newhash,
@@ -94,14 +94,19 @@ const LoginPage = () => {
           delete newPass.current
           delete newPass.new
           alert(`NEW PASSWORD CHANGED SUCCESSFUL!`)
+          window.location.reload();
         }
-        if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
+        if(res.hasError) {
+        console.log(`Error response: ${res.errorMessage}`)
         console.log(`Response has error: ${res.hasError}`)
+        alert(`${res.errorMessage}`)
+        }
     }).catch((error) => {
       if (error.response) {
         if(error.response=='500 (INTERNAL SERVER ERROR)'){
           alert(`BACKEND FAILED`)
         }
+        else
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -119,7 +124,7 @@ const LoginPage = () => {
     changeUser();
   }
   const changeUser = () => {
-    const user = parseInt(sessionStorage.getItem("user_id"));
+    const user = parseInt(localStorage.getItem("user_id"));
     const sendUser = {
       ...newUser,
       user_id: user
@@ -131,6 +136,7 @@ const LoginPage = () => {
         delete newUser.current
         delete newUser.new
         alert(`USERNAME CHANGED!`)
+        window.location.reload();
       }
     }).catch((error) => {
       if (error.response) {
@@ -162,11 +168,13 @@ const LoginPage = () => {
         delete credentials.username
         delete credentials.password
         alert(`Welcome to codeCraft!`)
-        navigate('/');
+        navigate('/login');
         window.location.reload();
       }
-      if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
+      if(res.hasError){
+      console.log(`Error response: ${res.errorMessage}`)
       console.log(`Response has error: ${res.hasError}`)
+      alert('Invalid password ${res.errorMessage}') }
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
@@ -178,6 +186,7 @@ const LoginPage = () => {
 
   const logout = () => {
     localStorage.clear();
+    navigate('/')
   }
 
   const remember = () => {
@@ -185,15 +194,15 @@ const LoginPage = () => {
   }
 
   const deleteAccount = () => {
-    const user = parseInt(sessionStorage.getItem("user_id"));
+    const user = parseInt(localStorage.getItem("user_id"));
 
     axios.post(`${FLASK_URL}/deleteAccount`, {user_id: user})
     .then((response) => {
       res = response.data
       if (res.success) {
-        alert(`Account deleted!`)
         logout()
         navigate('/'); 
+        alert(`Account deleted!`)
       }
       if(res.hasError) console.log(`Error response: ${res.errorMessage}`)
       console.log(`Response has error: ${res.hasError}`)
