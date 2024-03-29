@@ -260,7 +260,7 @@ const TranslatePage = () => {
               <h2>Input</h2>
               <div className="input-header">
                 <div className="form-group">
-                  <label>Source Language</label>
+                  <label htmlFor="sourceLanguage">Source Language</label>
                   <select
                     className="form-control"
                     id="sourceLanguage"

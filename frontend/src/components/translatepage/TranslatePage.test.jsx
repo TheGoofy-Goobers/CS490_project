@@ -79,10 +79,13 @@ describe('TranslatePage Component', () => {
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
-    const sourceLanguageSelect = screen.getByText('Source Language');
+  
+    // Use getByLabelText to target the select elements directly by their associated labels.
+    const sourceLanguageSelect = screen.getByLabelText('Source Language');
     fireEvent.change(sourceLanguageSelect, { target: { value: 'Python' } });
     expect(sourceLanguageSelect.value).toBe('Python');
-    const targetLanguageSelect = screen.getByText('Target Language');
+  
+    const targetLanguageSelect = screen.getByLabelText('Target Language');
     fireEvent.change(targetLanguageSelect, { target: { value: 'C++' } });
     expect(targetLanguageSelect.value).toBe('C++');
   });
