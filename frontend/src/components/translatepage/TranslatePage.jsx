@@ -9,18 +9,24 @@ import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/clike/clike.js'; // for C++
 import axios from 'axios'
 import { SITE_URL, FLASK_URL } from '../../vars'
+import { isExpired } from '../../vars';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
   const [outputText, setOutputText] = useState('');
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
+  const [isLoading, setIsLoading] = useState(false);
+  let goodapi;
+
 
   // TODO: Display the status on the page
   axios.get(`${FLASK_URL}/getApiStatus`)
   .then((response) => {
     const res = response.data
     console.log(`Status: ${res.code} ${res.reason}`)
+    // by javascript selects background
+    document.querySelector('.status').style.background = setBackgroundStats(res);
   }).catch((error) => {
     if (error.response) {
       console.log(error.response)
@@ -28,6 +34,19 @@ const TranslatePage = () => {
       console.log(error.response.headers)
       }
   })
+
+// checks response to determine background clor
+  function setBackgroundStats(res) {
+    if (res.code === 200) {
+      return 'green';
+      goodapi=true
+    }
+    else {
+      goodapi=false
+      return 'red';
+    }
+  }
+
 
   useEffect(() => {
     setInputText('');
@@ -153,15 +172,17 @@ const TranslatePage = () => {
 
     // Proceed with translation if input is valid
     getTranslation();
+    
   };
 
   var res
   const getTranslation = () => {
+    setIsLoading(true);
     const message = {
       text: inputText, 
       srcLang: sourceLanguage, 
       toLang: targetLanguage, 
-      user_id: parseInt(sessionStorage.getItem("user_id"))
+      user_id: parseInt(localStorage.getItem("user_id"))
     }
 
     axios.post(`${FLASK_URL}/translate`, message)
@@ -171,19 +192,27 @@ const TranslatePage = () => {
       if (res.success) {
         setOutputText(res.output)
         console.log(`Finish reason: ${res.finish_reason}`)
-        // TODO: handle potential errors from finish_reason (content_filter, length)
-        // Errors should be displayed 
+        if(res.finish_reason != "stop") {
+          var message = "Translate halted because"
+          if(res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
+          if(res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
+        }
       }
       
       console.log(`Response has error: ${res.hasError}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+      if(res.apiErrorMessage) {
+        alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
+      } 
     }).catch((error) => {
       if (error.response) {
+        alert(`Error enocuntered: ${res.errorMessage}`)
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
         }
     })
+    setIsLoading(false);
   };
 
   const handleCopyToClipboard = (onSuccess) => {
@@ -218,18 +247,20 @@ const TranslatePage = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
-  if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
   else{
     return (
       <div className="translate-page">
-        
           <div className="container main-content">
+	  <div className="status">
+            <a className='status_display' >Chat-GPT Status</a>
+          </div>
           <div className="code-container">
             <div className="code-box input-box">
               <h2>Input</h2>
               <div className="input-header">
                 <div className="form-group">
-                  <label htmlFor="sourceLanguage">Source Language</label>
+                  <label>Source Language</label>
                   <select
                     className="form-control"
                     id="sourceLanguage"
@@ -301,19 +332,20 @@ const TranslatePage = () => {
           </div>
           <div className="translate-button-container">
             <button
-              id="translateBtn"
-              className="btn translate-button"
-              onClick={handleTranslate}
-            >
-              Translate
-            </button>
+            id="translateBtn"
+            className="btn translate-button"
+            onClick={handleTranslate}
+            disabled={ goodapi && isLoading }
+          >
+            Translate
+          </button>
+          {isLoading && <p>Loading...</p>}
           </div>
         </div>
+       <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a> 
       </div>
     );
   }
 }
 
 export default TranslatePage;
-
-//comment to push

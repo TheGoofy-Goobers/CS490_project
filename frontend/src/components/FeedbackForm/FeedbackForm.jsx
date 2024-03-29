@@ -18,7 +18,7 @@ function FeedbackForm() {
 
     const feedbackData = {
       // TODO: sync user_id with session variables
-      user_id: parseInt(sessionStorage.getItem("user_id")),
+      user_id: parseInt(localStorage.getItem("user_id")),
       precision_rating: parseInt(ratings.question1),
       ease_rating: parseInt(ratings.question2),
       speed_rating: parseInt(ratings.question3),
@@ -32,6 +32,7 @@ function FeedbackForm() {
       console.log(`Response has error: ${res.hasError}`);
       if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
       else console.log('Feedback submitted successfully');
+      alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
       // reset form state here if successful
       setOpenEnded('');
       setRatings({
@@ -43,6 +44,7 @@ function FeedbackForm() {
       setLimit(300);
     }).catch((error) => {
       if (error.response) {
+        alert(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`)
         console.log(error.response);
         console.log(error.response.status);
         console.log(error.response.headers);
@@ -64,7 +66,7 @@ function FeedbackForm() {
     }
   }
 
-  if (!sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
   else
   {
     return (

@@ -4,9 +4,7 @@ import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import './customToast.css';
+import { setLocal } from '../../vars';
 
 const RegistrationPage = () => {
 
@@ -29,27 +27,16 @@ const RegistrationPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Handle registration logic here
     if (!validateUsername()) {
-      // toast.error("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.", {
-      //   className: 'custom-toast custom-toast-error', // Apply custom styles
-      // });
       alert("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.");
       return;
     }
     if (!validateEmail()) {
-      // toast.error("Please enter a valid email address.", {
-      //   className: 'custom-toast custom-toast-error', // Apply custom styles
-      // });
       alert("Please enter a valid email address.");
       return;
     }
 
      if (!validatePassword(user.password)) {
-       // If password doesn't meet the criteria, show popup
-      //  toast.error('Password must be at least 8 characters long.', {
-      //    className: 'custom-toast custom-toast-error', // Apply custom styles
-      //  });
       alert('Password must be at least 8 characters long, have a special character, and number.')
       return;
      }
@@ -98,10 +85,9 @@ const RegistrationPage = () => {
       res = response.data
       if (res.success) {
         alert("Registration Success!");
-        // edit this somehow
         delete user.username 
         delete user.email
-        setSessionLogin(res.user_id.toString())
+        setLocal(res.user_id.toString(), user.username, new Date().getTime())
         navigate('/')
       }
       // TODO: Handle registration response and redirection on front end
@@ -122,7 +108,7 @@ const RegistrationPage = () => {
     })
   }
 
-  if(sessionStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}?redirect=true`)
+  if(localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}?redirect=true`)
   else
   {  
     return (

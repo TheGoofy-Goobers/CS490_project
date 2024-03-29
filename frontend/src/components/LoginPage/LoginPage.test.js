@@ -9,7 +9,8 @@ describe('LoginPage Component', () => {
       json: jest.fn().mockResolvedValueOnce({ success: true, user_id: '123' })
     });
 
-    const { getByLabelText, getByText } = render(<LoginPage />);
+    //const { getByLabelText, getByText } = render(<LoginPage />);
+    const { getByLabelText, getByText } = render(<Router><LoginPage /></Router>);
 
     fireEvent.change(getByLabelText('Username or Email:'), { target: { value: 'testuser' } });
     fireEvent.change(getByLabelText('Password:'), { target: { value: 'testpassword' } });
