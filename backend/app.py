@@ -1,9 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
 from functions import api_status as status, change_profile as profile
@@ -80,5 +81,15 @@ def create_app(testing: bool):
     @api.route('/deleteAccount', methods=['POST'])
     def delete_account():
         return profile.delete_user(mysql)
+    
+    # New route for fetching translation history
+    @api.route('/api/translation-history/<user_id>', methods=['GET'])
+    def get_translation_history(user_id):
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT * FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
+        rows = cur.fetchall()
+        cur.close()
+        # Format rows as needed or just return the JSON directly
+        return jsonify(rows)
 
     return api

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaRegClipboard, FaDownload, FaUpload, FaBars } from 'react-icons/fa';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -17,6 +17,8 @@ const TranslatePage = () => {
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
   const [isLoading, setIsLoading] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [translationHistory, setTranslationHistory] = useState([]);
   let goodapi;
 
 
@@ -65,6 +67,53 @@ const TranslatePage = () => {
         return 'javascript';
     }
   };
+
+  const populateCodeMirror = (original_code, translated_code) => {
+    setInputText(original_code);
+    setOutputText(translated_code);
+  };
+
+  const groupByDate = translationHistory.reduce((group, item) => {
+    const { formattedDate } = item;
+    group[formattedDate] = group[formattedDate] ?? [];
+    group[formattedDate].push(item);
+    return group;
+  }, {});
+
+  useEffect(() => {
+    // Assume user_id is fetched from somewhere in your application
+    const user_id = localStorage.getItem("user_id");
+    axios.get(`${FLASK_URL}/api/translation-history/${user_id}`)
+      .then(response => {
+        // Process the data to format dates as 'Today', 'Yesterday', etc.
+        const processedHistory = response.data.map(item => {
+          // Create a new Date object from item.submission_date
+          const submissionDate = new Date(item.submission_date);
+          // Format the date
+          const formattedDate = formatSubmissionDate(submissionDate);
+          // Return a new object with the formatted date
+          return { ...item, formattedDate };
+        });
+        // Set the processed history to state
+        setTranslationHistory(processedHistory);
+      })
+      .catch(error => console.error("Error fetching translation history:", error));
+  }, [setTranslationHistory]); // Add any other dependencies if needed
+  
+  // Helper function to format the date
+  function formatSubmissionDate(date) {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return 'Previous 30 days';
+    }
+  }
 
   // Function to trigger the hidden file input
   const handleUploadClick = () => {
@@ -251,8 +300,29 @@ const TranslatePage = () => {
   else{
     return (
       <div className="translate-page">
-          <div className="container main-content">
-	  <div className="status">
+      <div className="sidebar-container">
+        <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>
+          <FaBars />
+        </button>
+        {showSidebar && (
+        <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+          <p className="translation-history-title">Translation History</p>
+          {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+            <div key={dateIndex}>
+              <div className={date === 'Today' ? "today-section" : ""}>{date}</div>
+              {items.map((item, itemIndex) => (
+                <div key={itemIndex} className="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code)}>
+                  <div>{`${item.source_language} -> ${item.target_language}`}</div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
+      </div>
+      <div className="container main-content">
+	    <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
           </div>
           <div className="code-container">
