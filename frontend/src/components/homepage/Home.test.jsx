@@ -1,20 +1,23 @@
-import { mount } from 'enzyme'; // Import Enzyme's mount function
-import Home from './Home'; // Import your component
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { BrowserRouter } from 'react-router-dom';
+import Home from './Home'; // Adjust the import path according to your file structure
 
-describe('Button Redirect Test', () => {
-  it('redirects when the button is clicked', () => {
-    // Mount your component (replace with your actual component)
-    const wrapper = mount(<Home />);
+// Utility function to render the component within the context of BrowserRouter
+const renderWithRouter = (ui, { route = '/' } = {}) => {
+  window.history.pushState({}, 'Test page', route);
+  return render(ui, { wrapper: BrowserRouter });
+};
 
-    // Find the button element by its class name or other selector
-    const button = wrapper.find('translate_now');
+describe('Home component', () => {
+  test('redirects to /translate page when the "Try it out !!!" button is clicked', () => {
+    renderWithRouter(<Home />);
+    // Find the button by its role and text
+    const button = screen.getByRole('button', { name: /try it out !!!/i });
+    fireEvent.click(button);
 
-    // Simulate a click on the button
-    button.simulate('click');
-
-    // Now, you can assert that the expected redirection occurs
-    // For example, check if the window location has changed to the expected URL
-    expect(window.location.href).toEqual('http://localhost:3000/translate');
+    // Expect the current URL to change to /translate
+    expect(window.location.pathname).toBe('/translate');
   });
 });

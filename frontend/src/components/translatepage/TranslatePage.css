@@ -41,6 +41,20 @@ h1, h2 {
   top: 100%; /* Position the toggle right below the container */
   left: 0;
   z-index: 101; /* Higher z-index to be above the main content */
+  width: 50px; /* Set a specific width */
+  height: 50px; /* Set a specific height */
+  border-radius: 25px; /* Make it round */
+  background-color: #495057; /* Adjust the background color */
+}
+
+.history-icon {
+  color: #7cff3b; /* Make the icon stand out with a brighter color */
+  font-size: 1.5em; /* Increase the size of the icon */
+}
+
+/* Add hover effect for the sidebar-toggle button for visual feedback */
+.sidebar-toggle:hover {
+  background-color: #6c757d; /* Slightly lighter shade when hovered */
 }
 
 .sidebar {
@@ -63,32 +77,92 @@ h1, h2 {
 
 .history-item {
   cursor: pointer;
-  padding: 5px;
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
   margin-bottom: 5px;
 }
 
+.history-item .source-language,
+.history-item .target-language {
+  flex: 1; /* Give equal space to source and target language text */
+  white-space: nowrap;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.arrow-icon {
+  margin: 0 10px; /* Adjust spacing around the arrow */
+  color: #adb5bd; /* Adjust arrow color as needed */
+}
+
 .history-item:hover {
-  background-color: #555; /* Or any other color to indicate hover state */
+  background-color: #495057; /* A slightly lighter shade for hover effect */
 }
 
-/* Styles for Translation History title */
-.translation-history-title {
-  font-size: 1.5rem; /* Increase font size */
-  font-weight: bold; /* Make it bold */
-  color: #fff; /* Change color if you wish */
-  margin-bottom: 0.5rem; /* Add some space below the title */
-  padding-left: 1rem; /* Align with the list items */
-  border-bottom: 2px solid #ffa500; /* Add an underline or border */
+.history-item > .language-icon {
+  margin-right: 8px; /* Space between icon and text */
+  font-size: 1.2em; /* Larger icon size */
 }
 
-/* Styles for the "Today" section */
-.today-section {
-  font-size: 1.2rem; /* Slightly larger font size for "Today" */
-  font-weight: bold; /* Make it bold */
-  color: #ffa500; /* A different color to stand out, e.g., an orange */
-  margin-top: 0.5rem; /* Add space above */
-  padding-left: 1.5rem; /* Add some padding */
+.history-item > span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px; /* Adjust based on your layout */
+  display: inline-block;
 }
+
+/* Styling for the language icons */
+.language-icon {
+  font-size: 24px; /* Adjust size as needed */
+}
+
+/* Specific styles for each language icon */
+.language-icon.javascript {
+  color: #f0db4f; /* JavaScript color */
+}
+
+.language-icon.python {
+  color: #3776ab; /* Python color */
+}
+
+.language-icon.cpp { /* Adjust class name as needed */
+  color: #00599c; /* C++ color */
+}
+
+.language-icon.java {
+  color: #f89820; /* Java color */
+}
+
+.language-icon.rust {
+  color: #dea584; /* Rust color */
+}
+
+
+/* Use pseudo-elements for the arrow in history items */
+/* CSS for arrows */
+.history-item::before {
+  font-size: 16px;
+  margin-right: 5px;
+}
+
+.section-title {
+  color: #7cff3b;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 2rem; /* Or whatever space you need between sections */
+  padding-left: 1rem;
+}
+
+.translation-history-title{
+  color: #7cff3b;
+  font-size: 1.4em;
+  font-weight: bold;
+  margin-top: 2rem; /* Or whatever space you need between sections */
+  padding-left: 1rem;
+}
+
+
 
 /* Add padding to the list for alignment */
 .sidebar ul {

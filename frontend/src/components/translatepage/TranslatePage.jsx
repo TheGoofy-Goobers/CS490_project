@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload, FaUpload, FaBars } from 'react-icons/fa';
+import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight } from 'react-icons/fa';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -19,6 +19,23 @@ const TranslatePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [translationHistory, setTranslationHistory] = useState([]);
+  
+  // Function to get the appropriate icon based on the language
+  const languageIcons = {
+    'JavaScript': FaJsSquare,
+    'Python': FaPython,
+    'C++': FaCuttlefish, // Replace with the appropriate icon for C++
+    'Java': FaJava,
+    'Rust': FaRust,
+  };
+
+  // Function to create icon elements with proper classes
+  const getLanguageIconElement = (language) => {
+    const iconClass = language.replace('+', 'p').toLowerCase(); // Replace '+' with 'p' and make it lowercase
+    const IconComponent = languageIcons[language];
+    return IconComponent ? <IconComponent className={`language-icon ${iconClass}`} /> : null;
+  };
+
   let goodapi;
 
 
@@ -49,10 +66,8 @@ const TranslatePage = () => {
     }
   }
 
-
-  useEffect(() => {
-    setInputText('');
-  }, [sourceLanguage]);
+  
+  
   const fileInputRef = useRef(null);
 
   const getMode = (language) => {
@@ -68,9 +83,11 @@ const TranslatePage = () => {
     }
   };
 
-  const populateCodeMirror = (original_code, translated_code) => {
+  const populateCodeMirror = (original_code, translated_code, source_lang, target_lang) => {
     setInputText(original_code);
     setOutputText(translated_code);
+    setSourceLanguage(source_lang); // Update the source language dropdown
+    setTargetLanguage(target_lang); // Update the target language dropdown
   };
 
   const groupByDate = translationHistory.reduce((group, item) => {
@@ -111,7 +128,7 @@ const TranslatePage = () => {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return 'Yesterday';
     } else {
-      return 'Previous 30 days';
+      return 'Previous 30 Days';
     }
   }
 
@@ -300,26 +317,29 @@ const TranslatePage = () => {
   else{
     return (
       <div className="translate-page">
-      <div className="sidebar-container">
+        <div className="sidebar-container">
         <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>
-          <FaBars />
+          <FaHistory className="history-icon" />
         </button>
         {showSidebar && (
         <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
-          <p className="translation-history-title">Translation History</p>
-          {Object.entries(groupByDate).map(([date, items], dateIndex) => (
-            <div key={dateIndex}>
-              <div className={date === 'Today' ? "today-section" : ""}>{date}</div>
-              {items.map((item, itemIndex) => (
-                <div key={itemIndex} className="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code)}>
-                  <div>{`${item.source_language} -> ${item.target_language}`}</div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        <p className="translation-history-title">Translation History</p>
+        {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+          <div key={dateIndex}>
+            <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
+            {items.map((item, itemIndex) => (
+              <div key={itemIndex} className="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
+                {getLanguageIconElement(item.source_language)}
+                <span className="source-language">{item.source_language}</span>
+                <FaArrowRight className="arrow-icon" />
+                {getLanguageIconElement(item.target_language)}
+                <span className="target-language">{item.target_language}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>      
       )}
-
       </div>
       <div className="container main-content">
 	    <div className="status">
