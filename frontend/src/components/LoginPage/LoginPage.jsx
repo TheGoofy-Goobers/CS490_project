@@ -174,7 +174,7 @@ const LoginPage = () => {
       if(res.hasError){
       console.log(`Error response: ${res.errorMessage}`)
       console.log(`Response has error: ${res.hasError}`)
-      alert('Invalid password ${res.errorMessage}') }
+      alert(`${res.errorMessage}`) }
     }).catch((error) => {
       if (error.response) {
         console.log(error.response)
