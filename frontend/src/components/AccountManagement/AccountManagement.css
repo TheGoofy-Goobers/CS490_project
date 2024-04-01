@@ -1,0 +1,55 @@
+.account-management-container {
+  width: 30rem;
+}
+
+.login-form-box {
+  background-color: #23272b;
+  padding: 2.5rem; /* Increase padding for wider boxes */
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  margin: 0 1rem;
+}
+
+
+.login-form-box h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* --------------------------------------------------- */
+.left-sidebar {
+    position: fixed;
+    top: 9.3rem; /* Adjust the value according to your navigation bar's height */
+    left: 0;
+    bottom: 0;
+    width: 9rem; /* Adjust width as needed */
+    background-color: #23272b;
+    padding: 20px;
+    overflow-y: auto; /* Add scrollbar if content exceeds sidebar height */
+    border: 1px solid #ccc;
+}
+
+.left-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+.left-sidebar ul li {
+    margin-bottom: 10px;
+    cursor: pointer; 
+    border-bottom: 1px solid #ccc;
+}
+
+.left-sidebar ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.left-sidebar ul li:hover {
+    color: #555;
+}

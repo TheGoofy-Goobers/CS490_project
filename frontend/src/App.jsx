@@ -11,7 +11,10 @@ import References from './components/References/References.jsx';
 import Help from './components/Help/Help.jsx';
 import Report from './components/report/Report.jsx';
 import { isExpired } from './vars.js';
-
+import AccountManagement from './components/AccountManagement/AccountManagement.jsx';
+import ChangeUserame from './components/AccountManagement/ChangeUsername.jsx';
+import ChangePassword from './components/AccountManagement/ChangePassword.jsx';
+import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
 
 function App() {
   
@@ -31,6 +34,10 @@ function App() {
             <Route path='/refernces' element={<References />}/>
             <Route path='/help' element={<Help />}/>
             <Route path='/report' element={<Report />}/>
+            <Route path='/accountmanagement' element={<AccountManagement />} />
+            <Route path='/accountmanagement/changeusername' element={<ChangeUserame/>}/>
+            <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
+            <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
           </Routes>
       </div>
     </div>
