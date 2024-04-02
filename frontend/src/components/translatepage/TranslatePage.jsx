@@ -19,6 +19,28 @@ const TranslatePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
   const [translationHistory, setTranslationHistory] = useState([]);
+  const [sortMethod, setSortMethod] = useState('date');
+  const [dateFilter, setDateFilter] = useState('');
+  const [sourceLanguageFilter, setSourceLanguageFilter] = useState('');
+  const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
+
+
+  const filterTranslationHistory = (history) => {
+    return history
+      .filter((item) => {
+        // Filter by date if a date filter is set
+        return dateFilter ? item.formattedDate === dateFilter : true;
+      })
+      .filter((item) => {
+        // Filter by source language if a source language filter is set
+        return sourceLanguageFilter ? item.source_language === sourceLanguageFilter : true;
+      })
+      .filter((item) => {
+        // Filter by target language if a target language filter is set
+        return targetLanguageFilter ? item.target_language === targetLanguageFilter : true;
+      });
+  };
+  
   
   // Function to get the appropriate icon based on the language
   const languageIcons = {
@@ -90,7 +112,9 @@ const TranslatePage = () => {
     setTargetLanguage(target_lang); // Update the target language dropdown
   };
 
-  const groupByDate = translationHistory.reduce((group, item) => {
+  const filteredTranslationHistory = filterTranslationHistory(translationHistory);
+
+  const groupByDate = filteredTranslationHistory.reduce((group, item) => {
     const { formattedDate } = item;
     group[formattedDate] = group[formattedDate] ?? [];
     group[formattedDate].push(item);
@@ -115,7 +139,7 @@ const TranslatePage = () => {
         setTranslationHistory(processedHistory);
       })
       .catch(error => console.error("Error fetching translation history:", error));
-  }, [setTranslationHistory]); // Add any other dependencies if needed
+  }, [setTranslationHistory, sortMethod, dateFilter, sourceLanguageFilter, targetLanguageFilter]); // Add any other dependencies if needed
   
   // Helper function to format the date
   function formatSubmissionDate(date) {
@@ -323,6 +347,40 @@ const TranslatePage = () => {
         </button>
         {showSidebar && (
         <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+          <div className="sorting-controls">
+            <div className="sort-by-date">
+              <label htmlFor="dateFilter">Date:</label>
+              <select id="dateFilter" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="form-control">
+                <option value="">All Dates</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="Previous 30 Days">Previous 30 Days</option>
+              </select>
+            </div>
+            <div className="sort-by-source-language">
+              <label htmlFor="sourceLanguageFilter">Source Language:</label>
+              <select id="sourceLanguageFilter" value={sourceLanguageFilter} onChange={(e) => setSourceLanguageFilter(e.target.value)} className="form-control">
+                <option value="">All Languages</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Rust">Rust</option>
+              </select>
+            </div>
+            <div className="sort-by-target-language">
+              <label htmlFor="targetLanguageFilter">Target Language:</label>
+              <select id="targetLanguageFilter" value={targetLanguageFilter} onChange={(e) => setTargetLanguageFilter(e.target.value)} className="form-control">
+                <option value="">All Languages</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Rust">Rust</option>
+              </select>
+            </div>
+          </div>
+
         <p className="translation-history-title">Translation History</p>
         {Object.entries(groupByDate).map(([date, items], dateIndex) => (
           <div key={dateIndex}>
