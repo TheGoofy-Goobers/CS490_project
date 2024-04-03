@@ -81,6 +81,18 @@ CREATE TABLE IF NOT EXISTS translation_feedback (
 """
 cursor.execute(create_translation_feedback_table_query)
 
+# create logged in user table
+create_logged_in_user_query = """
+CREATE TABLE IF NOT EXISTS logged_in (
+    login_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    session_token CHAR(36) NOT NULL,
+    login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_translation_feedback_table_query)
+
 # save changes and close
 connection.commit()
 cursor.close()
