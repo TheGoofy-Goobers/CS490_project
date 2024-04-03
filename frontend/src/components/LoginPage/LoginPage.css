@@ -23,7 +23,6 @@
   border-bottom: 1px solid #ccc;
 }
 
-
 .login-form-box {
   background-color: #23272b;
   padding: 2rem;
@@ -138,8 +137,8 @@ a{
 
 .show-password-button {
     position: absolute;
-    right: 3rem;
-    top: 24.2rem;
+    right: 4rem;
+    top: 23.3rem;
     background-color: transparent;
     border: none;
     cursor: pointer;

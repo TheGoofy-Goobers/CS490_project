@@ -65,47 +65,48 @@ const ChangePassword = () => {
 
     return(
         <div>
-            <div className='login-form-box'>
-                <form onSubmit={handlePassSubmit}>
-                    <div className='change_password'>
-                        <h2>Change Password</h2>
-                        <div className="login-form-group">
-                            <label>Current Password:</label>
-                            <input
-                                type="password"
-                                name="current"
-                                value={newPass.current}
-                                onChange={handlePassChange}
-                                className="login-form-control"
-                            />
-                        </div>
-                        <div className="login-form-group">
-                            <label>New Password:</label>
-                            <input
-                                type="password"
-                                name="new"
-                                value={newPass.new}
-                                onChange={handlePassChange}
-                                className="login-form-control"
-                            />
-                        </div>
-                        <div className="login-form-group">
-                            <label>Confirm Password:</label>
-                            <input
-                                type="password"
-                                name="conf"
-                                value={newPass.conf}
-                                onChange={handlePassChange}
-                                className="login-form-control"
-                            />
-                            <div className="login-button-container">
-                                <button type="submit" className="login-form-button">Submit</button>
+            <div className="box-container">
+                <div className='login-form-box'>
+                    <form onSubmit={handlePassSubmit}>
+                        <div className='change_password'>
+                            <h2>Change Password</h2>
+                            <div className="login-form-group">
+                                <label>Current Password:</label>
+                                <input
+                                    type="password"
+                                    name="current"
+                                    value={newPass.current}
+                                    onChange={handlePassChange}
+                                    className="login-form-control"
+                                />
+                            </div>
+                            <div className="login-form-group">
+                                <label>New Password:</label>
+                                <input
+                                    type="password"
+                                    name="new"
+                                    value={newPass.new}
+                                    onChange={handlePassChange}
+                                    className="login-form-control"
+                                />
+                            </div>
+                            <div className="login-form-group">
+                                <label>Confirm Password:</label>
+                                <input
+                                    type="password"
+                                    name="conf"
+                                    value={newPass.conf}
+                                    onChange={handlePassChange}
+                                    className="login-form-control"
+                                />
+                                <div className="login-button-container">
+                                    <button type="submit" className="login-form-button">Submit</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
-
         </div>
     )
 }

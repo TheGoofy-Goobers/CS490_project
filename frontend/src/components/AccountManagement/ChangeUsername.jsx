@@ -53,6 +53,7 @@ const ChangeUserame = () => {
 
 
     return(
+        <div className="box-container">
         <div className="login-form-box">
             <div className='manage_prof'>
 
@@ -86,6 +87,7 @@ const ChangeUserame = () => {
                     </form>
                 </div>
             </div>
+        </div>
         </div>
     )
 
