@@ -1,0 +1,48 @@
+.account-management-container {
+  width: 30rem;
+}
+
+.box-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Proxima Nova', sans-serif;
+  transform: translate(-50%, -50%);
+  top: 60%;
+  left: 50%;
+  position: absolute;
+  width: 25rem;
+}
+
+.delete-box-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-family: 'Proxima Nova', sans-serif;
+  transform: translate(-50%, -50%);
+  top: 60%;
+  left: 50%;
+  position: absolute;
+  width: 25rem;
+}
+
+.login-form-box {
+  background-color: #23272b;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+
+.login-form-box h2 {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.note{
+  color: white;
+}

@@ -85,10 +85,11 @@ const RegistrationPage = () => {
       res = response.data
       if (res.success) {
         alert("Registration Success!");
+        setLocal(res.user_id.toString(), user.username, new Date().getTime())
         delete user.username 
         delete user.email
-        setLocal(res.user_id.toString(), user.username, new Date().getTime())
         navigate('/')
+        window.location.reload();
       }
       // TODO: Handle registration response and redirection on front end
       console.log(`Response has error: ${res.hasError}`)
