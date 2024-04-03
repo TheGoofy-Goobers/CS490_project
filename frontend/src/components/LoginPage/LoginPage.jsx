@@ -50,20 +50,6 @@ const LoginPage = () => {
 
 
 
-  const handlePassSubmit = (e) => {
-    e.preventDefault();
-  };
-
-
-
-
-
-  const handleUserSubmit = (e) => {
-    e.preventDefault();
-  };
-  
-  
-
   // TODO: handle login response and redirection on front end
   var res;
   const login = () => {
@@ -94,10 +80,6 @@ const LoginPage = () => {
           console.log(error.response.headers);
         }
       });
-  };
-
-  const logout = () => {
-    localStorage.clear();
   };
 
 
