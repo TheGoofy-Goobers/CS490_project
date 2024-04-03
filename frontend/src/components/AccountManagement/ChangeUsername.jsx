@@ -61,8 +61,8 @@ const ChangeUserame = () => {
                     <h2>Change Username</h2>
                     <form onSubmit={handleUserSubmit}>
                         <div className="login-form-group">
-
                             <label>Current Username:</label>
+                                <p className="note">Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.</p>
                             <input
                                 type="text"
                                 name="current"

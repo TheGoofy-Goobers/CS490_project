@@ -30,8 +30,9 @@ const DeleteAccount = () => {
     };
 
     return(
-        <div>
+        <div className="box-container">
             <div className='login-form-box'>
+                <p className="note">Please note that once you delete your account, you cannot log back in or reactivate your account</p>
                 <form onSubmit={deleteAccount}>
                     <div>
                         <button type='submit' className='delete-form-button'>Delete Account</button>

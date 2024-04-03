@@ -65,11 +65,12 @@ const ChangePassword = () => {
 
     return(
         <div>
-            <div className="box-container">
+            <div className="delete-box-container">
                 <div className='login-form-box'>
                     <form onSubmit={handlePassSubmit}>
                         <div className='change_password'>
                             <h2>Change Password</h2>
+                            <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
                             <div className="login-form-group">
                                 <label>Current Password:</label>
                                 <input

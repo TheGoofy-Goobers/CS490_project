@@ -62,7 +62,7 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
             <div>
               <div
                 onMouseEnter={() => setIsMenuOpen(true)}
-                onMouseLeave={() => setIsMenuOpen(true)}
+                onMouseLeave={() => setIsMenuOpen(false)}
                 data-testid='prof'
               >
                 <img src={profile} height={40} alt="Profile" />
