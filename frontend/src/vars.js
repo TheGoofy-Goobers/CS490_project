@@ -29,8 +29,6 @@ export const isExpired = () => {
     const lastLogIn = parseInt(localStorage.getItem("lastLogIn"), 10);
     const currentTime = Math.floor(Date.now() / 1000)
     const elapsedTime = currentTime - lastLogIn;
-
-    
     console.log(`current time: ${currentTime}`)
     console.log(`lastLogin: ${lastLogIn}`)
     console.log(`elapsed time: ${elapsedTime}`)
@@ -39,4 +37,10 @@ export const isExpired = () => {
         localStorage.clear();
         window.location.href = SITE_URL + "/login";
     }
+}
+
+export const Logout = () => {
+    localStorage.clear();
+    console.log('User logged out');
+    window.location.href = SITE_URL + "/login";
 }

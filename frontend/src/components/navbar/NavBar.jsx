@@ -1,15 +1,19 @@
-import React from 'react';
+import { React, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo3 from './logo3.png';
 import './NavBar.css';
 import profile from '../translatepage/Profile.png';
 import github from '../translatepage/github-logo.png';
-
+import MiniMenu from './MiniMenu';
 
 const NavBar = () => {
 
+const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 const isLoggedIn = localStorage.getItem("isLoggedIn");
   const username = localStorage.getItem("username");
+
+
 
   return (
     <div className="nav-bar">
@@ -35,7 +39,7 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
             </Link>
           </ul>
         </div>
-        <div className='nav-bar-log-in'>
+        {/* <div className='nav-bar-log-in'>
           <Link to={'/login'} data-testid='prof'>
             <img src={profile} height={40} alt="Profile"/>
           </Link>
@@ -43,6 +47,31 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
             isLoggedIn &&
             <p className="username">{username}</p>
           }
+        </div> */}
+        <div className='nav-bar-log-in'>
+          { //if they're not logged in, when they click, send to login
+            !isLoggedIn && 
+            <div>
+              <Link to={'/login'} data-testid='prof'>
+                <img src={profile} height={40} alt="Profile" />
+              </Link>
+            </div>
+          }
+          { //if they are loggedin, hovering over will show minimenu
+            isLoggedIn && 
+            <div>
+              <div
+                onMouseEnter={() => setIsMenuOpen(true)}
+                onMouseLeave={() => setIsMenuOpen(false)}
+                data-testid='prof'
+              >
+                <img src={profile} height={40} alt="Profile" />
+                {isMenuOpen && <MiniMenu />}
+              </div>
+              <p className="username">{username}</p>
+            </div>
+          }
+          
         </div>
         
       </div>
