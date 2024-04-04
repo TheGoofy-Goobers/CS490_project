@@ -10,6 +10,7 @@ import 'codemirror/mode/clike/clike.js'; // for C++
 import axios from 'axios'
 import { SITE_URL, FLASK_URL } from '../../vars'
 import { isExpired } from '../../vars';
+import AlertBox from '../AlertBox/AlertBox';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -17,32 +18,39 @@ const TranslatePage = () => {
   const [sourceLanguage, setSourceLanguage] = useState('JavaScript');
   const [targetLanguage, setTargetLanguage] = useState('Python');
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [isTranslating, setIsTranslating] = useState(false);
   let goodapi;
-
+  
+  const handleClick = () => {
+    setIsTranslating(true);
+    handleTranslate(); 
+  };
 
   // TODO: Display the status on the page
   axios.get(`${FLASK_URL}/getApiStatus`)
-  .then((response) => {
-    const res = response.data
-    console.log(`Status: ${res.code} ${res.reason}`)
-    // by javascript selects background
-    document.querySelector('.status').style.background = setBackgroundStats(res);
-  }).catch((error) => {
-    if (error.response) {
-      console.log(error.response)
-      console.log(error.response.status)
-      console.log(error.response.headers)
+    .then((response) => {
+      const res = response.data
+      console.log(`Status: ${res.code} ${res.reason}`)
+      // by javascript selects background
+      document.querySelector('.status').style.background = setBackgroundStats(res);
+    }).catch((error) => {
+      if (error.response) {
+        console.log(error.response)
+        console.log(error.response.status)
+        console.log(error.response.headers)
       }
-  })
+    })
 
-// checks response to determine background clor
+  // checks response to determine background clor
   function setBackgroundStats(res) {
     if (res.code === 200) {
       return 'green';
-      goodapi=true
+      goodapi = true
     }
     else {
-      goodapi=false
+      goodapi = false
       return 'red';
     }
   }
@@ -75,7 +83,7 @@ const TranslatePage = () => {
   const handleFileInputChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-  
+
     // Extensions based on the source language
     const extensions = {
       'JavaScript': ['.js'],
@@ -84,62 +92,62 @@ const TranslatePage = () => {
       'Java': ['.java'],
       'Rust': ['.rs'],
     };
-  
+
     // Ensure the sourceLanguage matches the keys in the extensions object
     const expectedExtensions = extensions[sourceLanguage];
-    
+
     if (!expectedExtensions) {
       console.error('No expected extensions found for the selected source language.');
       return;
     }
-  
+
     const fileExtension = `.${file.name.split('.').pop()}`;
-  
+
     if (!expectedExtensions.includes(fileExtension)) {
       alert(`Please upload a file with the following extensions: ${expectedExtensions.join(', ')}`);
       return;
     }
-  
+
     const reader = new FileReader();
     reader.onload = (event) => {
       setInputText(event.target.result);
     };
     reader.readAsText(file);
   };
-  
+
 
   // Example validation functions for each language
   const validateJavaScript = (text) => {
     // Check for common JavaScript patterns and syntax
     return /function|var|let|const|=>|console\.log\(/.test(text);
   };
-  
+
   const validatePython = (text) => {
     // Enhanced Python validation to exclude non-Python code and include Python-specific syntax
     // Check for clear signs of Python code
     const pythonSigns = /def |import |print\(|if |elif |else:|for |in |range\(|class |self/.test(text);
     // Check for patterns common in JavaScript/JSX, indicating it's likely not Python
     const nonPythonSigns = /import .* from '.*'|class .* extends|return \(<\/?[\w\s="/.]+>\);|export default /.test(text);
-    
+
     // Consider valid if it looks like Python and doesn't contain patterns common in JavaScript/JSX
     return pythonSigns && !nonPythonSigns;
   };
-  
+
   const validateCpp = (text) => {
     // Check for C++ specific indicators, including common library includes and main function
     return /#include <iostream>|using namespace std;|int main\(\)|cout <<|cin >>/.test(text);
   };
-  
+
   const validateJava = (text) => {
     // Enhanced to include class definition, main method, and common print statement
     return /class |import java.|public static void main|System\.out\.println\(/.test(text);
   };
-  
+
   const validateRust = (text) => {
     // Check for Rust-specific syntax, including function declaration and common imports
     return /fn |use |let |println!\(|struct |enum |impl |mod |pub /.test(text);
   };
-  
+
   const isValidInput = (text, language) => {
     switch (language) {
       case 'JavaScript':
@@ -156,63 +164,69 @@ const TranslatePage = () => {
         return false; // Consider invalid if language is not recognized
     }
   };
-  
+
 
   const handleTranslate = () => {
     if (typeof inputText !== 'string' || inputText.trim() === '') {
+      alert('inputText is undefined, not a string, or empty');
       console.error('inputText is undefined, not a string, or empty');
+      setIsTranslating(false)
       return;
     }
-  
+
     // Validate input text before translating
     if (!isValidInput(inputText, sourceLanguage)) {
       alert(`Invalid ${sourceLanguage} code. Please check your input and try again.`);
+      setIsTranslating(false)
       return; // Prevent translation from proceeding
     }
 
     // Proceed with translation if input is valid
+    setNotificationMessage("Translation in progress...");
+    setShowLoading(true);
     getTranslation();
-    
   };
 
   var res
   const getTranslation = () => {
     setIsLoading(true);
     const message = {
-      text: inputText, 
-      srcLang: sourceLanguage, 
-      toLang: targetLanguage, 
+      text: inputText,
+      srcLang: sourceLanguage,
+      toLang: targetLanguage,
       user_id: parseInt(localStorage.getItem("user_id"))
     }
-
+    setIsLoading(true);
     axios.post(`${FLASK_URL}/translate`, message)
-    .then((response) => {
-      res = response.data
-      // TODO: Handle other data being sent from backend
-      if (res.success) {
-        setOutputText(res.output)
-        console.log(`Finish reason: ${res.finish_reason}`)
-        if(res.finish_reason != "stop") {
-          var message = "Translate halted because"
-          if(res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
-          if(res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
+      .then((response) => {
+        res = response.data
+        // TODO: Handle other data being sent from backend
+        if (res.success) {
+          setOutputText(res.output)
+          console.log(`Finish reason: ${res.finish_reason}`)
+          if (res.finish_reason != "stop") {
+            var message = "Translate halted because"
+            if (res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
+            if (res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
+          }
         }
-      }
-      
-      console.log(`Response has error: ${res.hasError}`)
-      if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
-      if(res.apiErrorMessage) {
-        alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
-      } 
-    }).catch((error) => {
-      if (error.response) {
-        alert(`Error enocuntered: ${res.errorMessage}`)
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
+
+        console.log(`Response has error: ${res.hasError}`)
+        if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+        if (res.apiErrorMessage) {
+          alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
         }
-    })
-    setIsLoading(false);
+      }).catch((error) => {
+        if (error.response) {
+          alert(`Error enocuntered: ${res.errorMessage}`)
+          console.log(error.response)
+          console.log(error.response.status)
+          console.log(error.response.headers)
+        }
+        // Hide loading box after translation
+      }).finally(() => {
+        setIsTranslating(false) // Call the callback function to reset the button state
+      });
   };
 
   const handleCopyToClipboard = (onSuccess) => {
@@ -220,7 +234,7 @@ const TranslatePage = () => {
       console.log('Copied to clipboard');
     });
   };
-  
+
   const handleDownloadCode = () => {
     // Mapping of target language to file extension
     const extensions = {
@@ -230,14 +244,14 @@ const TranslatePage = () => {
       'Java': 'java',
       'Rust': 'rs',
     };
-  
+
     // Determine the file extension based on the target language
     const extension = extensions[targetLanguage] || 'txt';
-  
+
     // Create a blob with the output text
     const blob = new Blob([outputText], { type: 'text/plain' });
     const href = URL.createObjectURL(blob);
-  
+
     // Create a temporary link to trigger the download
     const link = document.createElement('a');
     link.href = href;
@@ -248,11 +262,11 @@ const TranslatePage = () => {
     URL.revokeObjectURL(href);
   };
   if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
-  else{
+  else {
     return (
       <div className="translate-page">
-          <div className="container main-content">
-	  <div className="status">
+        <div className="container main-content">
+          <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
           </div>
           <div className="code-container">
@@ -281,7 +295,7 @@ const TranslatePage = () => {
                   onChange={handleFileInputChange}
                   style={{ display: 'none' }}
                   data-testid="fileInput"
-                  
+
                 />
               </div>
               <CodeMirror
@@ -332,17 +346,16 @@ const TranslatePage = () => {
           </div>
           <div className="translate-button-container">
             <button
-            id="translateBtn"
-            className="btn translate-button"
-            onClick={handleTranslate}
-            disabled={ goodapi && isLoading }
-          >
-            Translate
-          </button>
-          {isLoading && <p>Loading...</p>}
+              id="translateBtn"
+              className={`btn-translate-button${isTranslating ? '-translating' : '-regular'}`}
+              onClick={handleClick}
+              disabled={isTranslating}
+            >
+              {isTranslating ? 'Translating...' : 'Get Translation'}
+            </button>
           </div>
         </div>
-       <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a> 
+        <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a>
       </div>
     );
   }
