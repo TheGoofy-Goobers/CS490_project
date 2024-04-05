@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
-from functions import api_status as status, change_profile as profile
+from functions import api_status as status, change_profile as profile, logout
 
 load_dotenv()
 
@@ -62,23 +62,34 @@ def create_app(testing: bool):
         return translationFeedback.submit_feedback(mysql)
 
 
+    # API status
     @api.route('/getApiStatus')
     def get_status():
         return status.get_status(gpt_client.api_key)
     
 
+    # Change username
     @api.route('/userChangeUsername', methods=['POST'])
     def change_username():
         return profile.change_username(mysql)
 
 
+    # Change password
     @api.route('/userChangePassword', methods=['POST'])
     def change_password():
         return profile.change_password(mysql)
 
 
+    # Delete account
     @api.route('/deleteAccount', methods=['POST'])
     def delete_account():
         return profile.delete_user(mysql)
+
+
+    # Logout
+    @api.route('/userLogout', methods=['POST'])
+    def user_logout():
+        return logout.logout()
+    
 
     return api

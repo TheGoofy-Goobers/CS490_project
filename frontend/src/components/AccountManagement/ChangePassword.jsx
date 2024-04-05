@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SITE_URL, FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
+import { SITE_URL, FLASK_URL, setSessionLogin, isExpired, Logout } from '../../vars';
 import axios from 'axios';
 import './AccountManagement.css';
 import { Link } from 'react-router-dom';
@@ -27,7 +27,7 @@ const ChangePassword = () => {
     const changePass = () => {
         const hashedPassword = SHA256(newPass.current + "CS490!").toString();
         const newhash = SHA256(newPass.new + "CS490!").toString();
-        const user = parseInt(sessionStorage.getItem("user_id"));
+        const user = sessionStorage.getItem("sessionToken");
         const check = {
             currPass: hashedPassword,
             newPass: newhash,
@@ -50,6 +50,10 @@ const ChangePassword = () => {
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
+                if (res.Logout) {
+                    alert("Please login again.")
+                    Logout()
+                }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == '500 (INTERNAL SERVER ERROR)') {
