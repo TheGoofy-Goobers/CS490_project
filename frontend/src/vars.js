@@ -14,10 +14,10 @@ export const SITE_URL = "http://localhost:3000";
 //     }, 60 * 60 * 1000); // 60 minutes in milliseconds
 // }
 
-export const setLocal = (user_id, username, loginTime, rememberMe) => {
+export const setLocal = (session_token, username, loginTime, rememberMe) => {
     localStorage.setItem("lastLogIn", loginTime)
     localStorage.setItem("isLoggedIn", "true")
-    localStorage.setItem("user_id", user_id)
+    localStorage.setItem("sessionToken", session_token)
     // const sessionToken = uuidv4();
     // localStorage.setItem("sessionToken", sessionToken)
     localStorage.setItem("username", username)

@@ -85,18 +85,17 @@ const RegistrationPage = () => {
       res = response.data
       if (res.success) {
         alert("Registration Success!");
-        setLocal(res.user_id.toString(), user.username, new Date().getTime())
+        setLocal(res.sessionToken, user.username, Math.floor(Date.now() / 1000))
         delete user.username 
         delete user.email
         navigate('/')
         window.location.reload();
       }
-      // TODO: Handle registration response and redirection on front end
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
-      if(res.sqlErrors) {
+      if(res.sqlErrors && res.sqlErrors.length > 0) {
         alert(`${res.sqlErrors}`)
         console.log(`SQL Errors: ${res.sqlErrors}`)
       }
