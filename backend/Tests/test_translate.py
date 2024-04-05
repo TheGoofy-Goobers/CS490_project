@@ -8,7 +8,7 @@ from openai import resources
 import datetime
 from functions import get_user_id
 
-class TestRegistrationLogin:
+class TestTranslate:
     @pytest.fixture()
     def app(self):
         app = create_app(True)
