@@ -109,8 +109,8 @@ class TestRegistrationLogin:
         response = response.json
 
         assert "success" in response and response["success"]
-        assert not response["hasError"]
-        assert "user_id" in response and response["user_id"] == '1'
+        assert not response["hasError"]      #sessionToken is uuid, so should be len 36
+        assert "sessionToken" in response and len(response["sessionToken"]) == 36
 
     @pytest.mark.parametrize("username,password", [("unrecognizedUser", "validPassword")])
     def test_user_login_unrecognized_username_or_email_returns_error_response(self, client, username, password, monkeypatch):

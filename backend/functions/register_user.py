@@ -53,6 +53,7 @@ def register(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["sqlErrors"].append(str(e))
         cur.close()
+        return response
 
     try:
         # insert new user into db
@@ -63,6 +64,7 @@ def register(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["sqlErrors"].append(str(e))
         cur.close()
+        return response
 
     # get user id
     user_id = ""
@@ -76,6 +78,7 @@ def register(mysql: MySQL) -> dict:
         cur.close()
         response["hasError"] = True
         response["sqlErrors"].append(str(e))
+        return response
 
     # insert user id into new table, also generate a uuid
     id = str(uuid.uuid4())
@@ -88,6 +91,7 @@ def register(mysql: MySQL) -> dict:
         cur.close()
         response["hasError"] = True
         response["sqlErrors"].append(str(e))
+        return response
 
     cur.close()
     
