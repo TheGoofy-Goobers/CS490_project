@@ -95,7 +95,7 @@ const RegistrationPage = () => {
       if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
       if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
-      if(res.sqlErrors) { // TODO: This is where we will see information on duplicate username or email - make sure to handle this
+      if(res.sqlErrors && res.sqlErrors.length > 0) { // TODO: This is where we will see information on duplicate username or email - make sure to handle this
         alert(`${res.sqlErrors}`)
         console.log(`SQL Errors: ${res.sqlErrors}`)
       }

@@ -16,7 +16,7 @@ def change_username(mysql: MySQL) -> dict:
     
     current_user = responseJson["current"]
     new_user = responseJson["new"]
-    
+
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
     if error:
         response['hasError'] = True

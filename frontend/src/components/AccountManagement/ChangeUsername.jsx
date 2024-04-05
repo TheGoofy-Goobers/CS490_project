@@ -23,14 +23,15 @@ const ChangeUserame = () => {
     };
 
     const changeUser = () => {
-        const user = parseInt(localStorage.getItem("user_id"));
+        const user = localStorage.getItem("sessionToken");
         const sendUser = {
             ...newUser,
-            user_id: user
+            sessionToken: user
         };
         axios.post(`${FLASK_URL}/userChangeUsername`, sendUser)
             .then((response) => {
                 const res = response.data;
+                console.log(`Has error: ${res.hasError}`)
                 if (res.success) {
                     localStorage.setItem("username", newUser.new);
                     alert(`USERNAME CHANGED!`);
@@ -38,6 +39,13 @@ const ChangeUserame = () => {
                     delete newUser.new;
                     window.location.href = SITE_URL + "/accountmanagement";
                     window.location.reload();
+                }
+                else if(res.hasError) {
+                    console.log(`Errors: ${res.errorMessage}`)
+                }
+                if (res.Logout) {
+                    alert("Please login again.")
+                    Logout()
                 }
             }).catch((error) => {
                 if (error.response) {
