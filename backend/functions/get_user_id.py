@@ -1,12 +1,18 @@
 from flask_mysqldb import MySQL
 
-def get_user_id(mysql: MySQL, uuid: str) -> int:
-    cur = mysql.connection.cur()
-    cur.execute("SELECT user_id from logged_in WHERE session_token = %s", (uuid,))
-
-    user = cur.fetchone()
+def get_user_id(mysql: MySQL, token: str) -> int:
+    error = ""
+    user = None
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT user_id from logged_in WHERE session_token = %s", (token,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close
+        error = str(e)
     
+    cur.close()
     if user:
-        return user['user_id']
+        return user['user_id'], error
     else:
-        return -1
+        return -1, error

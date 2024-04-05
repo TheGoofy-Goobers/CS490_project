@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './FeedbackForm.css';
-import { FLASK_URL, SITE_URL } from '../../vars.js';
+import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
 
 function FeedbackForm() {
@@ -17,8 +17,7 @@ function FeedbackForm() {
     event.preventDefault();
 
     const feedbackData = {
-      // TODO: sync user_id with session variables
-      user_id: parseInt(localStorage.getItem("user_id")),
+      sessionToken: localStorage.getItem("sessionToken"),
       precision_rating: parseInt(ratings.question1),
       ease_rating: parseInt(ratings.question2),
       speed_rating: parseInt(ratings.question3),
@@ -31,8 +30,14 @@ function FeedbackForm() {
       const res = response.data;
       console.log(`Response has error: ${res.hasError}`);
       if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
-      else console.log('Feedback submitted successfully');
-      alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
+      else if (res.success) {
+        console.log('Feedback submitted successfully')
+        alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
+      }
+      if (res.logout) {
+        alert("Please login again.")
+        Logout()
+      }
       // reset form state here if successful
       setOpenEnded('');
       setRatings({

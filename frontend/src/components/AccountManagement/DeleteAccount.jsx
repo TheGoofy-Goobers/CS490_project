@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SITE_URL, FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
+import { SITE_URL, FLASK_URL, setSessionLogin, isExpired, Logout } from '../../vars';
 import axios from 'axios';
 import './AccountManagement.css';
 import { Link } from 'react-router-dom';
