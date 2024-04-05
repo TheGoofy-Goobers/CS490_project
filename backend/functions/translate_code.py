@@ -4,14 +4,14 @@ from flask import request
 from openai import OpenAI
 import datetime
 import openai
+from functions import get_user_id
 
-#TODO: THIS
 def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     response = {"hasError" : False}
 
     responseJson = json.loads(request.data.decode())
 
-    if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson:
+    if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
@@ -19,7 +19,18 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     message = responseJson['text']
     srcLang = responseJson['srcLang']
     toLang = responseJson['toLang']
-    user_id = responseJson['user_id']
+    user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
+    if error:
+        response['hasError'] = True
+        response['errorMessage'] = error
+        response['logout'] = True
+        return response
+
+    if user_id == -1:
+        response['hasError'] = True
+        response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
+        response['logout'] = True
+        return response
     
     cur = mysql.connection.cursor()
 

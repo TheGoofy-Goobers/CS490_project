@@ -23,7 +23,7 @@ class TestFeedbackForm:
     def client(self, app):
         return app.test_client()
     
-    @pytest.mark.parametrize("sessionToken,precision_rating,ease_rating,speed_rating,future_use_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 3, 2, 3, 5, 'This is a correct note!'), (7, 2, 3, 4, 5, 'This is yet another correct note that is longer than the previous one but under 300 characters in total.')])
+    @pytest.mark.parametrize("sessionToken,precision_rating,ease_rating,speed_rating,future_use_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 3, 2, 3, 5, 'This is a correct note!'), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 2, 3, 4, 5, 'This is yet another correct note that is longer than the previous one but under 300 characters in total.')])
     def test_feedback_success(self, client, sessionToken, precision_rating, ease_rating, speed_rating, future_use_rating, note, monkeypatch):
         # mock connection
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
@@ -70,7 +70,7 @@ class TestFeedbackForm:
         assert "success" not in response
         assert "errorMessage" in response and response["errorMessage"] == "Invalid note string length"
 
-    @pytest.mark.parametrize("sessionToken,precision_rating,ease_rating,speed_rating,future_use_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 0, 4, 2, 1, ''), (1, 1, 1, -7, 1, ''), (1, 5, 7, 5, 5, '')])
+    @pytest.mark.parametrize("sessionToken,precision_rating,ease_rating,speed_rating,future_use_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 0, 4, 2, 1, ''), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 1, 1, -7, 1, ''), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 5, 7, 5, 5, '')])
     def test_invalid_rating_values(self, client, sessionToken, precision_rating, ease_rating, speed_rating, future_use_rating, note, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))

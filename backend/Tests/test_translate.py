@@ -6,6 +6,7 @@ import json
 from flask_mysqldb import MySQL
 from openai import resources
 import datetime
+from functions import get_user_id
 
 class TestRegistrationLogin:
     @pytest.fixture()
@@ -32,8 +33,8 @@ class TestRegistrationLogin:
         return app.test_cli_runner()
     
     # The translated_before variable is a boolean just intended to change the behavior of the test's monkeypatch for cur.execute()
-    @pytest.mark.parametrize("text,srcLang,toLang,user_id,translated_before", [("print('hello world!')", "python", "java", 1, False), ("print('hello world!')", "python", "java", 1, True)])
-    def test_translation_success(self, client, text, srcLang, toLang, user_id, translated_before, monkeypatch):
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken,translated_before", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", False), ("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", True)])
+    def test_translation_success(self, client, text, srcLang, toLang, sessionToken, translated_before, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
             index=0,
@@ -60,8 +61,9 @@ class TestRegistrationLogin:
             monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"submission_date": lastSubmit})
         monkeypatch.setattr(resources.chat.Completions, "create", lambda self, model, messages, max_tokens, temperature: gpt_response)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
-        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "user_id": user_id}))
+        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "sessionToken": sessionToken}))
         response = response.json
 
         assert response["success"]
@@ -71,8 +73,8 @@ class TestRegistrationLogin:
         assert response["output"] == "System.out.println(\"hello world!\");"
 
 
-    @pytest.mark.parametrize("text,srcLang,toLang,user_id", [("print('hello world!')", "python", "java", 1)])
-    def test_database_connection_error(self, client, text, srcLang, toLang, user_id, monkeypatch):
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_database_connection_error(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
             index=0,
@@ -97,13 +99,14 @@ class TestRegistrationLogin:
         
         monkeypatch.setattr(resources.chat.Completions, "create", lambda self, model, messages, max_tokens, temperature: gpt_response)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
         def seeded_error(self, insertion, format):
             raise Exception("Database connection error.")
         
         monkeypatch.setattr(MockFlaskMysqlCursor, "execute", seeded_error)
 
-        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "user_id": user_id}))
+        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "sessionToken": sessionToken}))
         response = response.json
 
         assert response["hasError"]
@@ -111,39 +114,18 @@ class TestRegistrationLogin:
         assert "errorMessage" in response and response["errorMessage"] == "Database connection error."
 
 
-    @pytest.mark.parametrize("text,srcLang,toLang,user_id", [("print('hello world!')", "python", "java", 1)])
-    def test_api_connection_error(self, client, text, srcLang, toLang, user_id, monkeypatch):
-        choices = [MockGpt.completion_choice_builder(
-            finish_reason="stop",
-            index=0,
-            logprobs=None,
-            content="System.out.println(\"hello world!\");",
-            role="assistant",
-            function_call=None,
-            tool_calls=None
-            )]
-        
-        gpt_response = MockGpt.completion_response_builder(
-            choices=choices,
-            id="chatcmpl-925pb878hKeuj7abfDnQmKEezr05I",
-            created=1710286099,
-            model="gpt-3.5-turbo-0125",
-            object="chat.completion",
-            system_fingerprint="fp_abcd123456",
-            completion_tokens=7,
-            prompt_tokens=60,
-            total_tokens=67
-            )
-        
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_api_connection_error(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         def seeded_error(self, model, messages, max_tokens, temperature):
             raise Exception("GPT API connection error.")
         
         monkeypatch.setattr(resources.chat.Completions, "create", seeded_error)
 
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
         
 
-        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "user_id": user_id}))
+        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "sessionToken": sessionToken}))
         response = response.json
 
         assert response["hasError"]
@@ -151,8 +133,8 @@ class TestRegistrationLogin:
         assert "errorMessage" in response and response["errorMessage"] == "GPT API connection error."
 
 
-    @pytest.mark.parametrize("text,srcLang,toLang,user_id", [("print('hello world!')", "python", "java", 1)])
-    def test_translation_rate_limit(self, client, text, srcLang, toLang, user_id, monkeypatch):
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_translation_rate_limit(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
             index=0,
@@ -177,11 +159,12 @@ class TestRegistrationLogin:
     
         lastSubmit = datetime.datetime.now() - datetime.timedelta(seconds=1)
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"submission_date": lastSubmit})
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
         monkeypatch.setattr(resources.chat.Completions, "create", lambda self, model, messages, max_tokens, temperature: gpt_response)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
 
-        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "user_id": user_id}))
+        response = client.post("/translate", data=json.dumps({"text": text, "srcLang": srcLang, "toLang": toLang, "sessionToken": sessionToken}))
         response = response.json
 
         assert "success" not in response

@@ -23,7 +23,7 @@ class TestTranslationFeedback:
     def client(self, app):
         return app.test_client()
     
-    @pytest.mark.parametrize("sessionToken,star_rating,note", [(7, 3, 'This is a correct note!'), (2, 1, 'This is another correct note that is slightly longer.')])
+    @pytest.mark.parametrize("sessionToken,star_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 3, 'This is a correct note!'), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 1, 'This is another correct note that is slightly longer.')])
     def test_translation_feedback_success(self, client, sessionToken, star_rating, note, monkeypatch):
         # mock connection
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
@@ -35,7 +35,7 @@ class TestTranslationFeedback:
         assert response["success"]
         assert not response["hasError"]
 
-    @pytest.mark.parametrize("sessionToken,star_rating,note", [(35, 0, 'This is a correct note!'), (6, 7, 'This is another correct note that is slightly longer.'), (2, 3.5, 'Correct.')])
+    @pytest.mark.parametrize("sessionToken,star_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 0, 'This is a correct note!'), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 7, 'This is another correct note that is slightly longer.'), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 3.5, 'Correct.')])
     def test_invalid_translation_rating_value(self, client, sessionToken, star_rating, note, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
@@ -56,7 +56,7 @@ class TestTranslationFeedback:
     of a fully functioning GNU system made useful by the GNU corelibs, shell utilities
     and vital system components comprising a full OS as defined by POSIX.
     """
-    @pytest.mark.parametrize("sessionToken,star_rating,note", [(1, 4, long_string)])
+    @pytest.mark.parametrize("sessionToken,star_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 4, long_string)])
     def test_invalid_translation_note_length(self, client, sessionToken, star_rating, note, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
@@ -68,7 +68,7 @@ class TestTranslationFeedback:
         assert "success" not in response
         assert "errorMessage" in response and response["errorMessage"] == "Invalid note string length"
 
-    @pytest.mark.parametrize("sessionToken,star_rating,note", [(1, 5, 'This is a correct note!')])
+    @pytest.mark.parametrize("sessionToken,star_rating,note", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 5, 'This is a correct note!')])
     def test_translation_feedback_database_error(self, client, sessionToken, star_rating, note, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         def seeded_error(self, insertion, format):
