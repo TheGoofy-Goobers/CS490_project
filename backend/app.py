@@ -89,7 +89,7 @@ def create_app(testing: bool):
     # Logout
     @api.route('/userLogout', methods=['POST'])
     def user_logout():
-        return logout.logout()
+        return logout.logout(mysql)
     
 
     return api
