@@ -2,6 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import TranslatePage from './TranslatePage'; // Adjust the import path as necessary
 import axios from 'axios';
+import { FLASK_URL } from '../../vars'
 
 // Mock Axios
 jest.mock('axios');
@@ -45,6 +46,7 @@ jest.mock('react-codemirror2', () => ({
     return <textarea value={value} onChange={handleChange} readOnly={options.readOnly} data-testid={options.readOnly ? 'mockedCodeMirrorOutput' : 'mockedCodeMirrorInput'} />;
   },
 }));
+
 
 describe('TranslatePage Component', () => {
   test('renders correctly', () => {
@@ -123,6 +125,26 @@ describe('TranslatePage Component', () => {
     expect(clickSpy).toHaveBeenCalled();
     clickSpy.mockRestore();
   });
+
+  // Mock the API post call for translation
+  axios.post.mockImplementation((url) => {
+    console.log('URL called:', url); // Add this to ensure the correct URL is called
+    if (url === `${FLASK_URL}/translate`) {
+      return Promise.resolve({
+        data: {
+          success: true,
+          output: "print('Hello')",
+        }
+      });
+    }
+    return Promise.reject(new Error('not found'));
+  });
+  
+  
+
 });
 
+
 //comment to push
+
+
