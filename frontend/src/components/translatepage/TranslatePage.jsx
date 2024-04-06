@@ -216,7 +216,7 @@ const TranslatePage = () => {
           alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
         }
         if (res.logout) {
-          alert("Please login again.")
+          alert("Session expired. Please login again..")
           Logout()
         }
       }).catch((error) => {

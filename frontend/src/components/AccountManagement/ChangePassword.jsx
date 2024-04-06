@@ -27,11 +27,11 @@ const ChangePassword = () => {
     const changePass = () => {
         const hashedPassword = SHA256(newPass.current + "CS490!").toString();
         const newhash = SHA256(newPass.new + "CS490!").toString();
-        const user = sessionStorage.getItem("sessionToken");
+        const user = localStorage.getItem("sessionToken");
         const check = {
             currPass: hashedPassword,
             newPass: newhash,
-            user_id: user,
+            sessionToken: user,
         };
 
         if (newPass.new != newPass.conf) {
@@ -50,8 +50,8 @@ const ChangePassword = () => {
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
-                if (res.Logout) {
-                    alert("Please login again.")
+                if (res.logout) {
+                    alert("Session expired. Please login again..")
                     Logout()
                 }
             }).catch((error) => {

@@ -80,14 +80,25 @@ def change_password(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if "user_id" not in responseJson or 'currPass' not in responseJson or 'newPass' not in responseJson:
+    if "sessionToken" not in responseJson or 'currPass' not in responseJson or 'newPass' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
     
     currPass = responseJson["currPass"]
     newPass = responseJson["newPass"]
-    user_id = responseJson["user_id"]
+    user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
+    if error:
+        response['hasError'] = True
+        response['errorMessage'] = error
+        response['logout'] = True
+        return response
+
+    if user_id == -1:
+        response['hasError'] = True
+        response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
+        response['logout'] = True
+        return response
     
     # query the database to check if the user credentials are valid
     cur = mysql.connection.cursor()
@@ -124,14 +135,26 @@ def change_password(mysql: MySQL) -> dict:
 
 def delete_user(mysql: MySQL) -> dict:
     response = {"hasError" : False}
+
     responseJson = json.loads(request.data.decode())
 
-    if "user_id" not in responseJson:
+    if "sessionToken" not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
     
-    user_id = responseJson["user_id"]
+    user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
+    if error:
+        response['hasError'] = True
+        response['errorMessage'] = error
+        response['logout'] = True
+        return response
+
+    if user_id == -1:
+        response['hasError'] = True
+        response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
+        response['logout'] = True
+        return response
     
     # query the database to check if the user credentials are valid
     cur = mysql.connection.cursor()

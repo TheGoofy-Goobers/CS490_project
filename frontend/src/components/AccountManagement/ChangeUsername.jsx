@@ -43,8 +43,8 @@ const ChangeUserame = () => {
                 else if(res.hasError) {
                     console.log(`Errors: ${res.errorMessage}`)
                 }
-                if (res.Logout) {
-                    alert("Please login again.")
+                if (res.logout) {
+                    alert("Session expired. Please login again..")
                     Logout()
                 }
             }).catch((error) => {

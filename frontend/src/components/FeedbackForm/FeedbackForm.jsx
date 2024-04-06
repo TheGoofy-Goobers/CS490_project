@@ -35,7 +35,7 @@ function FeedbackForm() {
         alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
       }
       if (res.logout) {
-        alert("Please login again.")
+        alert("Session expired. Please login again..")
         Logout()
       }
       // reset form state here if successful
