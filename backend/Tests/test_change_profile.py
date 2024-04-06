@@ -143,7 +143,7 @@ class TestChangeProfile:
         assert response["hasError"]
         assert response["errorMessage"] == "Invalid password"
 
-    @pytest.mark.parametrize("sessionToken", [(1)])
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_delete_account_success(self, client, sessionToken, monkeypatch):
         # mocks connection
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
@@ -157,7 +157,7 @@ class TestChangeProfile:
         assert response["success"]
         assert not response["hasError"]
 
-    @pytest.mark.parametrize("sessionToken", [(1)])
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_delete_account_no_user_found(self, client, sessionToken, monkeypatch):
         # mocks connection
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)

@@ -9,12 +9,18 @@ def logout(mysql: MySQL) -> dict:
 
     if "sessionToken" not in responseJson:
         response["hasError"] = True
-        response["errorMessage"] = "User has no session token set."
+        response["errorMessage"] = "Unexpected error." 
         return response
 
+    sessionToken = responseJson["sessionToken"]
+    if sessionToken == None or sessionToken == "":
+        response["hasError"] = True
+        response["errorMessage"] = "User has no session token set."
+        return response
+    
     try:
         cur = mysql.connection.cursor()
-        cur.execute("DELETE FROM logged_in WHERE session_token = %s", (responseJson["sessionToken"],))
+        cur.execute("DELETE FROM logged_in WHERE session_token = %s", (sessionToken,))
         mysql.connection.commit()
     except Exception as e:
         mysql.connection.rollback()

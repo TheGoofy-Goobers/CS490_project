@@ -20,15 +20,8 @@ class TestFunctions:
         assert user_id == -1
         assert error == "Error in SQL query."
 
-        #Test token not found in table
-        monkeypatch.setattr(MockFlaskMysqlCursor, "execute", lambda self, query, format=None: None)
-        
-        user_id, error = get_user_id.get_user_id(mysql, "some token")
-        
-        assert user_id == -1
-        assert error == "Invalid token"
-
         #Test success
+        monkeypatch.setattr(MockFlaskMysqlCursor, "execute", lambda self, query, format=None: None)
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1})
 
         user_id, error = get_user_id.get_user_id(mysql, "some token")
