@@ -325,6 +325,35 @@ h1, h2 {
   align-items: center;
 }
 
+.btn-translate-button-translating {
+  background-color: grey;
+  border-color: #03595c;
+  color: white;
+  padding: .5rem 2rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  border-radius: .3rem;
+  cursor: pointer;
+  display: inline-block;
+  font-family: 'Proxima Nova', sans-serif;
+  border-radius: 0.8rem;
+}
+
+.btn-translate-button-regular
+{
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+  padding: .5rem 2rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  border-radius: .3rem;
+  cursor: pointer;
+  display: inline-block;
+  font-family: 'Proxima Nova', sans-serif;
+  border-radius: 0.8rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .code-container {
