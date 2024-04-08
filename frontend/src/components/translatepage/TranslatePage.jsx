@@ -128,8 +128,8 @@ const TranslatePage = () => {
 
   useEffect(() => {
     // Assume user_id is fetched from somewhere in your application
-    const user_id = localStorage.getItem("user_id");
-    axios.get(`${FLASK_URL}/api/translation-history/${user_id}`)
+    const sessionToken = localStorage.getItem("sessionToken");
+    axios.get(`${FLASK_URL}/api/translation-history`, { params: { sessionToken } })
       .then(response => {
         // Process the data to format dates as 'Today', 'Yesterday', etc.
         const processedHistory = response.data.map(item => {

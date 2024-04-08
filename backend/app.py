@@ -86,15 +86,24 @@ def create_app(testing: bool):
     def delete_account():
         return profile.delete_user(mysql)
     
-    # New route for fetching translation history
-    @api.route('/api/translation-history/<user_id>', methods=['GET'])
-    def get_translation_history(user_id):
+    @api.route('/api/translation-history', methods=['GET'])
+    def get_translation_history():
+        session_token = request.args.get('sessionToken')
+        if not session_token:
+            return jsonify({"error": "Session token is required"}), 400
+
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
-        rows = cur.fetchall()
-        cur.close()
-        # Format rows as needed or just return the JSON directly
-        return jsonify(rows)
+        # Find user_id from session token
+        cur.execute("SELECT user_id FROM logged_in WHERE session_token=%s", (session_token,))
+        result = cur.fetchone()
+        if result:
+            user_id = result['user_id']
+            # Now fetch translation history with the user_id
+            cur.execute("SELECT * FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
+            rows = cur.fetchall()
+            return jsonify(rows)
+        else:
+            return jsonify({"error": "Invalid session token"}), 404
 
 
     # Logout

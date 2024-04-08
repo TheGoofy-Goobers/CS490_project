@@ -67,7 +67,7 @@ describe('TranslatePage Component', () => {
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
     render(<TranslatePage />);
-    const translateButton = screen.getByText('Translate');
+    const translateButton = screen.getByText('Get Translation');
     fireEvent.click(translateButton);
     const downloadButton = screen.getByTitle('Download Code');
     fireEvent.click(downloadButton);
@@ -97,7 +97,7 @@ describe('TranslatePage Component', () => {
     const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
     fireEvent.change(inputCodeMirror, { target: { value: 'console.log("Hello World");' } });
     expect(inputCodeMirror.value).toBe('console.log("Hello World");');
-    const translateButton = screen.getByText('Translate');
+    const translateButton = screen.getByText('Get Translation');
     fireEvent.click(translateButton);
   });
 
@@ -126,19 +126,7 @@ describe('TranslatePage Component', () => {
     clickSpy.mockRestore();
   });
 
-  // Mock the API post call for translation
-  axios.post.mockImplementation((url) => {
-    console.log('URL called:', url); // Add this to ensure the correct URL is called
-    if (url === `${FLASK_URL}/translate`) {
-      return Promise.resolve({
-        data: {
-          success: true,
-          output: "print('Hello')",
-        }
-      });
-    }
-    return Promise.reject(new Error('not found'));
-  });
+  
   
   
 
