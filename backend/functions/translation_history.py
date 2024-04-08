@@ -1,19 +1,42 @@
 from flask import jsonify, request
+import json
+from functions import get_user_id
 
 def get_translation_history(mysql):
-    session_token = request.args.get('sessionToken')
-    if not session_token:
-        return jsonify({"error": "Session token is required"}), 400
+    response = {"hasError": False}
 
-    cur = mysql.connection.cursor()
-    # Find user_id from session token
-    cur.execute("SELECT user_id FROM logged_in WHERE session_token=%s", (session_token,))
-    result = cur.fetchone()
-    if result:
-        user_id = result['user_id']
-        # Now fetch translation history with the user_id
+    responseJson = json.loads(request.data.decode())
+
+    if "sessionToken" not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "Unknown error"
+        return response
+    
+    user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
+    if error:
+        response['hasError'] = True
+        response['errorMessage'] = error
+        response['logout'] = True
+        return response
+
+    if user_id == -1:
+        response['hasError'] = True
+        response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
+        response['logout'] = True
+        return response
+
+    rows = None
+    try:
+        cur = mysql.connection.cursor()
         cur.execute("SELECT * FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
         rows = cur.fetchall()
-        return jsonify(rows)
-    else:
-        return jsonify({"error": "Invalid session token"}), 404
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+
+    cur.close()
+    response["success"] = True
+    response["rows"] = rows
+    return response
