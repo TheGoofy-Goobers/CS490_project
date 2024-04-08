@@ -1,5 +1,6 @@
 import requests
 
+#TODO: Unit testing for this if we have time
 def get_status(api_key):
     headers = {
         'Authorization': f'Bearer {api_key}',

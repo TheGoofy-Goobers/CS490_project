@@ -5,7 +5,7 @@ import json
 from flask_mysqldb import MySQL
 from mock import Mock
 
-class TestRegistrationLogin:
+class TestRegistrationLoginLogout:
     @pytest.fixture()
     def app(self):
         app = create_app(True)
@@ -109,8 +109,8 @@ class TestRegistrationLogin:
         response = response.json
 
         assert "success" in response and response["success"]
-        assert not response["hasError"]
-        assert "user_id" in response and response["user_id"] == '1'
+        assert not response["hasError"]      #sessionToken is uuid, so should be len 36
+        assert "sessionToken" in response and len(response["sessionToken"]) == 36
 
     @pytest.mark.parametrize("username,password", [("unrecognizedUser", "validPassword")])
     def test_user_login_unrecognized_username_or_email_returns_error_response(self, client, username, password, monkeypatch):
@@ -145,3 +145,35 @@ class TestRegistrationLogin:
         assert response["hasError"]
         assert "errorMessage" in response
         assert response["errorMessage"] == "Invalid format for username or email"
+
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_logout_success(self, client, sessionToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        response = client.post("/userLogout", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
+        
+        assert "success" in response
+        assert not response["hasError"]
+
+    @pytest.mark.parametrize("sessionToken", [(None), ("")])
+    def test_logout_no_token_set_returns_error_response(self, client, sessionToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        response = client.post("/userLogout", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
+        
+        assert "success" not in response
+        assert response["hasError"]
+        assert "errorMessage" in response and response["errorMessage"] == "User has no session token set."
+
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_logout_sql_error_is_caught(self, client, sessionToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        def seeded_error(self, query, format=None):
+            raise Exception("SQL Error")
+        monkeypatch.setattr(MockFlaskMysqlCursor, "execute", seeded_error)
+        response = client.post("/userLogout", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
+        
+        assert "success" not in response
+        assert response["hasError"]
+        assert "errorMessage" in response and response["errorMessage"] == "SQL Error"
