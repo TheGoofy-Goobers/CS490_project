@@ -19,8 +19,18 @@ const TranslatePage = () => {
   const [targetLanguage, setTargetLanguage] = useState('Python');
   const [isLoading, setIsLoading] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [message, setMessage] = useState('Default message');
+
+  const showAlert = (res) => {
+    setAlertOpen(true);
+
+    // Optionally, automatically close the alert after some time
+    setTimeout(() => {
+      setAlertOpen(false);
+    }, 2000); // This should match the duration in AlertBox or be longer
+  };
   let goodapi;
   
   const handleClick = () => {
@@ -181,7 +191,6 @@ const TranslatePage = () => {
     }
 
     // Proceed with translation if input is valid
-    setNotificationMessage("Translation in progress...");
     setShowLoading(true);
     getTranslation();
   };
@@ -203,13 +212,15 @@ const TranslatePage = () => {
         if (res.success) {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
+          const reasonMessage = res.finish_reason || 'No reason provided'
+          setMessage(reasonMessage)
+          showAlert();
           if (res.finish_reason != "stop") {
             var message = "Translate halted because"
             if (res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
             if (res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
           }
         }
-
         console.log(`Response has error: ${res.hasError}`)
         if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
         if (res.apiErrorMessage) {
@@ -221,7 +232,7 @@ const TranslatePage = () => {
         }
       }).catch((error) => {
         if (error.response) {
-          alert(`Error enocuntered: ${res.errorMessage}`)
+          setIsTranslating(`Error enocuntered: ${res.errorMessage}`)
           console.log(error.response)
           console.log(error.response.status)
           console.log(error.response.headers)
@@ -268,6 +279,7 @@ const TranslatePage = () => {
   else {
     return (
       <div className="translate-page">
+        {<AlertBox message={message} isOpen={alertOpen} />}
         <div className="container main-content">
           <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
@@ -298,7 +310,6 @@ const TranslatePage = () => {
                   onChange={handleFileInputChange}
                   style={{ display: 'none' }}
                   data-testid="fileInput"
-
                 />
               </div>
               <CodeMirror

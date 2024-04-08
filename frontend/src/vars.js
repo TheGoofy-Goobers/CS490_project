@@ -26,7 +26,7 @@ export const setLocal = (session_token, username, loginTime, rememberMe) => {
 }
 
 export const isExpired = () => {
-    const expires = 60 * 60 * 24; //in seconds
+    const expires = 60; //in seconds
     const lastLogIn = parseInt(localStorage.getItem("lastLogIn"), 10);
     const currentTime = Math.floor(Date.now() / 1000)
     const elapsedTime = currentTime - lastLogIn;
