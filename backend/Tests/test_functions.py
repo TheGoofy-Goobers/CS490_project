@@ -54,7 +54,7 @@ class TestFunctions:
         assert user_id == 1
         assert error == ""
 
-    def test_api_status_always_has_proper_response(self, client):
+    def test_api_status_baseline(self, client):
         # Test that we can hit the API without mocking
         response = client.get("/getApiStatus")
         response = response.json
@@ -71,3 +71,4 @@ class TestFunctions:
         response = response.json
 
         assert "code" in response and "reason" in response
+        assert response["code"] == 506 and response["reason"] == "Reason"
