@@ -15,6 +15,7 @@ import AccountManagement from './components/AccountManagement/AccountManagement.
 import ChangeUserame from './components/AccountManagement/ChangeUsername.jsx';
 import ChangePassword from './components/AccountManagement/ChangePassword.jsx';
 import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
+import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
 
 function App() {
   
@@ -38,6 +39,7 @@ function App() {
             <Route path='/accountmanagement/changeusername' element={<ChangeUserame/>}/>
             <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
             <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
+            <Route path='/forgotpassword' element={<ForgotPass />} />
           </Routes>
       </div>
     </div>

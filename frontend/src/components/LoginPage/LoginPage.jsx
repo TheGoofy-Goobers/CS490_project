@@ -78,11 +78,6 @@ const LoginPage = () => {
       });
   };
 
-
-
-  
-
-
   return (
     <div>
       <div className="login-page-container">
@@ -128,9 +123,12 @@ const LoginPage = () => {
                   /> Remember Me
                 </label>
               </div>
-              <a href='/register'>
+              <p><a href='/register'>
                 Don't have an account? Register here
-              </a>
+              </a></p>
+              <p><a href='/forgotpassword'>
+                Forgot password?
+              </a></p>
               <div className="login-button-container">
                 <button type="submit" className="login-form-button">Login</button>
               </div>
