@@ -47,14 +47,10 @@ const LoginPage = () => {
     console.log('Login credentials:', credentials);
   };
 
-
-
-
-  // TODO: handle login response and redirection on front end
   var res;
   const login = () => {
     const hashedPassword = SHA256(credentials.password + "CS490!").toString();
-    delete credentials.password;
+    delete credentials.password
     const loginData = {
       ...credentials,
       password: hashedPassword,
@@ -62,9 +58,9 @@ const LoginPage = () => {
 
     axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)
       .then((response) => {
-        res = response.data;
+        res = response.data
         if (res.success) {
-          setLocal(res.user_id.toString(), credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
+          setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
           delete credentials.username;
           delete credentials.password;
           alert(`Welcome to codeCraft!`);

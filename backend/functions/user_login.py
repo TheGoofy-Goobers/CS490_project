@@ -2,6 +2,7 @@ from flask_mysqldb import MySQL
 import json
 from flask import request
 from functions.validation import validate_username, validate_email
+import uuid
 
 def login(mysql: MySQL) -> dict:
     response = {"hasError" : False}
@@ -18,11 +19,11 @@ def login(mysql: MySQL) -> dict:
     # username/email validation
     is_username = False
     is_email = False
-    validUser, errors = validate_username(username_or_email)
+    validUser, _ = validate_username(username_or_email)
     if validUser:
         is_username = True
     else:
-        validEmail, errors = validate_email(username_or_email)
+        validEmail, _ = validate_email(username_or_email)
         if validEmail:
             is_email = True
     
@@ -34,10 +35,16 @@ def login(mysql: MySQL) -> dict:
     encrypted_pw = responseJson['password']
 
     # query the database to check if the user credentials are valid
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT user_id, password FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
-    user = cur.fetchone()
-    cur.close()
+    user = None
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT user_id, password FROM users WHERE username = %s OR email = %s", (username_or_email, username_or_email))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
     if not user:
         response["hasError"] = True
@@ -45,15 +52,27 @@ def login(mysql: MySQL) -> dict:
         return response
 
     # make sure password matches
-    if encrypted_pw == user['password']:
-        response["user_id"] = user['user_id']
-        response["success"] = True
-        del user['password']
-        return response
-    
-    else:
+    if encrypted_pw != user['password']:
         response["hasError"] = True
         response["errorMessage"] = "Invalid password"
-        del user['password']
+        return response
 
+    del user['password']
+
+    #create uuid and store in db
+
+    id = uuid.uuid4()
+    try:
+        cur.execute("DELETE FROM logged_in WHERE user_id=%s", (user["user_id"],))
+        cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (user["user_id"], id))
+        mysql.connection.commit()
+    except:
+        mysql.connection.rollback()
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+
+    response["sessionToken"] = id
+    response["success"] = True
     return response

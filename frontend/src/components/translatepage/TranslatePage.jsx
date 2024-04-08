@@ -8,7 +8,7 @@ import 'codemirror/mode/javascript/javascript.js';
 import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/clike/clike.js'; // for C++
 import axios from 'axios'
-import { SITE_URL, FLASK_URL } from '../../vars'
+import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
 import AlertBox from '../AlertBox/AlertBox';
 
@@ -28,7 +28,6 @@ const TranslatePage = () => {
     handleTranslate(); 
   };
 
-  // TODO: Display the status on the page
   axios.get(`${FLASK_URL}/getApiStatus`)
     .then((response) => {
       const res = response.data
@@ -194,7 +193,7 @@ const TranslatePage = () => {
       text: inputText,
       srcLang: sourceLanguage,
       toLang: targetLanguage,
-      user_id: parseInt(localStorage.getItem("user_id"))
+      sessionToken: localStorage.getItem("sessionToken")
     }
     setIsLoading(true);
     axios.post(`${FLASK_URL}/translate`, message)
@@ -215,6 +214,10 @@ const TranslatePage = () => {
         if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
         if (res.apiErrorMessage) {
           alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
+        }
+        if (res.logout) {
+          alert("Session expired. Please login again..")
+          Logout()
         }
       }).catch((error) => {
         if (error.response) {
