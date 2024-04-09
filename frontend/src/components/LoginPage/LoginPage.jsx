@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
-import { FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
+import { FLASK_URL, setLocal, isExpired, Logout } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
@@ -17,7 +17,6 @@ const LoginPage = () => {
     password: '',
     rememberMe: false
   });
-
 
   const [loggedInUser, setLoggedInUser] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate hook

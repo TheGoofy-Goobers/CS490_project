@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload, FaUpload } from 'react-icons/fa';
+import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight } from 'react-icons/fa';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/material.css';
@@ -21,7 +21,46 @@ const TranslatePage = () => {
   const [showLoading, setShowLoading] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
   const [isTranslating, setIsTranslating] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [translationHistory, setTranslationHistory] = useState([]);
+  const [sortMethod, setSortMethod] = useState('date');
+  const [dateFilter, setDateFilter] = useState('');
+  const [sourceLanguageFilter, setSourceLanguageFilter] = useState('');
+  const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
   let goodapi;
+
+  const filterTranslationHistory = (history) => {
+    return history
+      .filter((item) => {
+        // Filter by date if a date filter is set
+        return dateFilter ? item.formattedDate === dateFilter : true;
+      })
+      .filter((item) => {
+        // Filter by source language if a source language filter is set
+        return sourceLanguageFilter ? item.source_language === sourceLanguageFilter : true;
+      })
+      .filter((item) => {
+        // Filter by target language if a target language filter is set
+        return targetLanguageFilter ? item.target_language === targetLanguageFilter : true;
+      });
+  };
+  
+  
+  // Function to get the appropriate icon based on the language
+  const languageIcons = {
+    'JavaScript': FaJsSquare,
+    'Python': FaPython,
+    'C++': FaCuttlefish, // Replace with the appropriate icon for C++
+    'Java': FaJava,
+    'Rust': FaRust,
+  };
+
+  // Function to create icon elements with proper classes
+  const getLanguageIconElement = (language) => {
+    const iconClass = language.replace('+', 'p').toLowerCase(); // Replace '+' with 'p' and make it lowercase
+    const IconComponent = languageIcons[language];
+    return IconComponent ? <IconComponent className={`language-icon ${iconClass}`} /> : null;
+  };
   
   const handleClick = () => {
     setIsTranslating(true);
@@ -54,10 +93,8 @@ const TranslatePage = () => {
     }
   }
 
-
-  useEffect(() => {
-    setInputText('');
-  }, [sourceLanguage]);
+  
+  
   const fileInputRef = useRef(null);
 
   const getMode = (language) => {
@@ -72,6 +109,67 @@ const TranslatePage = () => {
         return 'javascript';
     }
   };
+
+  const populateCodeMirror = (original_code, translated_code, source_lang, target_lang) => {
+    setInputText(original_code);
+    setOutputText(translated_code);
+    setSourceLanguage(source_lang); // Update the source language dropdown
+    setTargetLanguage(target_lang); // Update the target language dropdown
+  };
+
+  const filteredTranslationHistory = filterTranslationHistory(translationHistory);
+
+  const groupByDate = filteredTranslationHistory.reduce((group, item) => {
+    const { formattedDate } = item;
+    group[formattedDate] = group[formattedDate] ?? [];
+    group[formattedDate].push(item);
+    return group;
+  }, {});
+
+  useEffect(() => {
+    const sessionToken = localStorage.getItem("sessionToken");
+    axios.post(`${FLASK_URL}/translationHistory`, { sessionToken: sessionToken })
+      .then(response => {
+        // Process the data to format dates as 'Today', 'Yesterday', etc.
+        res = response.data
+        if (res.success) {
+          const processedHistory = res.rows.map(item => {
+            // Create a new Date object from item.submission_date
+            const submissionDate = new Date(item.submission_date);
+            // Format the date
+            const formattedDate = formatSubmissionDate(submissionDate);
+            // Return a new object with the formatted date
+            return { ...item, formattedDate };
+          });
+          // Set the processed history to state
+          setTranslationHistory(processedHistory);
+        }
+        else if (res.hasError) {
+          console.log(`Response has error: ${res.hasError}`)
+          console.log(`Error message: ${res.errorMessage}`)
+        }
+        if (res.logout) {
+          alert("Please login again.")
+          Logout()
+        }
+      })
+      .catch(error => console.error("Error fetching translation history:", error));
+  }, [setTranslationHistory, sortMethod, dateFilter, sourceLanguageFilter, targetLanguageFilter]); // Add any other dependencies if needed
+  
+  // Helper function to format the date
+  function formatSubmissionDate(date) {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    } else {
+      return 'Previous 30 Days';
+    }
+  }
 
   // Function to trigger the hidden file input
   const handleUploadClick = () => {
@@ -268,6 +366,64 @@ const TranslatePage = () => {
   else {
     return (
       <div className="translate-page">
+        <div className="sidebar-container">
+        <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
+          <FaHistory className="history-icon" />
+        </button>
+        {showSidebar && (
+        <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+          <div className="sorting-controls">
+            <div className="sort-by-date">
+              <label htmlFor="dateFilter">Date:</label>
+              <select id="dateFilter" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="form-control">
+                <option value="">All Dates</option>
+                <option value="Today">Today</option>
+                <option value="Yesterday">Yesterday</option>
+                <option value="Previous 30 Days">Previous 30 Days</option>
+              </select>
+            </div>
+            <div className="sort-by-source-language">
+              <label htmlFor="sourceLanguageFilter">Source Language:</label>
+              <select id="sourceLanguageFilter" value={sourceLanguageFilter} onChange={(e) => setSourceLanguageFilter(e.target.value)} className="form-control">
+                <option value="">All Languages</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Rust">Rust</option>
+              </select>
+            </div>
+            <div className="sort-by-target-language">
+              <label htmlFor="targetLanguageFilter">Target Language:</label>
+              <select id="targetLanguageFilter" value={targetLanguageFilter} onChange={(e) => setTargetLanguageFilter(e.target.value)} className="form-control">
+                <option value="">All Languages</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+                <option value="C++">C++</option>
+                <option value="Java">Java</option>
+                <option value="Rust">Rust</option>
+              </select>
+            </div>
+          </div>
+
+        <p className="translation-history-title">Translation History</p>
+        {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+          <div key={dateIndex}>
+            <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
+            {items.map((item, itemIndex) => (
+              <div key={itemIndex} className="history-item" data-testid="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
+                {getLanguageIconElement(item.source_language)}
+                <span className="source-language">{item.source_language}</span>
+                <FaArrowRight className="arrow-icon" />
+                {getLanguageIconElement(item.target_language)}
+                <span className="target-language">{item.target_language}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>      
+      )}
+      </div>
         <div className="container main-content">
           <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
@@ -277,7 +433,7 @@ const TranslatePage = () => {
               <h2>Input</h2>
               <div className="input-header">
                 <div className="form-group">
-                  <label>Source Language</label>
+                  <label htmlFor="sourceLanguage">Source Language</label>
                   <select
                     className="form-control"
                     id="sourceLanguage"
@@ -365,3 +521,4 @@ const TranslatePage = () => {
 }
 
 export default TranslatePage;
+//test

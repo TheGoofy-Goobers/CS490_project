@@ -10,6 +10,11 @@ function HelpContent({ searchQuery }) {
     { id: 4, title: 'What is the max length for the translation?', content: '4,000 characters' },
     { id: 5, title: 'Why am I getting errors when I try to translate?', 
     content: 'You are most likely seeing errors because your code does not comply with the selected language. Please check your code and double check the selected language and try again!' },
+    { id: 6, title: 'How do I see my past translations?', content: 'Click on the history icon in the top left corner! You will be able to see your past translations.' },
+    { id: 7, title: 'How do I change my password?', content: 'Hover on the profile icon in the top right corner. Hover over Account Management. Click on Edit Password!' },
+    { id: 8, title: 'How do I change my username?', content: 'Hover on the profile icon in the top right corner. Hover over Account Management. Click on Edit Username!' },
+    { id: 9, title: 'How do I delete my account?', content: 'Hover on the profile icon in the top right corner. Hover over Account Management. Click on Delete Account!' },
+    { id: 10, title: 'How do submit feedback?', content: 'Click on the feedback button on the banner! Let us know what we can do better!' },
   ];
 
   // Filter help content based on search query
