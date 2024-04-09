@@ -36,8 +36,8 @@ const ChangePassword = () => {
         changePass();
     };
 
-    const validatePassword = () => {
-        const password = newPass.password || '';
+    const validatePassword = (pass) => {
+        const password = pass || '';
         // Check if password length is at least 8 characters
         if (password.length < 8) {
           return false;
@@ -69,8 +69,9 @@ const ChangePassword = () => {
             return;
         }
 
-        if (!validatePassword(user.password)) {
-            alert('Password must be at least 8 characters long, have a special character, and number.')
+        if (!validatePassword(newPass.new)) {
+            setMessage(`Password must be at least 8 characters long, have a special character, and number.`);
+            showAlert();
             return;
            }
 
