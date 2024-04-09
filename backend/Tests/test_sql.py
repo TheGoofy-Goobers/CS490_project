@@ -154,7 +154,7 @@ class TestSql:
         cur.close()
     
     @pytest.mark.parametrize("user_id", [(1)])
-    def test_translation_history_sql(self, user_id):
+    def test_fetch_translation_history_sql(self, user_id):
         cur = connection.cursor(dictionary=True)
 
         rows = None
@@ -170,4 +170,15 @@ class TestSql:
         assert rows[1]["original_code"] == "print('Hello world 1!')"
         assert rows[2]["target_language"] == "javascript"
         assert rows[0]["translated_code"] == "console.log('Hello world 0!');"
+        cur.close()
+
+    #TODO: Everything below
+    def test_feedback_form_sql(self):
+        cur = connection.cursor(dictionary=True)
+
+        cur.close()
+
+    def test_translate_sql(self):
+        cur = connection.cursor(dictionary=True)
+
         cur.close()
