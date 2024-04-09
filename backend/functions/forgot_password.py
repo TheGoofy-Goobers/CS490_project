@@ -5,6 +5,10 @@ from functions.validation import validate_username, validate_email
 import uuid
 import smtplib
 from email.message import EmailMessage
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def send_email(mysql: MySQL) -> dict:
     response = {"hasError": False}
@@ -65,24 +69,22 @@ def send_email(mysql: MySQL) -> dict:
 
     # send email with link using uuid
     username = user["username"]
-    sender = 'passwordreset@codecraft.com'
+    sender = 'codecraft.user.services@gmail.com'
     receiver = user["email"]
     # TODO: update link during deployment
     link = "https://localhost:3000/resetpassword?token={id}"
 
-    message = """From: CodeCraft <passwordreset@codecraft.com>
-    To: {username} <{receiver}>
-    Subject: CodeCraft Password Reset
-
-    Click the following link to reset your password:
-    {link}
-
-    If you did not request to change your password, ignore this email.
-    """
+    message = EmailMessage()
+    message.set_content("Click the following link to reset your password:\n{link}\n\nIf you did not request to change your password, ignore this email.")
+    message['Subject'] = "CodeCraft Password Reset"
+    message['From'] = sender
+    message['To'] = receiver
 
     try:
-        smtpObj = smtplib.SMTP('localhost')
-        smtpObj.sendmail(sender, receiver, message)
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtpObj:
+            smtpObj.starttls()
+            smtpObj.login(sender, os.getenv('EMAIL_PASSWORD'))
+            smtpObj.send_message(message)
     except:
         response["hasError"] = True
         response["errorMessage"] = "Failed to send email."
