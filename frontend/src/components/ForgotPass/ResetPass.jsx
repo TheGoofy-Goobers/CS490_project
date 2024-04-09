@@ -42,14 +42,12 @@ const ForgotPass = () => {
       }
 
       const changePass = () => {
-        const hashedPassword = SHA256(newPass.current + "CS490!").toString();
-        const newhash = SHA256(newPass.new + "CS490!").toString();
+        const newhash = SHA256(newPass.password + "CS490!").toString();
         const queryParameters = new URLSearchParams(window.location.search);
         const user = queryParameters.get("token")
         const check = {
-            currPass: hashedPassword,
             newPass: newhash,
-            sessionToken: user,
+            emailToken: user,
         };
         console.log(`Token: ${user}`)
         if (newPass.password != newPass.conf) {
@@ -62,12 +60,12 @@ const ForgotPass = () => {
             return;
         }
         
-        axios.post(`${FLASK_URL}/userChangePassword`, check)
+        axios.post(`${FLASK_URL}/userResetPassword`, check)
             .then((response) => {
                 const res = response.data;
                 if (res.success) {
                     delete newPass.conf;
-                    delete newPass.new;
+                    delete newPass.password;
                     alert(`NEW PASSWORD CHANGED SUCCESSFUL!`);
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
@@ -98,7 +96,7 @@ const ForgotPass = () => {
                                 <label>New Password:</label>
                                 <input
                                     type="password"
-                                    name="new"
+                                    name="password"
                                     value={newPass.password}
                                     onChange={handlePassChange}
                                     className="login-form-control"

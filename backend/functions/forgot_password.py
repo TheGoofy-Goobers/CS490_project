@@ -73,7 +73,7 @@ def send_email(mysql: MySQL) -> dict:
     sender = 'codecraft.user.services@gmail.com'
     receiver = user["email"]
     # TODO: update link during deployment
-    link = f"https://localhost:3000/resetpassword?token={id}"
+    link = f"http://localhost:3000/resetpassword?token={id}"
     html_content = f"""\
     <html>
     <head></head>
@@ -111,20 +111,40 @@ def reset_password(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'newPass' not in responseJson or 'user_id' not in responseJson:
+    if 'newPass' not in responseJson:
         response["hasError"] = True
-        response["errorMessage"] = "Unexpected error"
+        response["errorMessage"] = "No password submitted"
+        return response
+
+    if 'emailToken' not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "No email token found"
         return response
     
     new_pass = responseJson["newPass"]
     email_token = responseJson["emailToken"]
 
-    # update the user's password
+    # validate email token and grab user id
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT user_id FROM password_reset WHERE email_token = %s", (email_token))
-        user_id = cur.fetchone()
+        cur.execute("SELECT user_id FROM password_reset WHERE email_token = %s", (email_token,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+    
+    if 'user_id' not in user:
+        response["hasError"] = True
+        response["errorMessage"] = "Invalid email token"
+        return response
+    user_id = user["user_id"]
+
+    # Update the password
+    try:
         cur.execute("UPDATE users SET password = %s WHERE user_id = %s", (new_pass, user_id))
+        cur.execute("DELETE FROM password_reset WHERE user_id = %s", (user_id,))
         mysql.connection.commit()
         cur.close()
         response["success"] = True

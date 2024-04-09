@@ -33,7 +33,7 @@ function App() {
             <Route path='/login' element={<LoginPage/>}/>
             <Route path='/register' element={<Register />}/>
             <Route path='/feedback' element={<Feedback />}/>
-            <Route path='/refernces' element={<References />}/>
+            <Route path='/references' element={<References />}/>
             <Route path='/help' element={<Help />}/>
             <Route path='/report' element={<Report />}/>
             <Route path='/accountmanagement' element={<AccountManagement />} />
@@ -41,7 +41,7 @@ function App() {
             <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
             <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
-            <Route path='/jack/token=123456' element={<ResetPass/>}/>
+            <Route path='/resetpassword' element={<ResetPass/>}/>
           </Routes>
       </div>
     </div>
