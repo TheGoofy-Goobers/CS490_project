@@ -121,6 +121,24 @@ def setup():
     if event_scheduler_status != 'ON':
         cursor.execute("SET GLOBAL event_scheduler = ON")
 
+    # insert pre-existing data
+    for i in range(3):
+        i = str(i)
+        username = "username" + i
+        email = "email" + i +"@email.com"
+        password = "password"
+        cursor.execute("INSERT INTO users(username, email, password) VALUES(%s, %s, %s)", (username, email, password))
+    
+    cursor.execute("INSERT INTO user_feedback(user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note) VALUES(%s, %s, %s, %s, %s, %s)", (1, 5, 4, 3, 2, "note"))
+
+    for i in range(3):
+        i = str(i)
+        original = "print('Hello world " + i + "!')"
+        translated = "console.log('Hello world " + i + "!');"
+        cursor.execute("INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)", (1, "python", original, "javascript", translated, "stop", 85))
+
+    cursor.execute("INSERT INTO translation_feedback(user_id, star_rating, note) VALUES(%s, %s, %s)", (1, 5, "note"))
+
     # save changes and close
     connection.commit()
     cursor.close()
