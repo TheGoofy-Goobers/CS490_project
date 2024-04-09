@@ -132,7 +132,6 @@ const LoginPage = () => {
                   <img src={eyeicon} className='eye-icon' alt="eyeicon" />
                 </button>
               </div>
-<<<<<<< HEAD
               <div className="login-form-group">
                 <label>
                   <input
@@ -152,29 +151,10 @@ const LoginPage = () => {
               <div className="login-button-container">
                 <button type="submit" className="login-form-button">Login</button>
               </div>
+            </div>
             </form>
           }
         </div>
-=======
-            </div>
-            <div className="login-form-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="rememberMe"
-                  checked={credentials.rememberMe}
-                  onChange={handleChange}
-                /> Remember Me
-              </label>
-            </div>
-            <p><a href='/register'>Don't have an account? Register here</a></p>
-            <p><a href='/forgotpassword'>Forgot password?</a></p>
-            <div className="login-button-container">
-              <button type="submit" className="login-form-button">Login</button>
-            </div>
-          </form>
-        }
->>>>>>> 252f9869b7378313730f44d65a71e2f60426e0d3
       </div>
     </div>
   );
