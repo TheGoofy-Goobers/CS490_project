@@ -120,10 +120,18 @@ class TestSql:
                 assert user
                 assert user["session_token"] == id
 
-                time.sleep(3.2)
                 connection.commit()
                 cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
                 user1 = cur.fetchone()
+                its = 0
+                while user1:
+                    its += 1
+                    time.sleep(.25)
+                    connection.commit()
+                    cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
+                    user1 = cur.fetchone()
+                    if its >= 22:
+                        raise Exception("Timed out while waiting for data to be removed from logged_in table")
                 assert not user1
             except Exception as e:
                 assert str(e) and False
