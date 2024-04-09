@@ -125,9 +125,9 @@ const LoginPage = () => {
               <p><a href='/register'>
                 Don't have an account? Register here
               </a></p>
-              <p><a href='/forgotpassword'>
+              <a href='/forgotpassword'>
                 Forgot password?
-              </a></p>
+              </a>
               <div className="login-button-container">
                 <button type="submit" className="login-form-button">Login</button>
               </div>
