@@ -17,12 +17,15 @@ class MockFlaskMysqlCursor:
     def __init__(self):
         pass
 
-    def execute(self, query, format = None):
+    def execute(self, query, format=None):
         return None
 
-    def fetchone(self = None):
+    def fetchone(self):
         return None
-    
-    def close(self = None):
+
+    def fetchall(self):
+        return None
+
+    def close(self):
         if self:
             del self

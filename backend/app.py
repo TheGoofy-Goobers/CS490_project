@@ -1,12 +1,14 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
+
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
-from functions import api_status as status, change_profile as profile, logout
+from functions import api_status as status, change_profile as profile, logout, forgot_password
+from functions import translation_history as translation_history
 
 load_dotenv()
 
@@ -20,7 +22,7 @@ def create_app(testing: bool):
     if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
-        api.config['MYSQL_DB'] = 'codecraft'
+        api.config['MYSQL_DB'] = 'codecraft_testing'
         api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
     else:
         api.config['MYSQL_HOST'] = os.getenv('DB_URL')
@@ -80,10 +82,29 @@ def create_app(testing: bool):
         return profile.change_password(mysql)
 
 
+    # Email for password reset
+    @api.route('/userSendEmail', methods=['POST'])
+    def send_email():
+        return forgot_password.send_email(mysql)
+
+
+    # Reset user password
+    @api.route('/userResetPassword', methods=['POST'])
+    def reset_password():
+        return forgot_password.reset_password(mysql)
+
+
     # Delete account
     @api.route('/deleteAccount', methods=['POST'])
     def delete_account():
         return profile.delete_user(mysql)
+    
+
+    # Pull translation history
+    @api.route('/translationHistory', methods=['POST'])
+    def translation_history_route():
+        return translation_history.get_translation_history(mysql)
+
 
 
     # Logout

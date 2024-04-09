@@ -10,7 +10,7 @@ def submit_feedback(mysql: MySQL) -> dict:
 
     if 'sessionToken' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
         response['hasError'] = True
-        response['errorMessage'] = "Unexpected Error"
+        response['errorMessage'] = "Hamdi Error"
         return response
     
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
@@ -51,9 +51,9 @@ def submit_feedback(mysql: MySQL) -> dict:
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
-        response["errorMessage"] = str(e)
-        if cur:
+        response["errorMessage"] = f"Exception: {str(e)}"
+        if 'cur' in locals():
             cur.close()
-        return response
+    return response
     
     return response

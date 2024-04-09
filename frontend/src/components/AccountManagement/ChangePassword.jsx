@@ -36,6 +36,23 @@ const ChangePassword = () => {
         changePass();
     };
 
+    const validatePassword = () => {
+        const password = newPass.password || '';
+        // Check if password length is at least 8 characters
+        if (password.length < 8) {
+          return false;
+        }
+        // Check if password contains at least one number
+        if (!/\d/.test(password)) {
+          return false;
+        }
+        // Check if password contains at least one special character
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+          return false;
+        }
+        return true;
+      }
+    
     const changePass = () => {
         const hashedPassword = SHA256(newPass.current + "CS490!").toString();
         const newhash = SHA256(newPass.new + "CS490!").toString();
@@ -51,6 +68,11 @@ const ChangePassword = () => {
             showAlert();
             return;
         }
+
+        if (!validatePassword(user.password)) {
+            alert('Password must be at least 8 characters long, have a special character, and number.')
+            return;
+           }
 
         axios.post(`${FLASK_URL}/userChangePassword`, check)
             .then((response) => {
@@ -88,7 +110,7 @@ const ChangePassword = () => {
             {<AlertBox message={message} isOpen={alertOpen} />}
             <div className="delete-box-container">
                 <div className='login-form-box'>
-                    <form onSubmit={handlePassSubmit}>
+                    <form onSubmit={handlePassSubmit}>i 
                         <div className='change_password'>
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
