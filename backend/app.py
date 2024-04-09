@@ -87,7 +87,9 @@ def create_app(testing: bool):
     def delete_account():
         return profile.delete_user(mysql)
     
-    @api.route('/api/translation-history', methods=['GET'])
+
+    # Pull translation history
+    @api.route('/api/translation-history', methods=['POST'])
     def translation_history_route():
         return translation_history.get_translation_history(mysql)
 

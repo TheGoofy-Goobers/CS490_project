@@ -127,21 +127,31 @@ const TranslatePage = () => {
   }, {});
 
   useEffect(() => {
-    // Assume user_id is fetched from somewhere in your application
     const sessionToken = localStorage.getItem("sessionToken");
-    axios.get(`${FLASK_URL}/api/translation-history`, { params: { sessionToken } })
+    axios.post(`${FLASK_URL}/api/translation-history`, { sessionToken: sessionToken })
       .then(response => {
         // Process the data to format dates as 'Today', 'Yesterday', etc.
-        const processedHistory = response.data.map(item => {
-          // Create a new Date object from item.submission_date
-          const submissionDate = new Date(item.submission_date);
-          // Format the date
-          const formattedDate = formatSubmissionDate(submissionDate);
-          // Return a new object with the formatted date
-          return { ...item, formattedDate };
-        });
-        // Set the processed history to state
-        setTranslationHistory(processedHistory);
+        res = response.data
+        if (res.success) {
+          const processedHistory = res.rows.map(item => {
+            // Create a new Date object from item.submission_date
+            const submissionDate = new Date(item.submission_date);
+            // Format the date
+            const formattedDate = formatSubmissionDate(submissionDate);
+            // Return a new object with the formatted date
+            return { ...item, formattedDate };
+          });
+          // Set the processed history to state
+          setTranslationHistory(processedHistory);
+        }
+        else if (res.hasError) {
+          console.log(`Response has error: ${res.hasError}`)
+          console.log(`Error message: ${res.errorMessage}`)
+        }
+        if (res.logout) {
+          alert("Please login again.")
+          Logout()
+        }
       })
       .catch(error => console.error("Error fetching translation history:", error));
   }, [setTranslationHistory, sortMethod, dateFilter, sourceLanguageFilter, targetLanguageFilter]); // Add any other dependencies if needed
