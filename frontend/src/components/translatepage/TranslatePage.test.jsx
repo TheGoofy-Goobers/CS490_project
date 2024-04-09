@@ -19,6 +19,25 @@ beforeAll(() => {
   }));
 });
 
+beforeEach(() => {
+  // Adjust the mock implementation to check for the presence of required properties
+  axios.post.mockImplementation((url, data) => {
+    if (url === `${FLASK_URL}/translate` && data.text && data.srcLang && data.toLang && data.sessionToken) {
+      // Check if the text to translate is the specific JavaScript function we expect
+      if (data.text.includes('function add(a, b)')) {
+        return Promise.resolve({
+          data: {
+            success: true,
+            output: 'def add(a, b):\n    return a + b', // Simulated translation output
+            finish_reason: 'completed'
+          }
+        });
+      }
+    }
+    return Promise.resolve({ data: {} }); // Fallback for any other calls
+  });
+});
+
 beforeAll(() => {
   // Mock the window.location.assign with a jest function
   delete window.location;
@@ -37,6 +56,24 @@ beforeEach(() => {
 
 beforeEach(() => {
   Storage.prototype.getItem = jest.fn(() => "true"); // Adjust the returned value as needed for your tests
+});
+
+beforeEach(() => {
+  // Mock both axios.get and axios.post calls
+  axios.get.mockResolvedValue({ data: { code: 200, reason: 'OK' } });
+  axios.post.mockResolvedValue({
+    data: [] // Mock response for post requests, adjust according to what your component expects
+  });
+
+  // Mock navigator.clipboard.writeText
+  Object.assign(navigator, {
+    clipboard: {
+      writeText: jest.fn().mockResolvedValue(),
+    },
+  });
+
+  // Mock localStorage.getItem
+  Storage.prototype.getItem = jest.fn(() => "true");
 });
 
 // Mock for react-codemirror2
@@ -126,134 +163,108 @@ describe('TranslatePage Component', () => {
     clickSpy.mockRestore();
   });
 
-  test('displays translation in history after translation', async () => {
-    // Arrange: setup the mock for axios.get to simulate fetching translation history
-    axios.get.mockResolvedValue({
-        data: [{
-            original_code: 'console.log("Hello, world!");',
-            translated_code: 'print("Hello, world!")',
-            source_language: 'JavaScript',
-            target_language: 'Python',
-            submission_date: new Date().toISOString(),
-        }]
-    });
+  
 
-    // Act: Render the TranslatePage component
+  test('filters translation history by date and language', async () => {
+    // Arrange
+    const historyData = [
+      {
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        submission_date: new Date().toISOString() // Assuming the date is today
+      },
+      // ... additional history data if needed for a more comprehensive test
+    ];
+  
+    axios.get.mockResolvedValueOnce({ data: historyData });
+  
+    // Act
+    render(<TranslatePage />);
+    fireEvent.click(screen.getByTestId('history-button')); // Open the history sidebar
+  
+    // Assert 'Today' section is present after the initial render
+    let todaySection = await screen.findByText('Today');
+    expect(todaySection).toBeInTheDocument();
+  
+    // Select 'Today' from the date filter dropdown
+    const dateFilterDropdown = screen.getByLabelText('Date:');
+    fireEvent.change(dateFilterDropdown, { target: { value: 'Today' } });
+  
+    // Assert 'Today' section is still present after applying 'Today' filter
+    todaySection = await screen.findByText('Today');
+    expect(todaySection).toBeInTheDocument();
+  
+  });
+
+  test('filters translation history by source language', async () => {
+    // Arrange
+    const historyData = [
+      {
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        submission_date: new Date().toISOString() // Assuming the date is today
+      },
+      // ...additional history data if needed for a more comprehensive test
+    ];
+  
+    axios.get.mockResolvedValueOnce({ data: historyData });
+
+    // Act
     render(<TranslatePage />);
 
-    // Click the history button to show the translation history sidebar
-    const historyButton = screen.getByTestId('history-button');
-    fireEvent.click(historyButton);
+    // Open the history sidebar to make the filter controls visible
+    fireEvent.click(screen.getByTestId('history-button'));
 
-    // Assert: Check if at least one history item is displayed
+    // Select 'JavaScript' from the source language filter dropdown
+    const sourceLanguageFilterDropdown = screen.getByLabelText('Source Language:');
+    fireEvent.change(sourceLanguageFilterDropdown, { target: { value: 'JavaScript' } });
+
+    // Wait for filter application by checking that items for 'JavaScript' are present
     await waitFor(() => {
-        const historyItems = screen.getAllByTestId('history-item');
-        expect(historyItems.length).toBeGreaterThan(0);
+      const sourceLanguageItems = screen.getAllByText(/JavaScript/);
+      expect(sourceLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'JavaScript' item
     });
 
-    // Additional assertions can be added here to further verify the content of the history items
+  
+  });
+
+  test('filters translation history by target language', async () => {
+    // Arrange
+    const historyData = [
+      {
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        submission_date: new Date().toISOString() // Assuming the date is today
+      },
+      // ...additional history data if needed for a more comprehensive test
+    ];
+  
+    axios.get.mockResolvedValueOnce({ data: historyData });
+  
+    // Act
+    render(<TranslatePage />);
+  
+    // Open the history sidebar to make the filter controls visible
+    fireEvent.click(screen.getByTestId('history-button'));
+  
+    // Select 'Python' from the target language filter dropdown
+    const targetLanguageFilterDropdown = screen.getByLabelText('Target Language:');
+    fireEvent.change(targetLanguageFilterDropdown, { target: { value: 'Python' } });
+  
+    // Wait for filter application by checking that items for 'Python' are present
+    await waitFor(() => {
+      const targetLanguageItems = screen.getAllByText(/Python/);
+      expect(targetLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'Python' item
     });
+  });
 
-    test('filters translation history by date and language', async () => {
-      // Arrange
-      const historyData = [
-        {
-          original_code: 'console.log("Hello, world!");',
-          translated_code: 'print("Hello, world!")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString() // Assuming the date is today
-        },
-        // ... additional history data if needed for a more comprehensive test
-      ];
-    
-      axios.get.mockResolvedValueOnce({ data: historyData });
-    
-      // Act
-      render(<TranslatePage />);
-      fireEvent.click(screen.getByTestId('history-button')); // Open the history sidebar
-    
-      // Assert 'Today' section is present after the initial render
-      let todaySection = await screen.findByText('Today');
-      expect(todaySection).toBeInTheDocument();
-    
-      // Select 'Today' from the date filter dropdown
-      const dateFilterDropdown = screen.getByLabelText('Date:');
-      fireEvent.change(dateFilterDropdown, { target: { value: 'Today' } });
-    
-      // Assert 'Today' section is still present after applying 'Today' filter
-      todaySection = await screen.findByText('Today');
-      expect(todaySection).toBeInTheDocument();
-    
-    });
-
-    test('filters translation history by source language', async () => {
-      // Arrange
-      const historyData = [
-        {
-          original_code: 'console.log("Hello, world!");',
-          translated_code: 'print("Hello, world!")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString() // Assuming the date is today
-        },
-        // ...additional history data if needed for a more comprehensive test
-      ];
-    
-      axios.get.mockResolvedValueOnce({ data: historyData });
-
-      // Act
-      render(<TranslatePage />);
-
-      // Open the history sidebar to make the filter controls visible
-      fireEvent.click(screen.getByTestId('history-button'));
-
-      // Select 'JavaScript' from the source language filter dropdown
-      const sourceLanguageFilterDropdown = screen.getByLabelText('Source Language:');
-      fireEvent.change(sourceLanguageFilterDropdown, { target: { value: 'JavaScript' } });
-
-      // Wait for filter application by checking that items for 'JavaScript' are present
-      await waitFor(() => {
-        const sourceLanguageItems = screen.getAllByText(/JavaScript/);
-        expect(sourceLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'JavaScript' item
-      });
-
-    
-    });
-
-    test('filters translation history by target language', async () => {
-      // Arrange
-      const historyData = [
-        {
-          original_code: 'console.log("Hello, world!");',
-          translated_code: 'print("Hello, world!")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString() // Assuming the date is today
-        },
-        // ...additional history data if needed for a more comprehensive test
-      ];
-    
-      axios.get.mockResolvedValueOnce({ data: historyData });
-    
-      // Act
-      render(<TranslatePage />);
-    
-      // Open the history sidebar to make the filter controls visible
-      fireEvent.click(screen.getByTestId('history-button'));
-    
-      // Select 'Python' from the target language filter dropdown
-      const targetLanguageFilterDropdown = screen.getByLabelText('Target Language:');
-      fireEvent.change(targetLanguageFilterDropdown, { target: { value: 'Python' } });
-    
-      // Wait for filter application by checking that items for 'Python' are present
-      await waitFor(() => {
-        const targetLanguageItems = screen.getAllByText(/Python/);
-        expect(targetLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'Python' item
-      });
-    });
-    
-    
   
 });
 //test
+

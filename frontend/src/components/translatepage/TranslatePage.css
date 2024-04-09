@@ -2,7 +2,7 @@
   background-color: #343a40;
   color: white;
   min-height: 100vh;
-  font-family: 'Proxima Nova';
+  font-family: 'Proxima Nova',sans-serif;
 }
 
 .container {
@@ -140,7 +140,7 @@ h1, h2 {
 .history-item .target-language {
   flex: 1; /* Give equal space to source and target language text */
   white-space: nowrap;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Proxima Nova',sans-serif;
 }
 
 .arrow-icon {

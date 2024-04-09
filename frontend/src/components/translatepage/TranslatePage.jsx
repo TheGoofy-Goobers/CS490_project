@@ -30,7 +30,24 @@ const TranslatePage = () => {
   const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
   const [alertOpen, setAlertOpen] = useState(false);
   const [message, setMessage] = useState('Default message');
+  const [charCount, setCharCount] = useState(0); // State to track character count
+  const maxCharLimit = 2375; // Define maximum character limit
   let goodapi;
+
+  const handleBeforeChange = (editor, data, value) => {
+    // Calculate the length of the text after the change
+    const newTextLength = editor.getValue().length + value.length - data.text.join('\n').length;
+    if (newTextLength > maxCharLimit) {
+      // Prevent the change if it exceeds the limit
+      data.cancel();
+    }
+  };
+
+  const handleChange = (editor, data, value) => {
+    // Update input text and character count
+    setInputText(value);
+    setCharCount(editor.getValue().length); // Update character count based on current editor value
+  };
 
   const filterTranslationHistory = (history) => {
     return history
@@ -473,10 +490,10 @@ const TranslatePage = () => {
                   theme: 'material',
                   lineNumbers: true,
                 }}
-                onChange={(editor, data, value) => {
-                  setInputText(value); // This is the right approach for handling changes
-                }}
+                beforeChange={handleBeforeChange}
+                onChange={handleChange}
               />
+              <div className="char-count">Characters: {charCount}/{maxCharLimit}</div> {/* Display character count */}
             </div>
             <div className="code-box output-box">
               <h2>Output</h2>
