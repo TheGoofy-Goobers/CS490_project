@@ -21,7 +21,8 @@ def send_email(mysql: MySQL) -> dict:
         return response
 
     # accepts username or email for reset
-    username_or_email = responseJson['username'].strip()
+    username_or_email = responseJson['email'].strip()
+    print(username_or_email)
     # username/email validation
     is_username = False
     is_email = False
@@ -59,8 +60,8 @@ def send_email(mysql: MySQL) -> dict:
     try:
         cur.execute("DELETE FROM password_reset WHERE user_id=%s", (user["user_id"],))
         cur.execute("INSERT INTO password_reset(user_id, email_token) VALUES(%s, %s)", (user["user_id"], id))
-        mysql.commit()
-    except:
+        mysql.connection.commit()
+    except Exception as e:
         mysql.connection.rollback()
         cur.close()
         response["hasError"] = True
@@ -72,10 +73,22 @@ def send_email(mysql: MySQL) -> dict:
     sender = 'codecraft.user.services@gmail.com'
     receiver = user["email"]
     # TODO: update link during deployment
-    link = "https://localhost:3000/resetpassword?token={id}"
+    link = f"https://localhost:3000/resetpassword?token={id}"
+    html_content = f"""\
+    <html>
+    <head></head>
+    <body>
+        <p>Hello {username},</p>
+        <p>Click the following link to reset your password:<br>
+        <a href="{link}">Reset Password</a>
+        </p>
+        <p>If you did not request to change your password, ignore this email.</p>
+    </body>
+    </html>
+    """
 
     message = EmailMessage()
-    message.set_content("Click the following link to reset your password:\n{link}\n\nIf you did not request to change your password, ignore this email.")
+    message.set_content(html_content, subtype='html')
     message['Subject'] = "CodeCraft Password Reset"
     message['From'] = sender
     message['To'] = receiver
@@ -88,6 +101,10 @@ def send_email(mysql: MySQL) -> dict:
     except:
         response["hasError"] = True
         response["errorMessage"] = "Failed to send email."
+
+    # TODO: add frontend success message
+
+    return response
 
 def reset_password(mysql: MySQL) -> dict:
     response = {"hasError" : False}

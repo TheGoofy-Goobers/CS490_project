@@ -107,7 +107,7 @@ cursor.execute(create_password_reset_table_query)
 create_remove_old_email_tokens_procedure_query = """
 CREATE PROCEDURE IF NOT EXISTS RemoveOldEmailTokens()
 BEGIN
-    DECLARE cutoff_date TIMESTAMP;
+    DECLARE cutoff_time TIMESTAMP;
     SET cutoff_time = NOW() - INTERVAL 15 MINUTE;
 
     DELETE FROM password_reset WHERE email_request_time < cutoff_time;

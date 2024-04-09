@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const ForgotPass = () => {
 
     const [credentials, setCredentials] = useState({
-        email: ''
+        email: '',
       });
     
     const handleUser = (e) => {
@@ -22,7 +22,7 @@ const ForgotPass = () => {
     };
 
     const changeUser = () => {
-        axios.post(`${FLASK_URL}/resetPassword`, credentials)
+        axios.post(`${FLASK_URL}/userSendEmail`, credentials)
             .then((response) => {
                 const res = response.data;
                 console.log(`Has error: ${res.hasError}`)
@@ -58,8 +58,8 @@ const ForgotPass = () => {
                     <label>Username or Email:</label>
                     <input
                     type="text"
-                    name="username"
-                    value={credentials.username}
+                    name="email"
+                    value={credentials.email}
                     onChange={handleUser}
                     className="username-control"
                     />
