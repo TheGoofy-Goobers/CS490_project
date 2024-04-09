@@ -357,7 +357,7 @@ const TranslatePage = () => {
     return (
       <div className="translate-page">
         <div className="sidebar-container">
-        <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)}>
+        <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
           <FaHistory className="history-icon" />
         </button>
         {showSidebar && (
@@ -401,7 +401,7 @@ const TranslatePage = () => {
           <div key={dateIndex}>
             <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
             {items.map((item, itemIndex) => (
-              <div key={itemIndex} className="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
+              <div key={itemIndex} className="history-item" data-testid="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
                 {getLanguageIconElement(item.source_language)}
                 <span className="source-language">{item.source_language}</span>
                 <FaArrowRight className="arrow-icon" />
