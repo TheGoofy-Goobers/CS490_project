@@ -1,9 +1,10 @@
 import {React, useState} from 'react';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
+import "./TranslationFeedback.css"
 
 const Star = ({ selected = false, onClick }) => (
-    <span onClick={onClick} style={{ cursor: 'pointer', color: selected ? 'orange' : 'gray' }}>
+    <span onClick={onClick} style={{ cursor: 'pointer', color: selected ? 'orange' : 'gray', fontSize: '35px'}}>
         {selected ? '★' : '☆'}
     </span>
 )
@@ -65,32 +66,33 @@ function TranslationFeedback(){
     }
 
 
-    return(
-        <div>
-            <p>Rate Translation:</p>
-            <div>
-                <form onSubmit={handleSubmit}>
+    return (
+        <div className="rating-container">
+            <p className="text">Rate Translation:</p>
+            <form onSubmit={handleSubmit} className="rating-form">
+                <div className="rating-stars">
                     {[1, 2, 3, 4, 5].map((star, index) => (
                         <Star
                             key={index}
+                            className="star"
                             selected={rating >= star}
                             onClick={() => handleRating(star)}
                         />
                     ))}
-                    <textarea
-                        className="textbox"
-                        value={openended}
-                        onChange={handleChange}
-                        placeholder={`Type here (Limit: ${limit} characters)`}
-                        rows={4}
-                        cols={50}
-                    />            
-                    <button className="submit-button" type="submit">Submit</button>
-                </form>
-            </div>
-
+                </div>
+                <textarea
+                    className="textbox"
+                    value={openended}
+                    onChange={handleChange}
+                    placeholder={`Type here (Limit: ${limit} characters)`}
+                    rows={4}
+                    cols={50}
+                />
+                <button className="submit-button" type="submit">Submit</button>
+            </form>
         </div>
     )
+
 }
 
 export default TranslationFeedback
