@@ -11,6 +11,7 @@ import axios from 'axios'
 import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
 import AlertBox from '../AlertBox/AlertBox';
+import TranslationFeedback from './TranslationFeedback';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -514,11 +515,14 @@ const TranslatePage = () => {
             </button>
           </div>
         </div>
-        <a href='/report' htmlFor="sourceLanguage" >Having trouble? Report errors here</a>
+        <div>
+          <TranslationFeedback/>
+        </div>
       </div>
     );
   }
 }
+
 
 export default TranslatePage;
 //test
