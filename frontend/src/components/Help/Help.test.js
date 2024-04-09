@@ -1,33 +1,33 @@
-import React from 'react';
-import { render, fireEvent } from '@testing-library/react';
-import axios from 'axios';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Help from './Help';
+import HelpContent from './HelpContent';
 
-jest.mock('axios');
+jest.mock('./HelpContent', () => jest.fn(() => null));
 
-describe('Help Component', () => {
-  test('search functionality', async () => {
-    const { getByPlaceholderText, getByText } = render(<Help />);
+describe('Help Section Search Feature', () => {
+  it('updates search results based on user input', () => {
+    render(<Help />);
+    const searchBar = screen.getByPlaceholderText('Search...'); // Assuming your SearchBar has a placeholder
+    fireEvent.change(searchBar, { target: { value: 'translate' } });
 
-    // Enter a search query
-    const searchInput = getByPlaceholderText('Search...');
-    fireEvent.change(searchInput, { target: { value: 'Your search query' } });
-
-    // Assert that search results are displayed
-    expect(queryByText(/Search/i)).toBeInTheDocument(); // Use a regular expression to match part of the text
+    expect(HelpContent).toHaveBeenCalledWith(
+      expect.objectContaining({ searchQuery: 'translate' }),
+      expect.anything()
+    );
   });
+});
 
-
-  
-  test('link accessibility', async () => {
-    const { getByText } = render(<Help />);
-
-    // Click on each link and assert it does not throw an error
-    const links = getByText(/Resources/i).parentElement.getElementsByTagName('a');
-    Array.from(links).forEach(link => {
-      fireEvent.click(link);
-      expect(global.window.location.href).toBe(link.href);
+describe('Help Section Links', () => {
+  it('renders valid links for resources', () => {
+    render(<Help />);
+    const links = screen.getAllByRole('link');
+    
+    expect(links).toHaveLength(2); // Adjust based on the number of links you expect
+    links.forEach(link => {
+      expect(link).toHaveAttribute('href');
+      expect(link.getAttribute('href')).toMatch(/^https?:\/\/.+/); // Basic format validation
     });
   });
-
 });
+
+//test
