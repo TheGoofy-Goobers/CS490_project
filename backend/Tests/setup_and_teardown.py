@@ -98,7 +98,7 @@ def setup():
     CREATE PROCEDURE IF NOT EXISTS RemoveOldLogins()
     BEGIN
         DECLARE cutoff_date TIMESTAMP;
-        SET cutoff_date = NOW() - INTERVAL 1 DAY;
+        SET cutoff_date = NOW() - INTERVAL 2 SECOND;
 
         DELETE FROM logged_in WHERE login_date < cutoff_date;
     END
@@ -107,7 +107,7 @@ def setup():
 
     create_remove_old_logins_event_query = """
     CREATE EVENT IF NOT EXISTS RemoveOldLoginsEvent
-    ON SCHEDULE EVERY 1 MINUTE
+    ON SCHEDULE EVERY 1 SECOND
     DO
     BEGIN
         CALL RemoveOldLogins();

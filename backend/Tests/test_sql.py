@@ -1,11 +1,11 @@
 import pytest
-from Tests.Mocks.MockFlaskMysql import MockFlaskMysqlConnection, MockFlaskMysqlCursor
 from app import create_app
 import os
 from dotenv import load_dotenv
-from flask_mysqldb import MySQL
 import mysql.connector
 from Tests.setup_and_teardown import setup, teardown
+import uuid
+import time
 
 # *************************** TEST INFORMATION *************************** #
 # THESE TESTS TEST ONLY THE SQL CALLS USED IN OTHER FUNCTIONS. THE TABLE   #
@@ -64,7 +64,7 @@ class TestSql:
     
     @pytest.mark.parametrize("username,email,password,expectExisting", [("username1", "email@email.com", "password", True), ("unique", "email@email.com", "password", False)])
     def test_registration_sql(self, username, email, password, expectExisting):
-        cur = connection.cursor()
+        cur = connection.cursor(dictionary=True)
 
         try:
             cur.execute("SELECT username, email FROM users WHERE username = %s OR email = %s", (username, email)) # Exact query used in register_user.py
@@ -84,8 +84,48 @@ class TestSql:
                 assert str(e) and False
 
             try:
-                cur.execute("SELECT * FROM users WHERE user_id = 1 AND username = %s AND email = %s AND password = %s", (4, username, email, password))
+                cur.execute("SELECT * FROM users WHERE user_id = %s AND username = %s AND email = %s AND password = %s", (4, username, email, password))
+                user = cur.fetchone()
+                assert user
             except Exception as e:
                 assert str(e) and False
-                
+
+        cur.close()
+
+    @pytest.mark.parametrize("username,password,expectExisting", [("username", "password", False), ("username1", "password", True), ("email1@email.com", "password", True)])
+    def test_login_sql(self, username, password, expectExisting): # This test should cover the login portion of user registration as well
+        cur = connection.cursor(dictionary=True)
+
+        user = None
+        try:
+            cur.execute("SELECT user_id, password FROM users WHERE username = %s OR email = %s", (username, username))
+            user = cur.fetchone()
+            if not expectExisting:
+                assert not user
+            else:
+                assert user
+        except Exception as e:
+            assert str(e) and False
+
+        if expectExisting:
+            assert user["user_id"] > 0
+            assert user["password"] == password
+            id = str(uuid.uuid4())
+            try:
+                cur.execute("DELETE FROM logged_in WHERE user_id=%s", (user["user_id"],))
+                cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (user["user_id"], id))
+                connection.commit()
+                cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
+                user = cur.fetchone()
+                assert user
+                assert user["session_token"] == id
+
+                time.sleep(3.2)
+                connection.commit()
+                cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
+                user1 = cur.fetchone()
+                assert not user1
+            except Exception as e:
+                assert str(e) and False
+
         cur.close()
