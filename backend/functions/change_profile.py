@@ -36,17 +36,29 @@ def change_username(mysql: MySQL) -> dict:
         response["errorMessage"] = errors
         return response
     
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT username FROM users WHERE username=%s", (new_user,))
-    user = cur.fetchone()
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT username FROM users WHERE username=%s", (new_user,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
     if user:
         response["hasError"] = True
         response["errorMessage"] = "Username already in use. Choose a different username."
         return response
     
-    cur.execute("SELECT username FROM users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
+    try:
+        cur.execute("SELECT username FROM users WHERE user_id=%s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
     if not user:
         response["hasError"] = True
@@ -101,9 +113,15 @@ def change_password(mysql: MySQL) -> dict:
         return response
     
     # query the database to check if the user credentials are valid
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
     if not user:
         response["hasError"] = True
@@ -157,9 +175,15 @@ def delete_user(mysql: MySQL) -> dict:
         return response
     
     # query the database to check if the user credentials are valid
-    cur = mysql.connection.cursor()
-    cur.execute("SELECT user_id FROM users WHERE user_id=%s", (user_id,))
-    user = cur.fetchone()
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT user_id FROM users WHERE user_id=%s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
     if not user:
         response["hasError"] = True

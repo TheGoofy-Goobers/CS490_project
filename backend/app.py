@@ -6,7 +6,7 @@ import os
 from dotenv import load_dotenv
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
-from functions import api_status as status, change_profile as profile, logout
+from functions import api_status as status, change_profile as profile, logout, forgot_password
 
 load_dotenv()
 
@@ -78,6 +78,18 @@ def create_app(testing: bool):
     @api.route('/userChangePassword', methods=['POST'])
     def change_password():
         return profile.change_password(mysql)
+
+
+    # Email for password reset
+    @api.route('/userSendEmail', methods=['POST'])
+    def send_email():
+        return forgot_password.send_email(mysql)
+
+
+    # Reset user password
+    @api.route('/userResetPassword', methods=['POST'])
+    def reset_password():
+        return forgot_password.reset_password(mysql)
 
 
     # Delete account
