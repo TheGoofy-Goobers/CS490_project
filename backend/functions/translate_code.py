@@ -54,17 +54,23 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response["errorMessage"] = str(e)
         cur.close()
         return response
-
-    cur.execute(
-        "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-        (user_id, srcLang, message, toLang, user_id, "in progress", 0)
-    )
-
+    
+    try:
+        cur.execute(
+            "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+            (user_id, srcLang, message, toLang, user_id, "in progress", 0)
+        )
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        cur.close()
+        return response
+    
     try:
         gpt_response = gpt_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                { "role": "system", "content": "You are a helpful assistant who translates code from one language to another. Refrain from saying anything other than the translated code. The response can also omit the name of the language."},
+                { "role": "system", "content": "You are a helpful assistant who translates code from one language to another. Refrain from saying anything other than the translated code. The response can also omit the name of the language, and should not include the \` character as a delimiter."},
                 { "role": "user", "content": f"Translate this code from {srcLang} to {toLang}:\n{message}"}
                 ],
             max_tokens=500,
