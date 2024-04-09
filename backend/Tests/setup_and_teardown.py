@@ -23,7 +23,7 @@ mysql_config['database'] = 'codecraft_testing'
 connection.close()
 connection = mysql.connector.connect(**mysql_config)
 
-def setup():
+def setup_module():
     # create users table
     cursor = connection.cursor()
     create_user_table_query = """
@@ -143,7 +143,7 @@ def setup():
     connection.commit()
     cursor.close()
 
-def teardown():
+def teardown_module():
     cursor = connection.cursor()
     cursor.execute("DROP DATABASE codecraft_testing")
     connection.commit()

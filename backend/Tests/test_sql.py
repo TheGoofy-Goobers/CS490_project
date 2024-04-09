@@ -3,7 +3,7 @@ from app import create_app
 import os
 from dotenv import load_dotenv
 import mysql.connector
-from Tests.setup_and_teardown import setup, teardown
+from Tests.setup_and_teardown import setup_module, teardown_module
 import uuid
 import time
 
