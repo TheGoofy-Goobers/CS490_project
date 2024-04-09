@@ -102,8 +102,7 @@ def send_email(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["errorMessage"] = "Failed to send email."
 
-    # TODO: add frontend success message
-
+    response["success"] = True
     return response
 
 def reset_password(mysql: MySQL) -> dict:
