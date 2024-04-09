@@ -3,10 +3,23 @@ import { SITE_URL, FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } fro
 import axios from 'axios';
 import './AccountManagement.css';
 import { useNavigate } from 'react-router-dom';
+import AlertBox from '../AlertBox/AlertBox';
 
 // USERNAME CHANGING
 
 const ChangeUserame = () => {
+    const [message, setMessage] = useState('Default message');
+    const [alertOpen, setAlertOpen] = useState(false);
+
+    const showAlert = () => {
+        setAlertOpen(true);
+    
+        // Optionally, automatically close the alert after some time
+        setTimeout(() => {
+          setAlertOpen(false);
+        }, 2000); // This should match the duration in AlertBox or be longer
+      };
+    
     const [newUser, setUser] = useState({
         current: '',
         new: '',
@@ -34,23 +47,28 @@ const ChangeUserame = () => {
                 console.log(`Has error: ${res.hasError}`)
                 if (res.success) {
                     localStorage.setItem("username", newUser.new);
-                    alert(`USERNAME CHANGED!`);
+                    setMessage(`USERNAME CHANGED!`);
+                    showAlert();
                     delete newUser.current;
                     delete newUser.new;
-                    window.location.href = SITE_URL + "/accountmanagement";
-                    window.location.reload();
+                    setTimeout(() => { 
+                        window.location.href = SITE_URL + "/accountmanagement";
+                        window.location.reload();
+                    }, 4000);
                 }
                 else if(res.hasError) {
                     console.log(`Errors: ${res.errorMessage}`)
                 }
                 if (res.logout) {
-                    alert("Session expired. Please login again..")
-                    Logout()
+                    setMessage(`Session expired. Please login again.`)
+                    showAlert();
+                    setTimeout(Logout, 4000)
                 }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == 500) {
-                        alert(`BACKEND FAILED`);
+                        setMessage(`Backend failed please contact support!`)
+                        showAlert();
                     }
                     console.log(error.response);
                     console.log(error.response.status);
@@ -62,6 +80,7 @@ const ChangeUserame = () => {
 
     return(
         <div className="box-container">
+        {<AlertBox message={message} isOpen={alertOpen} />}
         <div className="login-form-box">
             <div className='manage_prof'>
 

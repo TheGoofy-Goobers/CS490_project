@@ -23,7 +23,7 @@ const TranslatePage = () => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [message, setMessage] = useState('Default message');
 
-  const showAlert = (res) => {
+  const showAlert = () => {
     setAlertOpen(true);
 
     // Optionally, automatically close the alert after some time
@@ -215,16 +215,12 @@ const TranslatePage = () => {
           const reasonMessage = res.finish_reason || 'No reason provided'
           setMessage(reasonMessage)
           showAlert();
-          if (res.finish_reason != "stop") {
-            var message = "Translate halted because"
-            if (res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
-            if (res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
-          }
         }
         console.log(`Response has error: ${res.hasError}`)
         if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
         if (res.apiErrorMessage) {
-          alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
+          setMessage(`${res.errorCode}`)
+          showAlert()
         }
         if (res.logout) {
           alert("Session expired. Please login again..")

@@ -6,10 +6,12 @@ import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../navbar/NavBar';
 import eyeicon from './eyeicon.svg';
+import AlertBox from '../AlertBox/AlertBox';
 
 
 const LoginPage = () => {
-
+  const [message, setMessage] = useState('Default message');
+  const [alertOpen, setAlertOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   const [credentials, setCredentials] = useState({
@@ -22,6 +24,15 @@ const LoginPage = () => {
   const [loggedInUser, setLoggedInUser] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate hook
   const [width, setWidth] = useState();
+
+  const showAlert = () => {
+    setAlertOpen(true);
+
+    // Optionally, automatically close the alert after some time
+    setTimeout(() => {
+      setAlertOpen(false);
+    }, 2000); // This should match the duration in AlertBox or be longer
+  };
 
   useEffect(() => {
     // Check if user is already logged in
@@ -63,14 +74,21 @@ const LoginPage = () => {
           setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
           delete credentials.username;
           delete credentials.password;
-          alert(`Welcome to codeCraft!`);
-          navigate('/');
-          window.location.reload();
+          setMessage(`Welcome to codeCraft!`);
+          showAlert();
+          setTimeout(() => {
+            window.location.href = '/';}, 2000)
         }
-        if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+        if (res.hasError) {
+          console.log(`Error response: ${res.errorMessage}`);
+          setMessage(`${res.errorMessage}`)
+          showAlert();
+        }
         console.log(`Response has error: ${res.hasError}`);
       }).catch((error) => {
         if (error.response) {
+          setMessage(`${error.response}`)
+          showAlert();
           console.log(error.response);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -78,13 +96,9 @@ const LoginPage = () => {
       });
   };
 
-
-
-  
-
-
   return (
     <div>
+    {<AlertBox message={message} isOpen={alertOpen} />}
       <div className="login-page-container">
         <div className="login-form-box">
           {!localStorage.getItem("isLoggedIn") &&

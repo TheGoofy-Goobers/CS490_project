@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import './FeedbackForm.css';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
+import AlertBox from '../AlertBox/AlertBox.jsx';
 
 function FeedbackForm() {
+  const [message, setMessage] = useState('Default message');
+  const [alertOpen, setAlertOpen] = useState(false);
   const [limit, setLimit] = useState(300);
   const [ratings, setRatings] = useState({
     question1: '',
@@ -12,6 +15,15 @@ function FeedbackForm() {
     question4: ''
   });
   const [openended, setOpenEnded] = useState('');
+
+  const showAlert = () => {
+    setAlertOpen(true);
+
+    // Optionally, automatically close the alert after some time
+    setTimeout(() => {
+      setAlertOpen(false);
+    }, 2000); // This should match the duration in AlertBox or be longer
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -31,12 +43,15 @@ function FeedbackForm() {
       console.log(`Response has error: ${res.hasError}`);
       if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
       else if (res.success) {
+        setMessage(`FEEDBACK SUBMITTED SUCCESFULLY!`);
+        showAlert();
         console.log('Feedback submitted successfully')
-        alert(`FEEDBACK SUBMITTED SUCCESFULLY!`)
       }
       if (res.logout) {
-        alert("Session expired. Please login again..")
-        Logout()
+        setMessage("Session expired. Please login again..");
+        showAlert();
+        setTimeout(Logout, 4000);
+        setTimeout(() => {window.location.href = '/'}, 4000);
       }
       // reset form state here if successful
       setOpenEnded('');
@@ -49,7 +64,8 @@ function FeedbackForm() {
       setLimit(300);
     }).catch((error) => {
       if (error.response) {
-        alert(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`)
+        setMessage(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`);
+        showAlert();
         console.log(error.response);
         console.log(error.response.status);
         console.log(error.response.headers);
@@ -76,6 +92,7 @@ function FeedbackForm() {
   {
     return (
       <div>
+      {<AlertBox message={message} isOpen={alertOpen} />}
         <form onSubmit={handleSubmit}>
           <div className="background-page">
             <div className="title">

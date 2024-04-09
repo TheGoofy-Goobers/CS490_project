@@ -26,6 +26,21 @@ function AlertBox({ message, isOpen }) {
       case 'content_filter':
         response = "Code content was flagged by openai content filters"
         break;
+      case '401':
+        response = "OpenAI API Authentication failed "
+        break;
+      case '403':
+        response = "Country not supported with OpenAI"
+        break;
+      case '429':
+        response = "Please wait you sent too many characters"
+        break;
+      case '500':
+        response = "Unknown OpenAI server error"
+        break;
+      case '503':
+        response = "OpenAI server is currently being overloaded, please before submitting again"
+        break;
       default:
         response = message
         break;
