@@ -22,7 +22,7 @@ def create_app(testing: bool):
     if testing:
         api.config['MYSQL_HOST'] = 'localhost'
         api.config['MYSQL_USER'] = 'root'
-        api.config['MYSQL_DB'] = 'codecraft'
+        api.config['MYSQL_DB'] = 'codecraft_testing'
         api.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD')
     else:
         api.config['MYSQL_HOST'] = os.getenv('DB_URL')

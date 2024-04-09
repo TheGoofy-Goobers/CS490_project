@@ -78,27 +78,26 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <div className="login-page-container">
-        <div className="login-form-box">
-          {!localStorage.getItem("isLoggedIn") &&
-            <form onSubmit={handleSubmit}>
-              <h2>Login</h2>
-              <div className="login-form-group">
-                <label>Username or Email:</label>
-                <input
-                  type="text"
-                  name="username"
-                  value={credentials.username}
-                  onChange={handleChange}
-                  className="login-form-control"
-                />
-              </div>
-              <div className="login-form-group">
-                <label>Password:</label>
+    <div className="login-page-container">
+      <div className="login-form-box">
+        {!localStorage.getItem("isLoggedIn") &&
+          <form onSubmit={handleSubmit}>
+            <h2>Login</h2>
+            <div className="login-form-group">
+              <label>Username or Email:</label>
+              <input
+                type="text"
+                name="username"
+                value={credentials.username}
+                onChange={handleChange}
+                className="login-form-control"
+              />
+            </div>
+            <div className="login-form-group">
+              <label>Password:</label>
+              <div className="password-container">
                 <input
                   type={showPassword ? 'text' : 'password'}
-                  // type="password"
                   name="password"
                   value={credentials.password}
                   onChange={handleChange}
@@ -112,6 +111,7 @@ const LoginPage = () => {
                   <img src={eyeicon} className='eye-icon' alt="eyeicon" />
                 </button>
               </div>
+<<<<<<< HEAD
               <div className="login-form-group">
                 <label>
                   <input
@@ -134,6 +134,26 @@ const LoginPage = () => {
             </form>
           }
         </div>
+=======
+            </div>
+            <div className="login-form-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="rememberMe"
+                  checked={credentials.rememberMe}
+                  onChange={handleChange}
+                /> Remember Me
+              </label>
+            </div>
+            <p><a href='/register'>Don't have an account? Register here</a></p>
+            <p><a href='/forgotpassword'>Forgot password?</a></p>
+            <div className="login-button-container">
+              <button type="submit" className="login-form-button">Login</button>
+            </div>
+          </form>
+        }
+>>>>>>> 252f9869b7378313730f44d65a71e2f60426e0d3
       </div>
     </div>
   );

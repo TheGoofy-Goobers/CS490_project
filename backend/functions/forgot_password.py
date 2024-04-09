@@ -22,7 +22,6 @@ def send_email(mysql: MySQL) -> dict:
 
     # accepts username or email for reset
     username_or_email = responseJson['email'].strip()
-    print(username_or_email)
     # username/email validation
     is_username = False
     is_email = False
@@ -101,6 +100,7 @@ def send_email(mysql: MySQL) -> dict:
     except:
         response["hasError"] = True
         response["errorMessage"] = "Failed to send email."
+        return response
 
     response["success"] = True
     return response

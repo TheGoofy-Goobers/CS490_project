@@ -81,4 +81,4 @@ class TestTranslationFeedback:
 
         assert response["hasError"]
         assert "success" not in response
-        assert "errorMessage" in response and response["errorMessage"] == "Database connection error."
+        assert "errorMessage" in response and response["errorMessage"] == "Exception: Database connection error."

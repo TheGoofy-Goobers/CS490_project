@@ -5,6 +5,7 @@ import json
 from flask_mysqldb import MySQL
 from mock import Mock
 from functions import get_user_id
+import smtplib
 
 class TestForgotPassword:
     @pytest.fixture()
@@ -67,3 +68,20 @@ class TestForgotPassword:
         assert "success" not in response
         assert response["hasError"]
         assert response["errorMessage"].startswith("Invalid format for username or email")
+
+    @pytest.mark.parametrize("email", [("email@email.com")])
+    def test_failed_email(self, client, email, monkeypatch):
+        def SeededError():
+            raise Exception("Error sending email.")
+
+        # mocks connection
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1, "email": "email@email.com", "username": "username"})
+        monkeypatch.setattr(smtplib, "SMTP", SeededError)
+
+        response = client.post("/userSendEmail", data=json.dumps({"email": email}))
+        response = response.json
+
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["errorMessage"].startswith("Failed to send email")
