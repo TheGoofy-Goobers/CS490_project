@@ -3,6 +3,8 @@ from Tests.Mocks.MockFlaskMysql import MockFlaskMysqlConnection, MockFlaskMysqlC
 from flask_mysqldb import MySQL
 from app import create_app
 import json
+from functions import get_user_id
+import datetime
 
 class TestTranslationHistory:
     @pytest.fixture()
@@ -16,40 +18,50 @@ class TestTranslationHistory:
     @pytest.fixture()
     def client(self, app):
         return app.test_client()
-    
-    def test_get_translation_history_success(self, client, monkeypatch):
-        # Setup mock data for translation history
-        history_data = [
-            {"id": 1, "original_code": "print('Hello')", "translated_code": "echo 'Hello'", "source_language": "Python", "target_language": "PHP", "user_id": 1, "submission_date": "2023-04-01 10:00:00"}
-            # Add more mock history records if necessary
-        ]
 
-        # Create an instance of the mock cursor and set the mock data
-        mock_cursor = MockFlaskMysqlCursor()
-        mock_cursor.set_fetchall_data(history_data)
-
-        # Mock MySQL cursor and connection
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_get_translation_history_success(self, sessionToken, client, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        monkeypatch.setattr('flask_mysqldb.MySQL.connection.cursor', lambda: mock_cursor)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
+        retVal = ({'source_language': 'JavaScript', 'original_code': 'console.log("Hello world") //This should be placed inside a function', 'target_language': 'Python', 'translated_code': 'print("Hello world") #This should be placed inside a function', 'submission_date': datetime.datetime(2024, 4, 9, 0, 19, 26)}, {'source_language': 'Python', 'original_code': 'print("I\'m testing the translation!") #This should replace the div on the page with <p> and the content of this emssage</p>', 'target_language': 'JavaScript', 'translated_code': 'document.getElementById("divId").innerHTML = "<p>I\'m testing the translation!</p>";', 'submission_date': datetime.datetime(2024, 4, 5, 14, 31, 27)})
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchall", lambda self: retVal)
 
-        # Send GET request with mocked session token
-        response = client.get("/api/translation-history", query_string={"sessionToken": "valid-session-token"})
-        response_data = response.json
+        length = len(retVal)
 
-        # Assert response data matches mock history data
-        assert response.status_code == 200
-        assert response_data == history_data
+        response = client.post("/translationHistory", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
 
-    def test_get_translation_history_invalid_session_token(self, client, monkeypatch):
-        # Mock MySQL cursor and connection
+        assert "success" in response
+        assert not response["hasError"]
+        assert "rows" in response
+        rows = response["rows"]
+        assert length == len(rows)
+        assert rows[0]['source_language'] == "JavaScript"
+
+    @pytest.mark.parametrize("sessionToken,userId,error", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", -1, ""), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 1, "Error")])
+    def test_get_translation_history_invalid_session_token(self, sessionToken, userId, error, client, monkeypatch):
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        monkeypatch.setattr(MockFlaskMysqlCursor, "execute", lambda *args, **kwargs: None)
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda *args, **kwargs: None)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (userId, error))
 
-        # Send GET request with invalid session token
-        response = client.get("/api/translation-history", query_string={"sessionToken": "invalid-session-token"})
-        response_data = response.json
+        response = client.post("/translationHistory", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
 
-        # Assert response is error with invalid session token message
-        assert response.status_code == 404
-        assert "error" in response_data and response_data["error"] == "Invalid session token"
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["logout"]
+        assert response["errorMessage"] == "[LOGIN ERROR] User is not logged in!" or response["errorMessage"] == error
+
+    @pytest.mark.parametrize("sessionToken", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    def test_get_translation_history_catches_sql_error(self, sessionToken, client, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
+        def seeded_error(self, query, format=None):
+            raise Exception("Exception")
+        monkeypatch.setattr(MockFlaskMysqlCursor, "execute", seeded_error)
+
+        response = client.post("/translationHistory", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
+
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["errorMessage"] == "Exception"

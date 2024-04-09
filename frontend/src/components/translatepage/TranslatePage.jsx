@@ -128,7 +128,7 @@ const TranslatePage = () => {
 
   useEffect(() => {
     const sessionToken = localStorage.getItem("sessionToken");
-    axios.post(`${FLASK_URL}/api/translation-history`, { sessionToken: sessionToken })
+    axios.post(`${FLASK_URL}/translationHistory`, { sessionToken: sessionToken })
       .then(response => {
         // Process the data to format dates as 'Today', 'Yesterday', etc.
         res = response.data

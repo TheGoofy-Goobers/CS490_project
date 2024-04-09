@@ -10,7 +10,7 @@ def get_status(api_key):
     response = None
     try:
         status = requests.get(endpoint, headers=headers)
-        response.raise_for_status()
+        status.raise_for_status()
 
         response = {"code": status.status_code, "reason": status.reason}
     except requests.HTTPError as e:
