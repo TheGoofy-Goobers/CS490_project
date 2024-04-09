@@ -16,6 +16,7 @@ import ChangeUserame from './components/AccountManagement/ChangeUsername.jsx';
 import ChangePassword from './components/AccountManagement/ChangePassword.jsx';
 import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
 import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
+import ResetPass from './components/ForgotPass/ResetPass.jsx'
 
 function App() {
   
@@ -40,6 +41,7 @@ function App() {
             <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
             <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
+            <Route path='/jack/token=123456' element={<ResetPass/>}/>
           </Routes>
       </div>
     </div>

@@ -68,6 +68,7 @@ const ForgotPass = () => {
                 </div>
                 </div>
             </form>
+            <a href='/jack/token=123456'>Test</a>
         </div>
     )
 }
