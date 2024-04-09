@@ -3,5 +3,3 @@ venv/
 .env
 __pycache__
 Tests/__pycache__
-functions/__pycache__
-backend/functions/__pycache__
