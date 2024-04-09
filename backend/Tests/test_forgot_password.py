@@ -85,3 +85,50 @@ class TestForgotPassword:
         assert "success" not in response
         assert response["hasError"]
         assert response["errorMessage"].startswith("Failed to send email")
+
+    @pytest.mark.parametrize("newPass,emailToken", [("Password1!", "0c5a0708-09ca-4869-a22b-fde2a89f4ad9")])
+    def test_successful_password_reset(self, client, newPass, emailToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1})
+
+        response = client.post("/userResetPassword", data=json.dumps({"newPass": newPass, "emailToken": emailToken}))
+        response = response.json
+
+        assert "success" in response
+        assert response["success"]
+        assert not response["hasError"]
+
+    @pytest.mark.parametrize("newPass", [("Password1!")])
+    def test_missing_token(self, client, newPass, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1})
+
+        response = client.post("/userResetPassword", data=json.dumps({"newPass": newPass}))
+        response = response.json
+
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["errorMessage"].startswith("No email token found")
+
+    @pytest.mark.parametrize("emailToken", [("0c5a0708-09ca-4869-a22b-fde2a89f4ad9")])
+    def test_missing_password(self, client, emailToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1})
+
+        response = client.post("/userResetPassword", data=json.dumps({"emailToken": emailToken}))
+        response = response.json
+
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["errorMessage"].startswith("No password submitted")
+
+    @pytest.mark.parametrize("newPass,emailToken", [("Password1!", "0c5a0708-09ca-4869-a22b-fde2a89f4ad9")])
+    def test_invalid_token(self, client, newPass, emailToken, monkeypatch):
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+
+        response = client.post("/userResetPassword", data=json.dumps({"newPass": newPass, "emailToken": emailToken}))
+        response = response.json
+
+        assert "success" not in response
+        assert response["hasError"]
+        assert response["errorMessage"].startswith("Invalid email token")

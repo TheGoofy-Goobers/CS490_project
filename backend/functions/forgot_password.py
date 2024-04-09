@@ -134,7 +134,7 @@ def reset_password(mysql: MySQL) -> dict:
         response["errorMessage"] = str(e)
         return response
     
-    if 'user_id' not in user:
+    if not user:
         response["hasError"] = True
         response["errorMessage"] = "Invalid email token"
         return response
