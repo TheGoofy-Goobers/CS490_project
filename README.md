@@ -42,6 +42,7 @@ root/
 ## Serve the app
 `cd frontend` <br>
 `npm start` starts frontend <br>
+For WSL, `start-wsl-backend` starts backend for WSL with python3,
 For UNIX, `npm run start-backend` starts backend <br>
 For Windows, `npm run run-backend` starts backend
 

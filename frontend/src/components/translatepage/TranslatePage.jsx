@@ -28,6 +28,8 @@ const TranslatePage = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [sourceLanguageFilter, setSourceLanguageFilter] = useState('');
   const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [message, setMessage] = useState('Default message');
   let goodapi;
 
   const filterTranslationHistory = (history) => {
@@ -94,7 +96,14 @@ const TranslatePage = () => {
     }
   }
 
-  
+  const showAlert = () => {
+    setAlertOpen(true);
+
+    // Optionally, automatically close the alert after some time
+    setTimeout(() => {
+      setAlertOpen(false);
+    }, 2000); // This should match the duration in AlertBox or be longer
+  };
   
   const fileInputRef = useRef(null);
 
@@ -302,17 +311,15 @@ const TranslatePage = () => {
         if (res.success) {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
-          if (res.finish_reason != "stop") {
-            var message = "Translate halted because"
-            if (res.finish_reason == "length") alert(`${message} translated code is too long - too many tokens.`)
-            if (res.finish_reason == "content_filter") alert(`${message} code content was flagged by openai content filters.`)
-          }
+          const reasonMessage = res.finish_reason || 'No reason provided'
+          setMessage(reasonMessage)
+          showAlert();
         }
-
         console.log(`Response has error: ${res.hasError}`)
         if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
         if (res.apiErrorMessage) {
-          alert(`API Error: ${res.apiErrorMessage}\nCode: ${res.errorCode}`)
+          setMessage(`${res.errorCode}`)
+          showAlert()
         }
         if (res.logout) {
           alert("Session expired. Please login again..")
@@ -320,7 +327,7 @@ const TranslatePage = () => {
         }
       }).catch((error) => {
         if (error.response) {
-          alert(`Error enocuntered: ${res.errorMessage}`)
+          setIsTranslating(`Error enocuntered: ${res.errorMessage}`)
           console.log(error.response)
           console.log(error.response.status)
           console.log(error.response.headers)
@@ -367,6 +374,7 @@ const TranslatePage = () => {
   else {
     return (
       <div className="translate-page">
+      {<AlertBox message={message} isOpen={alertOpen} />}
         <div className="sidebar-container">
         <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
           <FaHistory className="history-icon" />
