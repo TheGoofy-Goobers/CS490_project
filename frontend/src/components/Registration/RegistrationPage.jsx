@@ -5,8 +5,11 @@ import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom'
 import { setLocal } from '../../vars';
+import AlertBox from '../AlertBox/AlertBox';
 
 const RegistrationPage = () => {
+  const [message, setMessage] = useState('Default message');
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const [user, setUser] = useState({
     username: '',
@@ -28,16 +31,19 @@ const RegistrationPage = () => {
     e.preventDefault();
 
     if (!validateUsername()) {
-      alert("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.");
+      setMessage("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.");
+      showAlert();
       return;
     }
     if (!validateEmail()) {
-      alert("Please enter a valid email address.");
+      setMessage("Please enter a valid email address.");
+      showAlert();
       return;
     }
 
      if (!validatePassword(user.password)) {
-      alert('Password must be at least 8 characters long, have a special character, and number.')
+      setMessage('Password must be at least 8 characters long, have a special character, and number.');
+      showAlert();
       return;
      }
 
@@ -70,6 +76,15 @@ const RegistrationPage = () => {
     return true;
   }
 
+  const showAlert = () => {
+    setAlertOpen(true);
+
+    // Optionally, automatically close the alert after some time
+    setTimeout(() => {
+      setAlertOpen(false);
+    }, 2000); // This should match the duration in AlertBox or be longer
+  };
+
   var res
   const register = () => {
     
@@ -84,23 +99,33 @@ const RegistrationPage = () => {
     .then((response) => {
       res = response.data
       if (res.success) {
-        alert("Registration Success!");
         setLocal(res.sessionToken, user.username, Math.floor(Date.now() / 1000))
         delete user.username 
         delete user.email
-        navigate('/')
-        window.location.reload();
+        alert('Registration Success!')
+        setMessage('Registration Success!');
+        showAlert()
+        setTimeout(() => {window.location.href = '/'}, 4000);
       }
       console.log(`Response has error: ${res.hasError}`)
-      if(res.usernameErrors) console.log(`Username errors: ${res.usernameErrors}`)
-      if(res.emailErrors) console.log(`Email errors: ${res.emailErrors}`)
+      if(res.usernameErrors) {
+        console.log(`Username errors: ${res.usernameErrors}`)
+        setMessage(`${res.usernameErrors}`)
+        showAlert();}
+      if(res.emailErrors) {
+        console.log(`Email errors: ${res.emailErrors}`)
+        setMessage(`${res.emailErrors}`)
+        showAlert();}
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
       if(res.sqlErrors && res.sqlErrors.length > 0) { // TODO: This is where we will see information on duplicate username or email - make sure to handle this
-        alert(`${res.sqlErrors}`)
+        setMessage(`${res.sqlErrors}`)
+        showAlert();
         console.log(`SQL Errors: ${res.sqlErrors}`)
       }
     }).catch((error) => {
       if (error.response) {
+        setMessage(`${error.response}`)
+        showAlert();
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -114,6 +139,7 @@ const RegistrationPage = () => {
     return (
       <div className="registration-page-container">
         <div className="registration-form-box">
+        {<AlertBox message={message} isOpen={alertOpen} />}
           <form onSubmit={handleSubmit}>
             <h2 className="registration-form-title">Register</h2>
             <div className="registration-form-group">

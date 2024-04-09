@@ -19,10 +19,7 @@ import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
 import ResetPass from './components/ForgotPass/ResetPass.jsx'
 
 function App() {
-  
  setInterval(isExpired(), 1000); //checks every second
-
-
   return (
     <div className="App">
       <NavBar />
@@ -41,7 +38,7 @@ function App() {
             <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
             <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
-            <Route path='/resetpassword' element={<ResetPass/>}/>
+            <Route path='/resetpassword' element={<ResetPass />}/>
           </Routes>
       </div>
     </div>

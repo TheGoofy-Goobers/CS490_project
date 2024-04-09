@@ -3,11 +3,23 @@ import { SITE_URL, FLASK_URL, setSessionLogin, isExpired, Logout } from '../../v
 import axios from 'axios';
 import './AccountManagement.css';
 import { Link } from 'react-router-dom';
+import AlertBox from '../AlertBox/AlertBox';
 import SHA256 from 'crypto-js/sha256';
 
 
 const ChangePassword = () => {
+    const [message, setMessage] = useState('Default message');
+    const [alertOpen, setAlertOpen] = useState(false);
 
+    const showAlert = () => {
+        setAlertOpen(true);
+    
+        // Optionally, automatically close the alert after some time
+        setTimeout(() => {
+          setAlertOpen(false);
+        }, 2000); // This should match the duration in AlertBox or be longer
+      };
+    
     const [newPass, setPass] = useState({
         current: '',
         new: '',
@@ -24,8 +36,8 @@ const ChangePassword = () => {
         changePass();
     };
 
-    const validatePassword = () => {
-        const password = newPass.password || '';
+    const validatePassword = (pass) => {
+        const password = pass || '';
         // Check if password length is at least 8 characters
         if (password.length < 8) {
           return false;
@@ -52,12 +64,14 @@ const ChangePassword = () => {
         };
 
         if (newPass.new != newPass.conf) {
-            alert(`New and confirmed are different. Change it to match!`);
+            setMessage(`New and confirmed are different. Change it to match!`);
+            showAlert();
             return;
         }
 
-        if (!validatePassword(user.password)) {
-            alert('Password must be at least 8 characters long, have a special character, and number.')
+        if (!validatePassword(newPass.new)) {
+            setMessage(`Password must be at least 8 characters long, have a special character, and number.`);
+            showAlert();
             return;
            }
 
@@ -68,18 +82,21 @@ const ChangePassword = () => {
                     delete newPass.conf;
                     delete newPass.current;
                     delete newPass.new;
-                    alert(`NEW PASSWORD CHANGED SUCCESSFUL!`);
+                    setMessage(`NEW PASSWORD CHANGED SUCCESSFUL!`);
+                    showAlert()
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
-                    alert("Session expired. Please login again..")
-                    Logout()
+                    setMessage(`Session expired. Please login again.`)
+                    showAlert();
+                    setTimeout(Logout, 4000)
                 }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == '500 (INTERNAL SERVER ERROR)') {
-                        alert(`BACKEND FAILED`);
+                        setMessage(`BACKEND FAILED contact support`);
+                        showAlert();
                     }
                     console.log(error.response);
                     console.log(error.response.status);
@@ -91,6 +108,7 @@ const ChangePassword = () => {
 
     return(
         <div>
+            {<AlertBox message={message} isOpen={alertOpen} />}
             <div className="delete-box-container">
                 <div className='login-form-box'>
                     <form onSubmit={handlePassSubmit}>i 
