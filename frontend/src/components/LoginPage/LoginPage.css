@@ -133,14 +133,21 @@ a{
 }
 
 .show-password-button {
-    position: absolute;
-    right: 4rem;
-    top: 23.3rem;
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.15rem;
+  height: calc(100% - 1rem);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
 }
 
 .show-password-button:active .eye-icon {
     filter: brightness(75%); /* Makes the image 25% darker when the button is clicked */
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
