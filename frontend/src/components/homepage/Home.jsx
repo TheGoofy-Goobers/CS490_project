@@ -27,8 +27,10 @@ const Home = () => {
                 
                 <div className="step1">
                     <h3>Choose Input and Output Language</h3>
-                    <img id='langs' src={javascr}/>
-                    <img id='langs2' src={cprog}/>  
+                    <div className="langholder">
+                        <img id='langs' src={javascr}/>
+                        <img id='langs2' src={cprog}/>
+                    </div>
                 </div>
                 <img className='arrows' src={arrow}/>
                 <div className="step2">
@@ -43,14 +45,15 @@ const Home = () => {
                 </div>
             </div>
             </div>
+            
+            <h1>Accepted Languages</h1>
             <div className="Accepted">
-                <h1>Accepted Languages</h1>
-                <img src={javascr}/>
-                <img src={py}/>
-                <img src={cprog}/>
-                <img src={jav}/>
+                <img className="langs" src={javascr}/>
+                <img className="langs" src={py}/>
+                <img className="langs" src={cprog}/>
+                <img className="langs" id="jav" src={jav}/>
             </div>
-            <div>
+            <div className="box">
                 <Link to="/translate">
                 <button className="translate_now" >Try it out !!!</button>
                 </Link>
