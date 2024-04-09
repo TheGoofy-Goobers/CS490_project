@@ -89,7 +89,7 @@ def create_app(testing: bool):
     
 
     # Pull translation history
-    @api.route('/api/translation-history', methods=['POST'])
+    @api.route('/translationHistory', methods=['POST'])
     def translation_history_route():
         return translation_history.get_translation_history(mysql)
 
