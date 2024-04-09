@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { SITE_URL, FLASK_URL, setSessionLogin, isExpired, Logout } from '../../vars';
+import './ResetPass.css';
+import { FLASK_URL, SITE_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
 import axios from 'axios';
-import './AccountManagement.css';
-import { Link } from 'react-router-dom';
 import SHA256 from 'crypto-js/sha256';
+import { useHistory } from 'react-router-dom';
 
+const ForgotPass = () => {
 
-const ChangePassword = () => {
-
-    const [newPass, setPass] = useState({
-        current: '',
-        new: '',
-        conf: '',
-    });
-
+    const [newPass, setNewPass] = useState({
+        password: '',
+        conf: ''
+      });
+    
     const handlePassChange = (e) => {
         const { name, value } = e.target;
-        setPass({ ...newPass, [name]: value });
+        setNewPass({ ...newPass, [name]: value });
+        
     };
 
     const handlePassSubmit = (e) => {
+        console.log(e); 
         e.preventDefault();
         changePass();
     };
@@ -40,33 +40,33 @@ const ChangePassword = () => {
         }
         return true;
       }
-    
-    const changePass = () => {
+
+      const changePass = () => {
         const hashedPassword = SHA256(newPass.current + "CS490!").toString();
         const newhash = SHA256(newPass.new + "CS490!").toString();
-        const user = localStorage.getItem("sessionToken");
+        const queryParameters = new URLSearchParams(window.location.search);
+        const user = queryParameters.get("token")
         const check = {
             currPass: hashedPassword,
             newPass: newhash,
             sessionToken: user,
         };
-
-        if (newPass.new != newPass.conf) {
+        console.log(`Token: ${user}`)
+        if (newPass.password != newPass.conf) {
             alert(`New and confirmed are different. Change it to match!`);
             return;
         }
 
-        if (!validatePassword(user.password)) {
+        if (!validatePassword(newPass.password)) {
             alert('Password must be at least 8 characters long, have a special character, and number.')
             return;
-           }
-
+        }
+        
         axios.post(`${FLASK_URL}/userChangePassword`, check)
             .then((response) => {
                 const res = response.data;
                 if (res.success) {
                     delete newPass.conf;
-                    delete newPass.current;
                     delete newPass.new;
                     alert(`NEW PASSWORD CHANGED SUCCESSFUL!`);
                 }
@@ -88,31 +88,18 @@ const ChangePassword = () => {
             });
     };
 
-
     return(
-        <div>
-            <div className="delete-box-container">
-                <div className='login-form-box'>
-                    <form onSubmit={handlePassSubmit}>i 
+        <div className="forgot-pass-container">
+            <form onSubmit={handlePassSubmit}> 
                         <div className='change_password'>
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
-                            <div className="login-form-group">
-                                <label>Current Password:</label>
-                                <input
-                                    type="password"
-                                    name="current"
-                                    value={newPass.current}
-                                    onChange={handlePassChange}
-                                    className="login-form-control"
-                                />
-                            </div>
                             <div className="login-form-group">
                                 <label>New Password:</label>
                                 <input
                                     type="password"
                                     name="new"
-                                    value={newPass.new}
+                                    value={newPass.password}
                                     onChange={handlePassChange}
                                     className="login-form-control"
                                 />
@@ -131,11 +118,9 @@ const ChangePassword = () => {
                                 </div>
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
     )
 }
 
-export default ChangePassword;
+export default ForgotPass;
