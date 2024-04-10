@@ -23,6 +23,7 @@
     "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger",
     "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger",
     "test-backend": "cd ../backend && python -m pytest -s Tests/",
+    "test-wsl-backend": "cd ../backend && python3 -m pytest -s Tests/",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

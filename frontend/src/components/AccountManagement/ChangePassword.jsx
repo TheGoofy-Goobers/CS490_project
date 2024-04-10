@@ -107,11 +107,10 @@ const ChangePassword = () => {
 
 
     return(
-        <div>
-            {<AlertBox message={message} isOpen={alertOpen} />}
             <div className="delete-box-container">
-                <div className='login-form-box'>
-                    <form onSubmit={handlePassSubmit}>i 
+            {<AlertBox message={message} isOpen={alertOpen} />}
+                
+                    <form onSubmit={handlePassSubmit}>
                         <div className='change_password'>
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
@@ -151,8 +150,6 @@ const ChangePassword = () => {
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
     )
 }
 
