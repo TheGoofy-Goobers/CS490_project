@@ -55,11 +55,17 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         cur.close()
         return response
     
+    translation_id = -1
     try:
         cur.execute(
             "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (user_id, srcLang, message, toLang, user_id, "in progress", 0)
         )
+        mysql.connection.commit()
+        cur.execute("SELECT translation_id FROM translation_history WHERE user_id=%s and status=%s", (user_id, "in progress"))
+        val = cur.fetchone()
+        if val:
+            translation_id = val["translation_id"]
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = str(e)
@@ -92,14 +98,29 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response["hasError"] = True
         response["apiErrorMessage"] = e.message
         response["errorCode"] = e.code
+        db_log_translation_errors(mysql, translation_id, e.message, e.code, "api")
         return response
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
         response["errorMessage"] = str(e)
+        db_log_translation_errors(mysql, translation_id, str(e))
         cur.close()
         return response
     
     cur.close()
 
     return response
+
+def db_log_translation_errors(mysql, translation_id, errorMessage, errorCode = None, etype = "other"):
+    if translation_id < 1:
+        print("Issue with SQL code on inserting in progress translation into translation_history")
+    cur = mysql.connection.cursor()
+    try:
+        cur.execute("INSERT INTO translation_errors(translation_id, error_message, error_code, error_type) VALUES(%s, %s, %s)", (translation_id, errorMessage, errorCode, etype))
+        mysql.connection.commit()
+    except Exception as e:
+        print("Error while attempting to insert a translation error into the database!")
+        print("Error message:", str(e))
+        cur.close()
+    cur.close()

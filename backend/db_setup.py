@@ -52,6 +52,19 @@ CREATE TABLE IF NOT EXISTS translation_history (
 """
 cursor.execute(create_translation_table_query)
 
+# create translation error table
+create_translation_error_table_query = """
+CREATE TABLE IF NOT EXISTS translation_errors (
+    error_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    translation_id INT NOT NULL,
+    error_message VARCHAR(2048) NOT NULL,
+    error_code INT,
+    error_type VARCHAR(8) NOT NULL,
+    FOREIGN KEY (translation_id) REFERENCES translation_history(translation_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_translation_error_table_query)
+
 # create feedback form table
 create_feedback_table_query = """
 CREATE TABLE IF NOT EXISTS user_feedback (
