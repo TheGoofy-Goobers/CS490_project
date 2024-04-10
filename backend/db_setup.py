@@ -136,6 +136,7 @@ BEGIN
     CALL RemoveOldEmailTokens();
 END;
 """
+cursor.execute(create_remove_old_email_tokens_event_query)
 
 create_remove_old_logins_procedure_query = """
 CREATE PROCEDURE IF NOT EXISTS RemoveOldLogins()
