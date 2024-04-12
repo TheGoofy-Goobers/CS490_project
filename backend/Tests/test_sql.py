@@ -17,8 +17,6 @@ import time
 # FILE IN ORDER TO ENSURE THAT THE QUERIES BEING TESTED ARE ACCURATE       #
 # *************************** TEST INFORMATION *************************** #
 
-connection = None
-
 class TestSql:
     @classmethod
     def setup_class(TestSql):
@@ -46,12 +44,7 @@ class TestSql:
             "TESTING": True,
         })
 
-        # other setup can go here
-
         yield app
-
-        # clean up / reset resources here
-
 
     @pytest.fixture()
     def client(self, app):
@@ -139,7 +132,7 @@ class TestSql:
                 cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
                 user1 = cur.fetchone()
                 its = 0
-                while user1:
+                while user1: # THIS IS A CHECK FOR AUTOMATIC LOGIN EXPIRY
                     its += 1
                     time.sleep(.25)
                     connection.commit()
@@ -171,14 +164,57 @@ class TestSql:
         assert rows[2]["target_language"] == "javascript"
         assert rows[0]["translated_code"] == "console.log('Hello world 0!');"
         cur.close()
-
-    #TODO: Everything below
-    def test_feedback_form_sql(self):
+    
+    #                                                                                                                                                                                      Testing empty string insertion
+    @pytest.mark.parametrize("user_id,precision_rating,ease_rating,speed_rating,future_use_rating,note,expectInsertion", [(1, 5, 5, 5, 5, "This is a note, but it is unique. This should be inserted.", True), (1, 5, 5, 5, 5, "", True), (1, 5, 5, 5, 6, "Rating is not valid, should not be inserted", False), (-1, 5, 5, 5, 5, "User id is invalid, should not be inserted", False), (1, 5, 5, 5, 5, "This note will be very long, and this is the last test case, so don't worry about anything on this line after this string. ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", False),])
+    def test_feedback_form_sql(self, user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note, expectInsertion):
         cur = connection.cursor(dictionary=True)
 
-        cur.close()
+        #Test setup should already insert 1 value into the table
+        try:
+            insertion = """
+            INSERT INTO user_feedback (user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+            """
+            cur.execute(insertion, (user_id, precision_rating, ease_rating, speed_rating, future_use_rating, note))
+            connection.commit()
+
+            if expectInsertion:
+                cur.execute("SELECT * FROM user_feedback WHERE user_id=%s AND precision_rating=%s AND note=%s", (user_id, precision_rating, note))
+                feedback = cur.fetchone()
+                cur.close()
+                assert feedback
+            elif not expectInsertion:
+                #SQL query should have failed, so this should never hit since we should be in the except block 
+                assert False
+        except Exception as e:
+            if expectInsertion:
+                assert str(e) and False
+            elif not expectInsertion:
+                cur.execute("SELECT * FROM user_feedback WHERE note=%s", (note,))
+                feedback = cur.fetchone()
+                cur.close()
+                assert not feedback
+
+        if cur:
+            cur.close()
+
+    #TODO: Everything below   
+    def test_translation_feedback_sql(self):
+        pass
 
     def test_translate_sql(self):
         cur = connection.cursor(dictionary=True)
 
         cur.close()
+
+    def test_forgot_password_sql(self):
+        pass
+
+    def test_change_profile_sql(self):
+        pass
+
+    def test_logout_sql(self):
+        pass
+
+    
