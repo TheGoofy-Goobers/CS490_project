@@ -52,8 +52,8 @@ def submit_feedback(mysql: MySQL) -> dict:
         mysql.connection.rollback()
         response["hasError"] = True
         response["errorMessage"] = f"Exception: {str(e)}"
-        if 'cur' in locals():
+        if cur:
             cur.close()
-    return response
-    
+        return response
+
     return response

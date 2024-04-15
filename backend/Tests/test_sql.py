@@ -6,6 +6,7 @@ import mysql.connector
 from Tests.setup_and_teardown import setup_module, teardown_module
 import uuid
 import time
+import json
 
 # *************************** TEST INFORMATION *************************** #
 # THESE TESTS TEST ONLY THE SQL CALLS USED IN OTHER FUNCTIONS. THE TABLE   #
@@ -67,6 +68,7 @@ class TestSql:
             else:
                 assert not existing_user
         except Exception as e:
+            cur.close()
             assert str(e) and False
         
         if not expectExisting:
@@ -74,6 +76,7 @@ class TestSql:
                 cur.execute("INSERT INTO users(username, email, password) VALUES (%s, %s, %s)", (username, email, password))
                 connection.commit()
             except Exception as e:
+                cur.close()
                 assert str(e) and False
 
             try:
@@ -81,6 +84,7 @@ class TestSql:
                 user = cur.fetchone()
                 assert user
             except Exception as e:
+                cur.close()
                 assert str(e) and False
 
             # Test teardown- delete inserted value to prevent unexpected behavior in future tests - also delete user
@@ -96,6 +100,7 @@ class TestSql:
                 user = cur.fetchall()
                 assert user and len(user) == 3
             except Exception as e:
+                cur.close()
                 assert str(e) and False
 
         cur.close()
@@ -113,6 +118,7 @@ class TestSql:
             else:
                 assert user
         except Exception as e:
+            cur.close()
             assert str(e) and False
 
         if expectExisting:
@@ -142,6 +148,7 @@ class TestSql:
                         raise Exception("Timed out while waiting for data to be removed from logged_in table")
                 assert not user1
             except Exception as e:
+                cur.close()
                 assert str(e) and False
 
         cur.close()
@@ -156,6 +163,7 @@ class TestSql:
             rows = cur.fetchall()
             assert rows
         except Exception as e:
+            cur.close()
             assert str(e) and False
         
         assert len(rows) == 3
@@ -189,6 +197,7 @@ class TestSql:
                 assert False
         except Exception as e:
             if expectInsertion:
+                cur.close()
                 assert str(e) and False
             elif not expectInsertion:
                 cur.execute("SELECT * FROM user_feedback WHERE note=%s", (note,))
@@ -198,14 +207,40 @@ class TestSql:
 
         if cur:
             cur.close()
+    
+    @pytest.mark.parametrize("user_id,star_rating,note, expectInsert", [(1, 1, "Unique note", True), (1, 6, "Bad star rating value", False), (1, 5, "I Will make this note far too long so that it does not insert. There are no more test cases after this one, so you do not need to look further than this. _-----------------------------------------------------------------------------------------------------------------------------------------------------------", False)])
+    def test_translation_feedback_sql(self, user_id, star_rating, note, expectInsert):
+        cur = connection.cursor(dictionary=True)
+        
+        try:
+            cur.execute("INSERT INTO translation_feedback (user_id, star_rating, note) VALUES (%s, %s, %s)", (user_id, star_rating, note))
+            connection.commit()
 
-    #TODO: Everything below   
-    def test_translation_feedback_sql(self):
-        pass
+            if expectInsert:
+                cur.execute("SELECT * FROM translation_feedback WHERE user_id=%s AND star_rating=%s AND note=%s", (user_id, star_rating, note))
+                feedback = cur.fetchone()
+                cur.close()
+                assert feedback
+            elif not expectInsert:
+                #SQL query should have failed, so this should never hit since we should be in the except block 
+                assert False
+        except Exception as e:
+            if expectInsert:
+                cur.close()
+                assert str(e) and False
+            elif not expectInsert:
+                cur.execute("SELECT * FROM translation_feedback WHERE note=%s", (note,))
+                feedback = cur.fetchone()
+                cur.close()
+                assert not feedback
 
+        if cur:
+            cur.close()
+
+    #TODO: Everything below 
     def test_translate_sql(self):
         cur = connection.cursor(dictionary=True)
-
+        
         cur.close()
 
     def test_forgot_password_sql(self):
@@ -214,7 +249,34 @@ class TestSql:
     def test_change_profile_sql(self):
         pass
 
-    def test_logout_sql(self):
-        pass
+    def test_logout_sql(self, client):
+        cur = connection.cursor(dictionary=True)
+        
+        sessionToken = str(uuid.uuid4())
+        try: 
+            cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (1, sessionToken))
+            connection.commit()
+            cur.execute("SELECT * FROM logged_in WHERE session_token=%s", (sessionToken,))
+            entry = cur.fetchone()
+            assert entry and entry["session_token"] == sessionToken
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        response = client.post("/userLogout", data=json.dumps({"sessionToken": sessionToken}))
+        response = response.json
+
+        assert "success" in response and response["success"]
+
+        connection.commit()
+        try:
+            cur.execute("SELECT * FROM logged_in WHERE session_token=%s", (sessionToken,))
+            newEntry = cur.fetchone()
+            assert not newEntry
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        cur.close()
 
     
