@@ -115,6 +115,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
 def db_log_translation_errors(mysql, translation_id, errorMessage, errorCode = None, etype = "other"):
     if translation_id < 1:
         print("Issue with SQL code on inserting in progress translation into translation_history")
+        return
     cur = mysql.connection.cursor()
     try:
         cur.execute("INSERT INTO translation_errors(translation_id, error_message, error_code, error_type) VALUES(%s, %s, %s)", (translation_id, errorMessage, errorCode, etype))
@@ -123,4 +124,5 @@ def db_log_translation_errors(mysql, translation_id, errorMessage, errorCode = N
         print("Error while attempting to insert a translation error into the database!")
         print("Error message:", str(e))
         cur.close()
+        return
     cur.close()
