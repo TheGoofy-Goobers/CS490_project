@@ -7,6 +7,9 @@ from flask_mysqldb import MySQL
 from openai import resources
 import datetime
 from functions import get_user_id
+from mock import Mock
+import openai
+import functions.translate_code
 
 class TestTranslate:
     @pytest.fixture()
@@ -58,7 +61,8 @@ class TestTranslate:
             )
         if translated_before:
             lastSubmit = datetime.datetime(1970, 1, 1, 12, 10, 10)
-            monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"submission_date": lastSubmit})
+            mock = Mock(side_effect=[{"submission_date": lastSubmit}, None, None])
+            monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
         monkeypatch.setattr(resources.chat.Completions, "create", lambda self, model, messages, max_tokens, temperature: gpt_response)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
@@ -117,10 +121,10 @@ class TestTranslate:
     @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_api_connection_error(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         def seeded_error(self, model, messages, max_tokens, temperature):
-            raise Exception("GPT API connection error.")
+            raise openai.APIConnectionError(message="GPT API connection error.", request=None)
         
         monkeypatch.setattr(resources.chat.Completions, "create", seeded_error)
-
+        monkeypatch.setattr(functions.translate_code, "db_log_translation_errors", lambda self, translation_id, eMessage, eCode = None, etype = None: None)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
         
@@ -130,8 +134,7 @@ class TestTranslate:
 
         assert response["hasError"]
         assert "success" not in response
-        assert "errorMessage" in response and response["errorMessage"] == "GPT API connection error."
-
+        assert "apiErrorMessage" in response and response["apiErrorMessage"] == "GPT API connection error."
 
     @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_translation_rate_limit(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
