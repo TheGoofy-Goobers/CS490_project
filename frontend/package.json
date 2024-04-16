@@ -19,9 +19,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-wsl-backend": "cd ../backend && python3 -m flask --app 'app:create_app(testing=False)' run --no-debugger",
-    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger",
-    "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger",
+    "start-wsl-backend": "cd ../backend && python3 -m flask --app 'app:create_app(testing=False)' run --no-debugger --cert=adhoc",
+    "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger --cert=adhoc",
+    "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger --cert=adhoc",
     "test-backend": "cd ../backend && python -m pytest -s Tests/",
     "backend-test": "cd ../backend && python -m pytest -s Tests/%npm_config_file%",
     "backend-test-wsl": "cd ../backend && python -m pytest -s Tests/${npm_config_file}",

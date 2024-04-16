@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios'
 
-export const FLASK_URL = "http://localhost:5000"; //these will need to be changed on deploy- maybe load out of env vars?
+export const FLASK_URL = "https://localhost:5000"; //these will need to be changed on deploy- maybe load out of env vars?
 export const SITE_URL = window.location.origin;
 
 // export const setSessionLogin = (user_id, username) => {
