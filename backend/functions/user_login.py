@@ -61,7 +61,7 @@ def login(mysql: MySQL) -> dict:
 
     #create uuid and store in db
 
-    id = uuid.uuid4()
+    id = str(uuid.uuid4())
     try:
         cur.execute("DELETE FROM logged_in WHERE user_id=%s", (user["user_id"],))
         cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (user["user_id"], id))
