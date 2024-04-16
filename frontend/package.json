@@ -18,7 +18,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "HTTPS=true react-scripts start",
     "start-wsl-backend": "cd ../backend && python3 -m flask --app 'app:create_app(testing=False)' run --no-debugger --cert=adhoc",
     "start-backend": "cd ../backend && python -m flask --app 'app:create_app(testing=False)' run --no-debugger --cert=adhoc",
     "run-backend": "cd ../backend && python -m flask --app app:create_app(testing=False) run --no-debugger --cert=adhoc",
