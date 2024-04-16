@@ -28,7 +28,7 @@ def get_translation_history(mysql):
     rows = None
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT source_language, original_code, target_language, translated_code, submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
+        cur.execute("SELECT translation_id, source_language, original_code, target_language, translated_code, submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
         rows = cur.fetchall()
     except Exception as e:
         cur.close()
