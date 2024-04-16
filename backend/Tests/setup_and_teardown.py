@@ -121,7 +121,7 @@ def setup_module():
     CREATE PROCEDURE IF NOT EXISTS RemoveOldEmailTokens()
     BEGIN
         DECLARE cutoff_time TIMESTAMP;
-        SET cutoff_time = NOW() - INTERVAL 15 MINUTE;
+        SET cutoff_time = NOW() - INTERVAL 2 SECOND;
 
         DELETE FROM password_reset WHERE email_request_time < cutoff_time;
     END
@@ -130,7 +130,7 @@ def setup_module():
 
     create_remove_old_email_tokens_event_query = """
     CREATE EVENT IF NOT EXISTS RemoveOldEmailTokensEvent
-    ON SCHEDULE EVERY 1 MINUTE
+    ON SCHEDULE EVERY 1 SECOND
     DO
     BEGIN
         CALL RemoveOldEmailTokens();

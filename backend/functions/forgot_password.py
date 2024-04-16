@@ -55,7 +55,7 @@ def send_email(mysql: MySQL) -> dict:
         return response
 
     # generate uuid and store in db per user
-    id = uuid.uuid4()
+    id = str(uuid.uuid4())
     try:
         cur.execute("DELETE FROM password_reset WHERE user_id=%s", (user["user_id"],))
         cur.execute("INSERT INTO password_reset(user_id, email_token) VALUES(%s, %s)", (user["user_id"], id))
@@ -124,6 +124,7 @@ def reset_password(mysql: MySQL) -> dict:
     email_token = responseJson["emailToken"]
 
     # validate email token and grab user id
+    user = None
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT user_id FROM password_reset WHERE email_token = %s", (email_token,))
@@ -146,8 +147,6 @@ def reset_password(mysql: MySQL) -> dict:
         cur.execute("DELETE FROM password_reset WHERE user_id = %s", (user_id,))
         mysql.connection.commit()
         cur.close()
-        response["success"] = True
-        return response
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = str(e)
@@ -155,5 +154,6 @@ def reset_password(mysql: MySQL) -> dict:
         if cur:
             cur.close()
         return response
-
+    
+    response["success"] = True
     return response

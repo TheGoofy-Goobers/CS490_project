@@ -7,6 +7,8 @@ from Tests.setup_and_teardown import setup_module, teardown_module
 import uuid
 import time
 import json
+import datetime
+from Tests import helpers
 
 # *************************** TEST INFORMATION *************************** #
 # THESE TESTS TEST ONLY THE SQL CALLS USED IN OTHER FUNCTIONS. THE TABLE   #
@@ -140,11 +142,11 @@ class TestSql:
                 its = 0
                 while user1: # THIS IS A CHECK FOR AUTOMATIC LOGIN EXPIRY
                     its += 1
-                    time.sleep(.25)
+                    time.sleep(.2)
                     connection.commit()
                     cur.execute("SELECT * FROM logged_in WHERE user_id = %s", (user["user_id"],))
                     user1 = cur.fetchone()
-                    if its >= 22:
+                    if its >= 27:
                         raise Exception("Timed out while waiting for data to be removed from logged_in table")
                 assert not user1
             except Exception as e:
@@ -237,18 +239,273 @@ class TestSql:
         if cur:
             cur.close()
 
-    #TODO: Everything below 
-    def test_translate_sql(self):
+    @pytest.mark.parametrize("user_id,srcLang,message,toLang,translation", [(1, "python", "print('Hi')", "javascript", "console.log('Hi')")])
+    def test_translate_sql(self, user_id, srcLang, message, toLang, translation):
         cur = connection.cursor(dictionary=True)
-        
+
+        #Testing initial check for rate limit
+        #Translation_history should be pre-populated w/ data
+        try:
+            cur.execute("SELECT submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC LIMIT 1", (user_id,))
+            lastSubmit = cur.fetchone()
+
+            lastSubmit = lastSubmit['submission_date']
+            difference = datetime.datetime.now() - lastSubmit
+            rate_limit = datetime.timedelta(seconds=100) #We aren't really trying to test if datetime is working, so just set a high time delta
+
+            assert difference < rate_limit
+        except Exception as e:
+            cur.close()
+            assert str(e) and False #Exception in check for rate limit
+
+        translation_id = -1
+        try:
+            cur.execute(
+                "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (user_id, srcLang, message, toLang, user_id, "in progress", 0)
+            )
+            connection.commit()
+            cur.execute("SELECT translation_id FROM translation_history WHERE user_id=%s and status=%s", (user_id, "in progress"))
+            val = cur.fetchone()
+            assert val #If this fails, then there was a failure to insert the temporary entry into db
+            translation_id = val["translation_id"]
+            assert translation_id
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        try:
+            cur.execute(
+                "UPDATE translation_history SET translated_code = %s, status = %s, total_tokens = %s WHERE translated_code = %s AND status = %s", 
+                (translation, "stop", 85, user_id, "in progress")
+            )
+            connection.commit()
+            cur.execute("SELECT * FROM translation_history WHERE user_id=%s AND original_code=%s", (user_id, message))
+            entry = cur.fetchone()
+            assert entry
+            assert entry["translated_code"] == translation and entry["total_tokens"] == 85
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        #Test translation error logging
+        #Modified function    takes connection rather than mysql
+        def db_log_translation_errors(connection, translation_id, errorMessage, errorCode = None, etype = "other"):
+            if translation_id < 1:
+                print("Issue with SQL code on inserting in progress translation into translation_history")
+                return
+            cur = connection.cursor()
+            try:
+                cur.execute("INSERT INTO translation_errors(translation_id, error_message, error_code, error_type) VALUES(%s, %s, %s, %s)", (translation_id, errorMessage, errorCode, etype))
+                connection.commit()
+            except Exception as e:
+                print("Error while attempting to insert a translation error into the database!")
+                print("Error message:", str(e))
+                cur.close()
+                return
+            cur.close()
+
+        try:
+            db_log_translation_errors(connection, translation_id, "This is an API error", 400, "api")
+            connection.commit()
+            cur.execute("SELECT * FROM translation_errors WHERE translation_id=%s AND error_type=%s", (translation_id, "api"))
+            entry = cur.fetchone()
+            assert entry
+
+            db_log_translation_errors(connection, translation_id, "This is some other error")
+            connection.commit()
+            cur.execute("SELECT * FROM translation_errors WHERE translation_id=%s AND error_type=%s", (translation_id, "other"))
+            entry2 = cur.fetchone()
+            assert entry2
+        except Exception as e:
+            cur.close()
+            assert str(e) and False 
+
+        cur.close()
+    
+    def test_send_email_sql_and_automatic_expiry(self):
+        cur = connection.cursor(dictionary=True)
+
+        id = str(uuid.uuid4())
+        user = {"user_id": 1}
+        try:
+            cur.execute("DELETE FROM password_reset WHERE user_id=%s", (user["user_id"],))
+            cur.execute("INSERT INTO password_reset(user_id, email_token) VALUES(%s, %s)", (user["user_id"], id))
+            connection.commit()
+
+            cur.execute("SELECT * FROM password_reset WHERE user_id=%s AND email_token=%s", (user["user_id"], id))
+            entry = cur.fetchone()
+            assert entry
+
+            its = 0
+            while entry: # THIS IS A CHECK FOR AUTOMATIC FORGET PASSWORD EXPIRY
+                its += 1
+                time.sleep(.2)
+                connection.commit()
+                cur.execute("SELECT * FROM password_reset WHERE user_id = %s", (user["user_id"],))
+                entry = cur.fetchone()
+                if its >= 27:
+                    raise Exception("Timed out while waiting for data to be removed from password_reset table")
+            assert not entry
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+            
         cur.close()
 
-    def test_forgot_password_sql(self):
-        pass
+    def test_password_recovery_sql(self):
+        cur = connection.cursor(dictionary=True)
 
-    def test_change_profile_sql(self):
-        pass
+        #setup- make a new user for this test
+        user = None
+        try:
+            user = helpers.insert_new_user(connection, "newUser1", "newEmail@email.com", "password")
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
 
+        id = str(uuid.uuid4())
+        try:
+            cur.execute("DELETE FROM password_reset WHERE user_id=%s", (user["user_id"],))
+            cur.execute("INSERT INTO password_reset(user_id, email_token) VALUES(%s, %s)", (user["user_id"], id))
+            connection.commit()
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+            
+        user = None
+        try:
+            cur.execute("SELECT user_id FROM password_reset WHERE email_token = %s", (id,))
+            user = cur.fetchone()
+            assert user
+        except Exception as e: 
+            cur.close()
+            assert str(e) and False
+
+        user_id = user["user_id"]
+        # Update the password
+        try:
+            cur.execute("UPDATE users SET password = %s WHERE user_id = %s", ("newPassword", user_id))
+            cur.execute("DELETE FROM password_reset WHERE user_id = %s", (user_id,))
+            connection.commit()
+            cur.execute("SELECT * FROM password_reset WHERE user_id = %s", (user_id,))
+            user = cur.fetchone()
+            assert not user
+
+            cur.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+            user = cur.fetchone()
+            assert user and user["password"] == "newPassword"
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+        
+        #TEST TEARDOWN
+        try:
+            helpers.delete_user(connection, user_id)
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        cur.close()
+     
+    @pytest.mark.parametrize("new_user,expectUnique", [("newusername", True), ("username1", False)])
+    def test_change_username_sql(self, new_user, expectUnique):
+        cur = connection.cursor(dictionary=True)
+
+        #setup- make a new user for this test
+        user = None
+        try:
+            user = helpers.insert_new_user(connection, "newUser1", "newEmail@email.com", "password")
+            assert user
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+        
+        user_id = user["user_id"]
+
+        try:
+            cur.execute("SELECT username FROM users WHERE username=%s", (new_user,))
+            user = cur.fetchone()
+            if expectUnique:
+                assert not user
+            else:
+                assert user
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        if expectUnique: #this is the only case in which there will be an update
+            try:
+                cur.execute("SELECT username FROM users WHERE user_id=%s", (user_id,))
+                user = cur.fetchone()
+                assert user
+            except Exception as e:
+                cur.close()
+                return str(e) and False
+            
+            try:
+                cur.execute("UPDATE users SET username=%s WHERE user_id=%s", (new_user, user_id))
+                connection.commit()
+                cur.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+                user = cur.fetchone()
+                assert user["username"] == new_user
+            except Exception as e:
+                cur.close()
+                assert str(e) and False
+
+        #teardown
+        try:
+            helpers.delete_user(connection, user_id)
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+
+        cur.close()
+
+    def test_change_password_sql(self):
+        cur = connection.cursor(dictionary=True)
+
+        #setup- make a new user for this test
+        user = None
+        try:
+            user = helpers.insert_new_user(connection, "newUser1", "newEmail@email.com", "password")
+            assert user
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+        
+        user_id = user["user_id"]
+
+        #change password query
+        try:
+            cur.execute("UPDATE users SET password=%s WHERE user_id=%s", ("newPassword", user_id))
+            connection.commit()
+            cur.execute("SELECT * FROM users WHERE user_id=%s", (user_id,))
+            user = cur.fetchone()
+            assert user and user["password"] == "newPassword"
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+        
+        #teardown
+        try:
+            helpers.delete_user(connection, user_id)
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
+            
+        cur.close()
+    
+    # ****************** TEST INFO ****************** #
+    # This test is unneeded because the exact queries #
+    # used in account deletion are already being used #
+    # in the function helpers.delete_user             #
+    # ****************** TEST INFO ****************** #
+    '''
+    def test_delete_account_sql(self):
+        pass
+    '''
+    
     def test_logout_sql(self, client):
         cur = connection.cursor(dictionary=True)
         
