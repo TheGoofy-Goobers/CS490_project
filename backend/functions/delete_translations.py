@@ -34,17 +34,24 @@ def delete_translations(mysql: MySQL):
         response["errorMessage"] = "Frontend error: Passed data should be a list of ints."
         return response
     
+    if type(ids) == list:
+        for e in ids:
+            if type(e) != int:
+                response["hasError"] = True
+                response["errorMessage"] = "Frontend error: Passed data should be a list of ints."
+                return response
+                
     try:
-        cur = mysql.connection.cur()
+        cur = mysql.connection.cursor()
         if ids == "all":
             cur.execute("DELETE FROM translation_history WHERE user_id=%s", (user_id,))
         elif type(ids) == list:
             deletion = "DELETE FROM translation_history WHERE user_id=%s AND ("
             for i in range(len(ids)):
                 deletion += "translation_id=%s OR "
-            deletion.strip(" OR")
+            deletion = deletion.strip(" OR ")
             deletion += ")"
-            cur.execute(deletion, ids)
+            cur.execute(deletion, (user_id, *ids))
         else:
             response["hasError"] = True
             response["errorMessage"] = "Frontend error: Passed data is invalid."
@@ -56,7 +63,7 @@ def delete_translations(mysql: MySQL):
     except Exception as e:
         mysql.connection.rollback()
         response["hasError"] = True
-        response["errorMessage"] = f"Exception: {str(e)}"
+        response["errorMessage"] = str(e)
         if cur:
             cur.close()
         return response

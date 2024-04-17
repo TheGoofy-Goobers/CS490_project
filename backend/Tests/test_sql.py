@@ -240,7 +240,7 @@ class TestSql:
             cur.close()
 
     @pytest.mark.parametrize("user_id,srcLang,message,toLang,translation", [(1, "python", "print('Hi')", "javascript", "console.log('Hi')")])
-    def test_translate_sql(self, user_id, srcLang, message, toLang, translation):
+    def test_translate_log_translate_errors_and_delete_translation_sql(self, user_id, srcLang, message, toLang, translation):
         cur = connection.cursor(dictionary=True)
 
         #Testing initial check for rate limit
@@ -274,7 +274,6 @@ class TestSql:
             cur.close()
             assert str(e) and False
 
-        translation_id = -1
         try:
             cur.execute(
                 "UPDATE translation_history SET translated_code = %s, status = %s, total_tokens = %s WHERE translated_code = %s AND status = %s", 
@@ -289,7 +288,6 @@ class TestSql:
         except Exception as e:
             cur.close()
             assert str(e) and False
-        #TODO: Test translation_history deletion
 
         #Test translation error logging
         #Modified function    takes connection rather than mysql
@@ -323,6 +321,23 @@ class TestSql:
         except Exception as e:
             cur.close()
             assert str(e) and False 
+        
+        ids = [translation_id, 12123] #random id
+        deletion = "DELETE FROM translation_history WHERE user_id=%s AND ("
+        for i in range(len(ids)):
+            deletion += "translation_id=%s OR "
+        deletion = deletion.strip(" OR ")
+        deletion += ")"
+
+        try:
+            cur.execute(deletion, (user_id, *ids))
+            connection.commit()
+            cur.execute("SELECT * FROM translation_history WHERE user_id=%s AND original_code=%s", (user_id, message)) # This entry should have been removed
+            entry = cur.fetchone()
+            assert not entry
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
 
         cur.close()
     
