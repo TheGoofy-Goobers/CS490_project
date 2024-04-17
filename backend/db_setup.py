@@ -30,7 +30,8 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(24) NOT NULL UNIQUE,
     email VARCHAR(64) NOT NULL UNIQUE,
-    password VARCHAR(64) NOT NULL
+    password VARCHAR(64) NOT NULL,
+    totp VARCHAR(64)
 )
 """
 cursor.execute(create_user_table_query)

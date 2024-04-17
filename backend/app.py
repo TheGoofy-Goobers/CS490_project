@@ -3,12 +3,14 @@ from flask_cors import CORS
 from flask_mysqldb import MySQL
 from openai import OpenAI
 import os
+import time
 from dotenv import load_dotenv
 
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
 from functions import api_status as status, change_profile as profile, logout, forgot_password
 from functions import translation_history as translation_history
+from functions import two_factor
 
 load_dotenv()
 
@@ -51,12 +53,15 @@ def create_app(testing: bool):
     def submit_feedback():
         return feedback.submit_feedback(mysql)
 
-
     # code translation backend
     @api.route('/translate', methods=['POST'])
     def translate_code():
-        return translate.translate(mysql, gpt_client)
-
+        time_before = time.time()
+        response = translate.translate(mysql, gpt_client)
+        time_after = time.time()
+        elapsed_time = time_after - time_before
+        print(f"Elapsed time: {elapsed_time}")
+        return response
 
     # translation feedback
     @api.route('/translationFeedback', methods=['POST'])
@@ -105,6 +110,17 @@ def create_app(testing: bool):
     def translation_history_route():
         return translation_history.get_translation_history(mysql)
 
+
+    # Generate the initial QR code for 2FA
+    @api.route('/getQRCode', methods=['POST'])
+    def generate_qr_code():
+        return two_factor.generate_qr_code(mysql)
+    
+
+    # Verify the TOTP for 2Fa
+    @api.route('/verifyTOTP', methods=['POST'])
+    def validate_totp():
+        return two_factor.verify_totp(mysql)
 
 
     # Logout
