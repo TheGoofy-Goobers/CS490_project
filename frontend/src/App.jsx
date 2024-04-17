@@ -15,8 +15,10 @@ import AccountManagement from './components/AccountManagement/AccountManagement.
 import ChangeUserame from './components/AccountManagement/ChangeUsername.jsx';
 import ChangePassword from './components/AccountManagement/ChangePassword.jsx';
 import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
+import TwoFA from './components/AccountManagement/TwoFA.jsx'
 import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
 import ResetPass from './components/ForgotPass/ResetPass.jsx'
+
 
 function App() {
  setInterval(isExpired(), 1000); //checks every second
@@ -37,6 +39,7 @@ function App() {
             <Route path='/accountmanagement/changeusername' element={<ChangeUserame/>}/>
             <Route path='/accountmanagement/changepassword' element={<ChangePassword />} />
             <Route path='/accountmanagement/deleteaccount' element={<DeleteAccount />} />
+            <Route path='/accountmanagement/twoFA' element={<TwoFA/>} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
             <Route path='/resetpassword' element={<ResetPass />}/>
           </Routes>

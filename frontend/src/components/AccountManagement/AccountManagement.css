@@ -46,3 +46,15 @@
 .note{
   color: white;
 }
+
+.digit-input {
+    width: 40px;    /* Adjust width as needed */
+    margin: 0 5px;  /* Adds spacing between inputs */
+    text-align: center;
+    font-size: 16px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: center;
+}
