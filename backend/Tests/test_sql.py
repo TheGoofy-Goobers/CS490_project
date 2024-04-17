@@ -274,6 +274,7 @@ class TestSql:
             cur.close()
             assert str(e) and False
 
+        translation_id = -1
         try:
             cur.execute(
                 "UPDATE translation_history SET translated_code = %s, status = %s, total_tokens = %s WHERE translated_code = %s AND status = %s", 
@@ -284,9 +285,11 @@ class TestSql:
             entry = cur.fetchone()
             assert entry
             assert entry["translated_code"] == translation and entry["total_tokens"] == 85
+            translation_id = entry["translation_id"]
         except Exception as e:
             cur.close()
             assert str(e) and False
+        #TODO: Test translation_history deletion
 
         #Test translation error logging
         #Modified function    takes connection rather than mysql

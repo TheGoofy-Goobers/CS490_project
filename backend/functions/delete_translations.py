@@ -1,14 +1,15 @@
+from typing import List
 from flask_mysqldb import MySQL
 import json
-from flask import request
+from flask import request 
 from functions import get_user_id
 
-def submit_feedback(mysql: MySQL) -> dict:
+def delete_translations(mysql: MySQL):
     response = {"hasError": False}
 
     responseJson = json.loads(request.data.decode())
 
-    if 'sessionToken' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
+    if 'ids' not in responseJson:
         response['hasError'] = True
         response['errorMessage'] = "Unexpected Error"
         return response
@@ -26,27 +27,31 @@ def submit_feedback(mysql: MySQL) -> dict:
         response['logout'] = True
         return response
     
-    star_rating = responseJson['star_rating']
-    note = responseJson['note'].strip()
+    ids = responseJson["ids"]
 
-    if not star_rating in [1, 2, 3, 4, 5]:
+    if type(ids) != str and type(ids) != list:
         response["hasError"] = True
-        response["errorMessage"] = "Invalid rating value(s)"
-        return response
-    
-    if not 0 <= len(note) <= 150:
-        response["hasError"] = True
-        response["errorMessage"] = "Invalid note string length"
+        response["errorMessage"] = "Frontend error: Passed data should be a list of ints."
         return response
     
     try:
-        insertion = "INSERT INTO translation_feedback (user_id, star_rating, note) VALUES (%s, %s, %s)"
-        cur = mysql.connection.cursor()
-        cur.execute(insertion, (user_id, star_rating, note))
+        cur = mysql.connection.cur()
+        if ids == "all":
+            cur.execute("DELETE FROM translation_history WHERE user_id=%s", (user_id,))
+        elif type(ids) == list:
+            deletion = "DELETE FROM translation_history WHERE user_id=%s AND ("
+            for i in range(len(ids)):
+                deletion += "translation_id=%s OR "
+            deletion.strip(" OR")
+            deletion += ")"
+            cur.execute(deletion, ids)
+        else:
+            response["hasError"] = True
+            response["errorMessage"] = "Frontend error: Passed data is invalid."
+            return response
+
         mysql.connection.commit()
         cur.close()
-
-        response["success"] = True
 
     except Exception as e:
         mysql.connection.rollback()
@@ -56,4 +61,5 @@ def submit_feedback(mysql: MySQL) -> dict:
             cur.close()
         return response
 
+    response["success"] = True
     return response
