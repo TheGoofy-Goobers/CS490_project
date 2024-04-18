@@ -103,7 +103,8 @@ class TestRegistrationLoginLogout:
     def test_user_login_success(self, client, username, password, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": "1", "password" : "validPassword"})
+        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None])
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
 
         response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
         response = response.json

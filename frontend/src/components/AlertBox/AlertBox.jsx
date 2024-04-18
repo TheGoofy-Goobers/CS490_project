@@ -17,7 +17,7 @@ function AlertBox({ message, isOpen }) {
   const handleResponse = (message) => {
     let response;
     switch (message){
-      case 'stop':
+      case 'stop': case 'from_db':
         response = "Translation Success!!"
         break;
       case 'length':

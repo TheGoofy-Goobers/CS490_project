@@ -14,7 +14,6 @@ def get_user_id(mysql: MySQL, token: str) -> int:
     error = ""
 
     if token in cache:
-        print(cache)
         user = cache[token]
         if datetime.datetime.now() < user.expiry:
             return user.id, error

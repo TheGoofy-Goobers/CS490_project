@@ -75,8 +75,9 @@ const LoginPage = () => {
           delete credentials.password;
           setMessage(`Welcome to codeCraft!`);
           showAlert();
-          setTimeout(() => {
-            window.location.href = '/';}, 2000)
+          window.location.href = '/'
+          // setTimeout(() => {
+          //   window.location.href = '/';}, 2000)
         }
         if (res.hasError) {
           console.log(`Error response: ${res.errorMessage}`);
