@@ -1,7 +1,7 @@
 from flask_mysqldb import MySQL
 import json
 from flask import request
-from functions.get_user_id import cache
+from functions.get_user_id import id_cache
 
 def logout(mysql: MySQL) -> dict:
     response = {"hasError": False}
@@ -20,8 +20,8 @@ def logout(mysql: MySQL) -> dict:
         return response
     
     try:
-        if sessionToken in cache:
-            cache.pop(sessionToken)
+        if sessionToken in id_cache:
+            id_cache.pop(sessionToken)
         cur = mysql.connection.cursor()
         cur.execute("DELETE FROM logged_in WHERE session_token = %s", (sessionToken,))
         mysql.connection.commit()
