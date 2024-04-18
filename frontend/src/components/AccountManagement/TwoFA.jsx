@@ -1,29 +1,91 @@
-import React, { useState, useRef } from 'react';
-import { SITE_URL, FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
+import React, { useState, useRef, useEffect } from 'react';
+import { FLASK_URL, set2FAVerification, Logout } from '../../vars';
 import axios from 'axios';
 import './AccountManagement.css';
 import { useNavigate } from 'react-router-dom';
 import AlertBox from '../AlertBox/AlertBox';
+import SHA256 from 'crypto-js/sha256';
+import eyeicon from './eyeicon.svg';
 
 const TwoFA = () => {
+
+    const [message, setMessage] = useState('Default message');
+    const [alertOpen, setAlertOpen] = useState(false);
+
+    const showAlert = () => {
+        setAlertOpen(true);
+
+        // Optionally, automatically close the alert after some time
+        setTimeout(() => {
+            setAlertOpen(false);
+        }, 2000); // This should match the duration in AlertBox or be longer
+    };
+
     const [code, setCode] = useState(Array(6).fill(""));
     const inputsRef = useRef([]);
     const [qrCode, setQrCode] = useState('');
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await axios.get(`${FLASK_URL}/getQRCode`); 
-    //             setQrCode(response.data.qr);  // Assuming 'qr' is the key where QR data is stored
-    //         } catch (error) {
-    //             console.error('Error fetching QR code:', error);
-    //         }
-    //     };
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`${FLASK_URL}/getQRCode`); 
+                setQrCode(response.data.qr);  // Assuming 'qr' is the key where QR data is stored
+            } catch (error) {
+                console.error('Error fetching QR code:', error);
+            }
+        };
+        fetchData();
+    }, []);
 
-    //     fetchData();
-    // }, []);
 
-    // setQrCode();
+    const handlePassChange = (e) => {
+        setPass(e.target.value);
+    }
+
+    const handlePassSubmit = (e) => {
+        e.preventDefault();
+        checkPass();
+    };
+
+    const [pass, setPass] = useState('');
+    
+    const checkPass = () => {
+        const hashedPassword = SHA256(pass + "CS490!").toString();
+        const key = SHA256(pass + "2FAkey").toString();
+        const check = {
+            currPass: hashedPassword,
+            key: key,
+        };
+
+        axios.post(`${FLASK_URL}/getQRCode`, check)
+            .then((response) => {
+                const res = response.data;
+                if (res.success) {
+                    set2FAVerification(true);
+                    setCode(res.qr);
+                    setPass('');
+                    setMessage(`Password confirmed successfully!`);
+                    showAlert();
+                }
+                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                console.log(`Response has error: ${res.hasError}`);
+                if (res.logout) {
+                    setMessage(`Session expired. Please login again.`);
+                    showAlert();
+                    setTimeout(Logout, 4000);
+                }
+            }).catch((error) => {
+                if (error.response) {
+                    if (error.response == '500 (INTERNAL SERVER ERROR)') {
+                        setMessage(`BACKEND FAILED contact support`);
+                        showAlert();
+                    }
+                    console.log(error.response);
+                    console.log(error.response.status);
+                    console.log(error.response.headers);
+                }
+            });
+    };
 
     const handleInput = (index, event) => {
         const nums = [...code];
@@ -50,38 +112,73 @@ const TwoFA = () => {
 
     return (
         <div>
-            <div className="delete-box-container">
-                <form onSubmit={handleSubmit}>
-                    <div className='change_password'>
-                        <h2>Set up 2-factor authentication</h2>
-                        {/* <div>
-                            {qrCode && <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}
-                            {!qrCode && <p>Loading QR code...</p>}
-                        </div> */}
-                        <p className="note">Get your code from your asshole bitch ass hoe</p>
-                        <div className="login-form-group">
-                            <label>Please enter your 6-digit code:</label>
-                            <div className="input-container">
-                                {code.map((num, index) => (
-                                    <input
-                                        key={index}
-                                        type="text"
-                                        maxLength="1"
-                                        value={num}
-                                        onChange={e => handleInput(index, e)}
-                                        onKeyDown={e => handleBackspace(index, e)}
-                                        className="login-form-control digit-input"
-                                        ref={el => inputsRef.current[index] = el}
-                                    />
-                                ))}
+           
+                {
+                    !localStorage.getItem("passIsVerified") &&
+                    <div>
+                        <div className="delete-box-container">
+                            <div className='login-form-box'>
+                                <form onSubmit={handlePassSubmit}>
+                                    <div>
+                                        <h2>Verify Password</h2>
+                                        <p className="note">Please verify your password to setup or edit your 2-factor authentication</p>
+                                        <div className="login-form-group">
+                                            <label>Password</label>
+                                            <input
+                                                type="password"
+                                                value={pass}
+                                                onChange={handlePassChange}
+                                                className="login-form-control"
+                                            />
+                                        </div>
+                                        <div className="login-button-container">
+                                            <button type="submit" className="login-form-button">Submit</button>
+                                        </div>
+
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <div className="login-button-container">
-                            <button type="submit" className="login-form-button">Submit</button>
-                        </div>
                     </div>
-                </form>
-            </div>
+                }
+                
+                
+           
+            {
+                localStorage.getItem("passIsVerified") &&
+                <div className="delete-box-container">
+                    <form onSubmit={handleSubmit}>
+                        <div className='change_password'>
+                            <h2>Set up 2-factor authentication</h2>
+                            {/* <div>
+                                {qrCode && <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}
+                                {!qrCode && <p>Loading QR code...</p>}
+                            </div> */}
+                            <p className="note">Get your code from your asshole bitch ass hoe</p>
+                            <div className="login-form-group">
+                                <label>Please enter your 6-digit code:</label>
+                                <div className="input-container">
+                                    {code.map((num, index) => (
+                                        <input
+                                            key={index}
+                                            type="text"
+                                            maxLength="1"
+                                            value={num}
+                                            onChange={e => handleInput(index, e)}
+                                            onKeyDown={e => handleBackspace(index, e)}
+                                            className="login-form-control digit-input"
+                                            ref={el => inputsRef.current[index] = el}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="login-button-container">
+                                <button type="submit" className="login-form-button">Submit</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            }
         </div>
     );
 };
