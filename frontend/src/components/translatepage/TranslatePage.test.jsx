@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TranslatePage from './TranslatePage'; // Adjust the import path as necessary
+import TranslatePage from './TranslatePage'
 import axios from 'axios';
 import { FLASK_URL } from '../../vars'
 
@@ -76,13 +76,31 @@ beforeEach(() => {
   Storage.prototype.getItem = jest.fn(() => "true");
 });
 
-// Mock for react-codemirror2
-jest.mock('react-codemirror2', () => ({
-  UnControlled: ({ value, onChange, options }) => {
-    const handleChange = (event) => onChange({ getValue: () => event.target.value });
-    return <textarea value={value} onChange={handleChange} readOnly={options.readOnly} data-testid={options.readOnly ? 'mockedCodeMirrorOutput' : 'mockedCodeMirrorInput'} />;
+jest.mock('@uiw/react-codemirror', () => ({
+  CodeMirror: ({ value, onChange, extensions, theme, editable, ...props }) => {
+    const handleChange = (event) => {
+      // Simulate the CodeMirror 'change' event structure
+      onChange({
+        getValue: () => event.target.value
+      });
+    };
+
+    // Simulate more of the CodeMirror's DOM structure and behaviors
+    return (
+      <div data-testid="codemirror-wrapper">
+        <textarea
+          value={value}
+          onChange={handleChange}
+          readOnly={!editable}
+          data-testid={editable ? 'codemirror-input' : 'codemirror-output'}
+          style={{ visibility: 'hidden' }} // Hide in tests to prevent layout issues
+        />
+      </div>
+    );
   },
 }));
+
+
 
 
 describe('TranslatePage Component', () => {
@@ -93,6 +111,7 @@ describe('TranslatePage Component', () => {
     expect(screen.getByText('Source Language')).toBeInTheDocument();
     expect(screen.getByText('Target Language')).toBeInTheDocument();
   });
+  
 
   test('copies text to clipboard', async () => {
     render(<TranslatePage />);
@@ -115,7 +134,7 @@ describe('TranslatePage Component', () => {
 
   test('allows code input and language selection', async () => {
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('mockedCodeMirror');
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
   
@@ -131,7 +150,7 @@ describe('TranslatePage Component', () => {
 
   test('validates language selection and code input', async () => {
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('mockedCodeMirror');
     fireEvent.change(inputCodeMirror, { target: { value: 'console.log("Hello World");' } });
     expect(inputCodeMirror.value).toBe('console.log("Hello World");');
     const translateButton = screen.getByText('Get Translation');
@@ -144,7 +163,7 @@ describe('TranslatePage Component', () => {
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('mockedCodeMirror');
     fireEvent.change(inputCodeMirror, { target: { value: longText } });
     const downloadButton = screen.getByTitle('Download Code');
     fireEvent.click(downloadButton);

@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
 import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight } from 'react-icons/fa';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/mode/python/python.js';
-import 'codemirror/mode/clike/clike.js'; // for C++
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript} from '@codemirror/lang-javascript';
+import { python} from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { cpp } from '@codemirror/lang-cpp';
+import { rust } from '@codemirror/lang-rust';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import axios from 'axios'
 import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
@@ -33,21 +34,6 @@ const TranslatePage = () => {
   const [charCount, setCharCount] = useState(0); // State to track character count
   const maxCharLimit = 2375; // Define maximum character limit
   let goodapi;
-
-  const handleBeforeChange = (editor, data, value) => {
-    // Calculate the length of the text after the change
-    const newTextLength = editor.getValue().length + value.length - data.text.join('\n').length;
-    if (newTextLength > maxCharLimit) {
-      // Prevent the change if it exceeds the limit
-      data.cancel();
-    }
-  };
-
-  const handleChange = (editor, data, value) => {
-    // Update input text and character count
-    setInputText(value);
-    setCharCount(editor.getValue().length); // Update character count based on current editor value
-  };
 
   const filterTranslationHistory = (history) => {
     return history
@@ -124,16 +110,20 @@ const TranslatePage = () => {
   
   const fileInputRef = useRef(null);
 
-  const getMode = (language) => {
+  const getLanguageExtension = (language) => {
     switch (language) {
       case 'JavaScript':
-        return 'javascript';
+        return javascript();
       case 'Python':
-        return 'python';
+        return python();
       case 'C++':
-        return 'text/x-c++src'; // Mode for C++
+        return cpp(); // Make sure you have the correct import for C++
+      case 'Java':
+        return java();
+      case 'Rust':
+        return rust(); // Assuming you find a suitable Rust extension
       default:
-        return 'javascript';
+        return javascript(); // Default case to handle any unforeseen values
     }
   };
 
@@ -463,7 +453,17 @@ const TranslatePage = () => {
                     className="form-control"
                     id="sourceLanguage"
                     value={sourceLanguage}
-                    onChange={(e) => setSourceLanguage(e.target.value)}
+                    onChange={(e) => {
+                      // Set the new source language
+                      setSourceLanguage(e.target.value);
+                      
+                      // Clear the input text and reset the character count
+                      setInputText('');
+                      setCharCount(0);
+                      
+                      // Optionally clear the output text if you also want to clear translations
+                      setOutputText('');
+                    }}
                   >
                     <option value="JavaScript">JavaScript</option>
                     <option value="Python">Python</option>
@@ -482,16 +482,22 @@ const TranslatePage = () => {
 
                 />
               </div>
+              <div className="custom-codemirror-wrapper">
+              
               <CodeMirror
                 value={inputText}
-                options={{
-                  mode: getMode(sourceLanguage),
-                  theme: 'material',
-                  lineNumbers: true,
+                theme={vscodeDark}
+                extensions={[getLanguageExtension(sourceLanguage)]}
+                onChange={(value) => {
+                  if (value.length <= maxCharLimit) {
+                    setInputText(value)
+                    setCharCount(value.length)
+                  }
                 }}
-                beforeChange={handleBeforeChange}
-                onChange={handleChange}
+                basicSetup={{ lineNumbers: true }}
               />
+              
+              </div>
               <div className="char-count">Characters: {charCount}/{maxCharLimit}</div> {/* Display character count */}
             </div>
             <div className="code-box output-box">
@@ -512,15 +518,17 @@ const TranslatePage = () => {
                 </select>
               </div>
               <div className="position-relative textarea-container">
-                <CodeMirror
-                  value={outputText}
-                  options={{
-                    mode: getMode(targetLanguage),
-                    theme: 'material',
-                    lineNumbers: true,
-                    readOnly: true,
-                  }}
-                />
+              <div className="custom-codemirror-wrapper">
+              <CodeMirror
+                value={outputText}
+                theme={vscodeDark}
+                extensions={[
+                  getLanguageExtension(targetLanguage) // This function will select the proper language mode
+                ]}
+                editable={true} // Makes the editor read-only
+                basicSetup={{ lineNumbers: true }} // Line numbers and other basic setups
+              />
+              </div>
                 <div className="icons">
                   <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
                   <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
