@@ -18,7 +18,7 @@ const MiniMenuComponent = () => {
         <div className="mini-menu">
             <ul>
                 <li className='user'>{localStorage.getItem("username")}</li>
-                <li onMouseEnter={() => setShowAccountMenu(true)}
+                <li onClick={() => setShowAccountMenu(true)}
                 >
                     <Link className="acc-button">Account Management</Link>
                     {showAccountMenu && (
