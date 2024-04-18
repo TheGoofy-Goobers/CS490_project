@@ -23,7 +23,7 @@ const TwoFA = () => {
     //     fetchData();
     // }, []);
 
-    setQrCode();
+    // setQrCode();
 
     const handleInput = (index, event) => {
         const nums = [...code];
@@ -54,10 +54,10 @@ const TwoFA = () => {
                 <form onSubmit={handleSubmit}>
                     <div className='change_password'>
                         <h2>Set up 2-factor authentication</h2>
-                        <div>
+                        {/* <div>
                             {qrCode && <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}
                             {!qrCode && <p>Loading QR code...</p>}
-                        </div>
+                        </div> */}
                         <p className="note">Get your code from your asshole bitch ass hoe</p>
                         <div className="login-form-group">
                             <label>Please enter your 6-digit code:</label>
