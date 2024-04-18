@@ -8,7 +8,6 @@ def logout(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    print(responseJson)
     if "sessionToken" not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error." 
@@ -21,6 +20,8 @@ def logout(mysql: MySQL) -> dict:
         return response
     
     try:
+        if sessionToken in cache:
+            cache.pop(sessionToken)
         cur = mysql.connection.cursor()
         cur.execute("DELETE FROM logged_in WHERE session_token = %s", (sessionToken,))
         mysql.connection.commit()
