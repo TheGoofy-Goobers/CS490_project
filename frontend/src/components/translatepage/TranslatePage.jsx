@@ -314,7 +314,6 @@ const TranslatePage = () => {
     axios.post(`${FLASK_URL}/translate`, message)
       .then((response) => {
         res = response.data
-        // TODO: Handle other data being sent from backend
         if (res.success) {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)

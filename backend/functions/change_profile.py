@@ -36,6 +36,7 @@ def change_username(mysql: MySQL) -> dict:
         response["errorMessage"] = errors
         return response
     
+    user = None #make sure scope of user is outside the try block
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT username FROM users WHERE username=%s", (new_user,))
@@ -65,7 +66,6 @@ def change_username(mysql: MySQL) -> dict:
         response["errorMessage"] = "User not found (Make sure you're signed in)"
         return response
 
-    # make sure password matches
     if current_user == user['username']:
         try:
             cur.execute("UPDATE users SET username=%s WHERE user_id=%s", (new_user, user_id))
@@ -113,6 +113,7 @@ def change_password(mysql: MySQL) -> dict:
         return response
     
     # query the database to check if the user credentials are valid
+    user = None #make sure scope of user is outside the try block
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
@@ -175,6 +176,7 @@ def delete_user(mysql: MySQL) -> dict:
         return response
     
     # query the database to check if the user credentials are valid
+    user = None #make sure scope of user is outside the try block
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT user_id FROM users WHERE user_id=%s", (user_id,))
@@ -189,7 +191,6 @@ def delete_user(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["errorMessage"] = "User not found (Make sure you're signed in)"
         return response
-
 
     try:
         cur.execute("DELETE FROM users WHERE user_id=%s", (user_id,))

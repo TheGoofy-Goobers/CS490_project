@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 from openai import OpenAI
@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 
 from functions import register_user as register, user_login as login, submit_feedback as feedback, translate_code as translate, translation_feedback as translationFeedback
-from functions import api_status as status, change_profile as profile, logout, forgot_password
-from functions import translation_history as translation_history
+from functions import api_status as status, change_profile as profile, logout, forgot_password, delete_translations
+from functions import translation_history
 
 load_dotenv()
 
@@ -113,4 +113,10 @@ def create_app(testing: bool):
         return logout.logout(mysql)
     
 
+    # Manage translation history
+    @api.route('/deleteTranslations', methods=['POST'])
+    def manage_translation_history():
+        return delete_translations.delete_translations(mysql)
+    
+    
     return api
