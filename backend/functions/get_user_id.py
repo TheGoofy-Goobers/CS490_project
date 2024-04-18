@@ -1,10 +1,29 @@
 from flask_mysqldb import MySQL
+import datetime
+
+EXPIRY_HOURS = 24
+class User:
+    def __init__(self, token, id, login_time):
+        self.token = token
+        self.id = id
+        self.expiry = login_time + datetime.timedelta(hours=24)
+
+cache = {}
 
 def get_user_id(mysql: MySQL, token: str) -> int:
     error = ""
+
+    if token in cache:
+        print(cache)
+        user = cache[token]
+        if datetime.datetime.now() < user.expiry:
+            return user.id, error
+        else:
+            cache.pop(token)
+
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT user_id from logged_in WHERE session_token = %s", (token,))
+        cur.execute("SELECT user_id, login_date from logged_in WHERE session_token = %s", (token,))
     except Exception as e:
         cur.close
         error = str(e)
@@ -13,6 +32,7 @@ def get_user_id(mysql: MySQL, token: str) -> int:
     
     cur.close()
     if user:
+        cache[token] = User(token, user["user_id"], user["login_date"])
         return user['user_id'], error
     else:
         return -1, error

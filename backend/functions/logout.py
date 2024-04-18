@@ -1,12 +1,14 @@
 from flask_mysqldb import MySQL
 import json
 from flask import request
+from functions.get_user_id import cache
 
 def logout(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
     responseJson = json.loads(request.data.decode())
 
+    print(responseJson)
     if "sessionToken" not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error." 
