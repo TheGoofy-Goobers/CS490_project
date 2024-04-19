@@ -6,6 +6,8 @@ import datetime
 import openai
 from functions import get_user_id
 
+accepted_languages = ["Python", "Rust", "C++", "JavaScript", "Java"]
+
 def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     response = {"hasError" : False}
 
@@ -32,6 +34,10 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response['logout'] = True
         return response
     
+    if srcLang not in accepted_languages or toLang not in accepted_languages:
+        response["hasError"] = True
+        response["errorMessage"] = f"Language not recognized. Accepted languages (case sensitive): {accepted_languages}"
+
     cur = mysql.connection.cursor()
 
     try:
