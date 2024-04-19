@@ -98,7 +98,8 @@ const LoginPage = () => {
   return (
 
     <div>
-    {<AlertBox message={message} isOpen={alertOpen} />}
+    {<AlertBox message={message} isOpen={alertOpen} />} 
+      {/* //ask hamdi wtf this does */}
     <div className="login-page-container">
       <div className="login-form-box">
         {!localStorage.getItem("isLoggedIn") &&

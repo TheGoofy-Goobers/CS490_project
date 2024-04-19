@@ -25,6 +25,10 @@ export const setLocal = (session_token, username, loginTime, rememberMe) => {
     localStorage.setItem("rememberMe", rememberMe)
 }
 
+export const set2FAVerification = (passIsVerified) => {
+    localStorage.setItem("passIsVerified", passIsVerified)
+}
+
 export const isExpired = () => {
     const expires = 60 *60 *24; //in seconds
     const lastLogIn = parseInt(localStorage.getItem("lastLogIn"), 10);
