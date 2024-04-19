@@ -120,7 +120,7 @@ def create_app(testing: bool):
     # Verify the TOTP for 2Fa
     @api.route('/verifyTOTP', methods=['POST'])
     def validate_totp():
-        return two_factor.verify_totp(mysql)
+        return two_factor.validate_setup_totp(mysql)
 
 
     # Logout

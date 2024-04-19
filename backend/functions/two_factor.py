@@ -47,7 +47,7 @@ def generate_qr_code(mysql: MySQL) -> dict:
     user = None # make sure scope of user is outside the try block
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+        cur.execute("SELECT username, password FROM users WHERE user_id=%s", (user_id,))
         user = cur.fetchone()
     except Exception as e:
         cur.close()
@@ -68,9 +68,11 @@ def generate_qr_code(mysql: MySQL) -> dict:
         return response
     del user["password"]
 
+    username = user["username"]
+
     # generate a totp key
     key = pyotp.random_base32()
-    uri = pyotp.totp.TOTP(key).provisioning_uri(name=str(user_id), issuer_name='CodeCraft')
+    uri = pyotp.totp.TOTP(key).provisioning_uri(name=username, issuer_name='CodeCraft')
 
     if not uri:
         response['hasError'] = True
@@ -102,11 +104,11 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     # generate and send the qr code to the frontend
     img = qrcode.make(uri)
-    img.save('qrcode.png')
+    img.save('qrcode.png') # TODO: REMOVE LINE BEFORE MERGING
     
     # encode the image
     buffer = io.BytesIO()
-    img.save(buffer, format='PNG')
+    img.save(buffer)
     img_bytes = buffer.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode('utf-8')
     print(encoded_img)
@@ -153,8 +155,12 @@ def validate_setup_totp(mysql: MySQL) -> dict:
     totp_key = user["totp_key"]
     fernet_key = user["fernet_key"]
 
+    # convert decrypt key from hex to bytes and encode in base 64 for fernet function
+    encoded_decrypt_key = bytes.fromhex(fernet_key)
+    encoded_decrypt_key = base64.urlsafe_b64encode(encoded_decrypt_key).decode('utf-8')
+
     # decrypt the totp key with the fernet key
-    f = Fernet(fernet_key)
+    f = Fernet(encoded_decrypt_key)
     totp_key = f.decrypt(totp_key).decode('utf-8')
 
     # verify the code is correct
@@ -168,7 +174,7 @@ def validate_setup_totp(mysql: MySQL) -> dict:
     
     # move the code from the temporary database to the user database
     try:
-        cur.execute("UPDATE users SET totp = %s WHERE user_id = %s", (totp_key,))
+        cur.execute("UPDATE users SET totp = %s WHERE user_id = %s", (totp_key,user_id))
         cur.execute("DELETE FROM twofa_setup WHERE user_id = %s", (user_id,))
         mysql.connection.commit()
         cur.close()
@@ -239,9 +245,13 @@ def validate_totp(mysql: MySQL) -> dict:
         response["errorMessage"] = "Key not found"
         return response
 
-    # decrypt the totp key using the fernet key
     fernet_key = user["fernet_key"]
-    f = Fernet(fernet_key)
+    # convert decrypt key from hex to bytes and encode in base 64 for fernet function
+    encoded_decrypt_key = bytes.fromhex(fernet_key)
+    encoded_decrypt_key = base64.urlsafe_b64encode(encoded_decrypt_key).decode('utf-8')
+
+    # decrypt the totp key using the fernet key
+    f = Fernet(encoded_decrypt_key)
     totp_key = f.decrypt(totp_key).decode('utf-8')
 
     # verify the code is correct
