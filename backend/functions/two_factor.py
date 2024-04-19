@@ -1,7 +1,8 @@
 from flask_mysqldb import MySQL
 import json
 from flask import request
-import get_user_id
+from functions import get_user_id
+from cryptography.fernet import Fernet
 import time
 import pyotp
 import qrcode
@@ -13,6 +14,16 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
+    if 'key' not in responseJson or 'currPass' not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "No encryption key found"
+        return response
+    
+    # entered password is hashed with 2 different salts on the frontend
+    hashed_pw = responseJson["currPass"].strip() # normal login salt to verify accuracy
+    encrypt_key = responseJson["key"].strip() # new salt to encrypt totp key
+
+    # get the user id info
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
     if error:
         response['hasError'] = True
@@ -25,8 +36,33 @@ def generate_qr_code(mysql: MySQL) -> dict:
         response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
         response['logout'] = True
         return response
+    
+    # query the database to check if the password is valid
+    user = None # make sure scope of user is outside the try block
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT password FROM users WHERE user_id=%s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
 
-    # generate a key
+    if not user:
+        response["hasError"] = True
+        response["errorMessage"] = "User not found (Make sure you're signed in)"
+        return response
+    
+    # verify that the password matches
+    if hashed_pw != user["password"]:
+        response["hasError"] = True
+        response["errorMessage"] = "Invalid password"
+        del user['password']
+        return response
+    del user["password"]
+
+    # generate a totp key
     key = pyotp.random_base32()
     uri = pyotp.totp.TOTP(key).provisioning_uri(name=user_id, issuer_name='CodeCraft')
 
@@ -36,12 +72,15 @@ def generate_qr_code(mysql: MySQL) -> dict:
         response['logout'] = True
         return response
 
-    # TODO: encrypt the key
+    # encrypt the totp key
+    f = Fernet(encrypt_key)
+    token = f.encrypt(key.encode())
 
-    # store the key
+    # update temporary verification table
     try:
         cur = mysql.connection.cursor()
-        cur.execute("UPDATE users SET totp = %s WHERE user_id = %s", (key, user_id))
+        cur.execute("DELETE FROM twofa_setup WHERE user_id = %s", (user_id,))
+        cur.execute("INSERT INTO twofa_setup (user_id, fernet_key, totp_key) VALUES (%s, %s, %s)", (user_id, encrypt_key, token))
         mysql.connection.commit()
         cur.close()
     except Exception as e:
@@ -57,6 +96,74 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     response["qr"] = encoded_img
     response["success"] = True
+    return response
+
+def validate_setup_totp(mysql: MySQL) -> dict:
+    response = {"hasError": False}
+
+    responseJson = json.loads(request.data.decode())
+
+    if 'passcode' not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "Unexpected error"
+        return response
+
+    passcode = responseJson['passcode'].strip()
+
+    user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
+    if error:
+        response['hasError'] = True
+        response['errorMessage'] = error
+        response['logout'] = True
+        return response
+
+    if user_id == -1:
+        response['hasError'] = True
+        response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
+        response['logout'] = True
+        return response
+    
+    try:
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT totp_key, fernet_key FROM twofa_setup WHERE user_id = %s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        cur.close()
+        return response
+
+    totp_key = user["totp_key"]
+    fernet_key = user["fernet_key"]
+
+    # decrypt the totp key with the fernet key
+    f = Fernet(fernet_key)
+    totp_key = f.decrypt(totp_key).decode('utf-8')
+
+    # verify the code is correct
+    totp = pyotp.TOTP(totp_key)
+    verified = totp.verify(passcode)
+
+    if not verified:
+        response["hasError"] = True
+        response["errorMessage"] = "Failed TOTP verification"
+        return response
+    
+    # move the code from the temporary database to the user database
+    try:
+        cur.execute("UPDATE users SET totp = %s WHERE user_id = %s", (totp_key,))
+        cur.execute("DELETE FROM twofa_setup WHERE user_id = %s", (user_id,))
+        mysql.connection.commit()
+        cur.close()
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        mysql.connection.rollback()
+        cur.close()
+        return response
+
+    response["success"] = True
+    response["hasError"] = False
     return response
 
 def validate_totp(mysql: MySQL) -> dict:
@@ -84,28 +191,63 @@ def validate_totp(mysql: MySQL) -> dict:
         response['logout'] = True
         return response
 
-    # fetch the key from the database
+    # fetch the totp key from the database
     try:
         cur = mysql.connection.cursor()
         cur.execute("SELECT totp FROM users WHERE user_id = %s", (user_id,))
-        key = cur.fetchone()
+        user = cur.fetchone()
     except Exception as e:
         cur.close()
         response["hasError"] = True
         response["errorMessage"] = str(e)
-        return response    
+        return response
 
-    if not key:
+    if not user or not user["totp"]:
         response["hasError"] = True
         response["errorMessage"] = "Key not found"
         return response
-    
-    # TODO: decrypt the key
+    totp_key = user["totp"]
+
+    # fetch the fernet key from the temporary table
+    try:
+        cur.execute("SELECT fernet_key FROM twofa_login WHERE user_id = %s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+
+    if not user["fernet_key"]:
+        response["hasError"] = True
+        response["errorMessage"] = "Key not found"
+        return response
+
+    # decrypt the totp key using the fernet key
+    fernet_key = user["fernet_key"]
+    f = Fernet(fernet_key)
+    totp_key = f.decrypt(totp_key).decode('utf-8')
 
     # verify the code is correct
-    totp = pyotp.TOTP(key)
+    totp = pyotp.TOTP(totp_key)
     verified = totp.verify(passcode)
 
-    response["verified"] = verified
+    if not verified:
+        response["hasError"] = True
+        response["errorMessage"] = "Failed TOTP verification"
+        return response
+
+    # delete the information on success
+    try:
+        cur.execute("DELETE FROM twofa_login WHERE user_id = %s", (user_id,))
+        mysql.connection.commit()
+        cur.close()
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        mysql.connection.rollback()
+        cur.close()
+        return response
+    
     response["success"] = True
+    response["hasError"] = False
     return response
