@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(24) NOT NULL UNIQUE,
     email VARCHAR(64) NOT NULL UNIQUE,
     password VARCHAR(64) NOT NULL,
-    totp VARCHAR(123)
+    totp VARCHAR(144)
 )
 """
 cursor.execute(create_user_table_query)
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS twofa_setup (
     twofa_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL UNIQUE,
     fernet_key VARCHAR(64),
-    totp_key VARCHAR(123),
+    totp_key VARCHAR(144),
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """

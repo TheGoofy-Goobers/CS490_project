@@ -6,6 +6,7 @@ from cryptography.fernet import Fernet
 import time
 import pyotp
 import qrcode
+import io
 import os
 import base64
 
@@ -13,6 +14,11 @@ def generate_qr_code(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
     responseJson = json.loads(request.data.decode())
+
+    if "sessionToken" not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "Unexpected error"
+        return response
 
     if 'key' not in responseJson or 'currPass' not in responseJson:
         response["hasError"] = True
@@ -64,7 +70,7 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     # generate a totp key
     key = pyotp.random_base32()
-    uri = pyotp.totp.TOTP(key).provisioning_uri(name=user_id, issuer_name='CodeCraft')
+    uri = pyotp.totp.TOTP(key).provisioning_uri(name=str(user_id), issuer_name='CodeCraft')
 
     if not uri:
         response['hasError'] = True
@@ -72,8 +78,12 @@ def generate_qr_code(mysql: MySQL) -> dict:
         response['logout'] = True
         return response
 
+    # convert encrypt key from hex to bytes and encode in base 64 for fernet function
+    encoded_encrypt_key = bytes.fromhex(encrypt_key)
+    encoded_encrypt_key = base64.urlsafe_b64encode(encoded_encrypt_key).decode('utf-8')
+
     # encrypt the totp key
-    f = Fernet(encrypt_key)
+    f = Fernet(encoded_encrypt_key)
     token = f.encrypt(key.encode())
 
     # update temporary verification table
@@ -92,7 +102,14 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     # generate and send the qr code to the frontend
     img = qrcode.make(uri)
-    encoded_img = base64.b64encode(img).decode('utf-8')
+    img.save('qrcode.png')
+    
+    # encode the image
+    buffer = io.BytesIO()
+    img.save(buffer, format='PNG')
+    img_bytes = buffer.getvalue()
+    encoded_img = base64.b64encode(img_bytes).decode('utf-8')
+    print(encoded_img)
 
     response["qr"] = encoded_img
     response["success"] = True
@@ -103,7 +120,7 @@ def validate_setup_totp(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'passcode' not in responseJson:
+    if 'passcode' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
@@ -171,7 +188,7 @@ def validate_totp(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'passcode' not in responseJson:
+    if 'passcode' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response

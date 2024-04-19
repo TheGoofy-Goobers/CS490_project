@@ -52,9 +52,11 @@ const TwoFA = () => {
     const checkPass = () => {
         const hashedPassword = SHA256(pass + "CS490!").toString();
         const key = SHA256(pass + "2FAkey").toString();
+        const user = localStorage.getItem("sessionToken");
         const check = {
             currPass: hashedPassword,
             key: key,
+            sessionToken: user,
         };
 
         axios.post(`${FLASK_URL}/getQRCode`, check)
