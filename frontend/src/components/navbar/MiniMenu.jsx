@@ -27,7 +27,7 @@ const MiniMenuComponent = () => {
                                 <li className="change-user-li"><Link to="/accountmanagement/changeusername" className="acc-button">Edit Username</Link></li>
                                 <li><Link to="/accountmanagement/changepassword" className="acc-button">Edit Password</Link></li>
                                 <li className="acc-button"><Link to="/accountmanagement/deleteaccount" className="acc-button">Delete Account</Link></li>
-                                <li className="delete-account-li"><Link to="/accountmanagement/twoFA" className="acc-button">too fak ter aw thenti fik ayshon</Link></li>
+                                <li className="delete-account-li"><Link to="/accountmanagement/twoFA" className="acc-button">2 Factor Authentication</Link></li>
                             </ul>
                         </div>
                     )}

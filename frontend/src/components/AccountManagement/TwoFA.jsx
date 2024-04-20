@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FLASK_URL, set2FAVerification, Logout } from '../../vars';
+import { SITE_URL, FLASK_URL, set2FAVerification, Logout, passIsVerified } from '../../vars';
 import axios from 'axios';
 import './AccountManagement.css';
 import { useNavigate } from 'react-router-dom';
 import AlertBox from '../AlertBox/AlertBox';
 import SHA256 from 'crypto-js/sha256';
 import eyeicon from './eyeicon.svg';
+import { useLocation } from 'react-router-dom';
 
 const TwoFA = () => {
+
 
     const [message, setMessage] = useState('Default message');
     const [alertOpen, setAlertOpen] = useState(false);
@@ -27,23 +29,23 @@ const TwoFA = () => {
 
     // setQrCode('SGVsbG8sIHdvcmxkIQ==');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.post(`${FLASK_URL}/getQRCode`);
-                setQrCode(response.data.qr);  // Set QR code in state
-                localStorage.setItem('qrCode', response.data.qr);  // Store in localStorage
-            } catch (error) {
-                console.error('Error fetching QR code:', error);
-            }
-        };
-        const storedQr = localStorage.getItem('qrCode');
-        if (storedQr) {
-            setQrCode(storedQr);  // Use stored QR code if available
-        } else {
-            fetchData();  // Fetch if not stored
-        }
-    }, []);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.post(`${FLASK_URL}/getQRCode`);
+    //             setQrCode(response.data.qr);  // Set QR code in state
+    //             localStorage.setItem('qrCode', response.data.qr);  // Store in localStorage
+    //         } catch (error) {
+    //             console.error('Error fetching QR code:', error);
+    //         }
+    //     };
+    //     const storedQr = localStorage.getItem('qrCode');
+    //     if (storedQr) {
+    //         setQrCode(storedQr);  // Use stored QR code if available
+    //     } else {
+    //         fetchData();  // Fetch if not stored
+    //     }
+    // }, []);
 
 
     const handlePassChange = (e) => {
@@ -72,10 +74,10 @@ const TwoFA = () => {
                 const res = response.data;
                 if (res.success) {
                     set2FAVerification(true);
-                    setCode(res.qr);
+                    setQrCode(res.qr);
                     setPass('');
                     setMessage(`Password confirmed successfully!`);
-                    showAlert();
+                    showAlert("success");
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 alert()
@@ -136,11 +138,21 @@ const TwoFA = () => {
             });
     };
 
+    // const resetPWverification = () => {
+    //     set2FAVerification(false);
+    // }
+
+    // window.addEventListener("beforeunload", function (e) {
+    //     resetPWverification();
+    //     window.location.href = SITE_URL + "/AccountManagement/TwoFA";
+    // });
+
+
+
     return (
-        <div>
-           
+        <div>           
                 {
-                    !localStorage.getItem("passIsVerified") &&
+                    !passIsVerified &&
                     <div>
                         <div className="delete-box-container">
                             <div className='login-form-box'>
@@ -169,7 +181,7 @@ const TwoFA = () => {
                 }
            
             {
-                localStorage.getItem("passIsVerified") &&
+                passIsVerified &&
                 <div className="delete-box-container">
                     <form onSubmit={handleSubmit}>
                         <div className='change_password'>

@@ -26,7 +26,7 @@ export const setLocal = (session_token, username, loginTime, rememberMe) => {
 }
 
 export const set2FAVerification = (passIsVerified) => {
-    localStorage.setItem("passIsVerified", passIsVerified)
+    localStorage.setItem("passIsVerified", passIsVerified.toString());
 }
 
 export const isExpired = () => {
