@@ -111,7 +111,7 @@ class TestRegistrationLoginLogout:
 
         assert "success" in response and response["success"]
         assert not response["hasError"]      #sessionToken is uuid, so should be len 36
-        assert response["totp"] == False
+        assert response["totp"] == "disabled"
         assert "sessionToken" in response and len(response["sessionToken"]) == 36
 
     @pytest.mark.parametrize("username,password", [("validUser", "validPassword"), ("valid@email.com", "validPassword")])
@@ -126,7 +126,7 @@ class TestRegistrationLoginLogout:
 
         assert "success" in response and response["success"]
         assert not response["hasError"]      #sessionToken is uuid, so should be len 36
-        assert response["totp"] == True
+        assert response["totp"] == "enabled"
         assert "sessionToken" in response and len(response["sessionToken"]) == 36
 
     @pytest.mark.parametrize("username,password", [("unrecognizedUser", "validPassword")])
