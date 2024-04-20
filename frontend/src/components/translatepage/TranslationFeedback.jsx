@@ -1,7 +1,7 @@
 import {React, useState} from 'react';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
-import "./TranslationFeedback.css"
+// import './TranslateFeedback.css';
 
 const Star = ({ selected = false, onClick }) => (
     <span onClick={onClick} style={{ cursor: 'pointer', color: selected ? 'orange' : 'gray', fontSize: '35px'}}>
