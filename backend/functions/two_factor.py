@@ -24,7 +24,7 @@ def generate_qr_code(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["errorMessage"] = "No encryption key found"
         return response
-    
+
     # entered password is hashed with 2 different salts on the frontend
     hashed_pw = responseJson["currPass"].strip() # normal login salt to verify accuracy
     encrypt_key = responseJson["key"].strip() # new salt to encrypt totp key
@@ -110,7 +110,6 @@ def generate_qr_code(mysql: MySQL) -> dict:
     img.save(buffer)
     img_bytes = buffer.getvalue()
     encoded_img = base64.b64encode(img_bytes).decode('utf-8')
-    print(encoded_img)
 
     response["qr"] = encoded_img
     response["success"] = True
@@ -153,6 +152,10 @@ def validate_setup_totp(mysql: MySQL) -> dict:
 
     totp_key = user["totp_key"]
     fernet_key = user["fernet_key"]
+
+    # TODO: delete before merging
+    print(f"totp_key: {totp_key}")
+    print(f"fernet_key: {fernet_key}")
 
     # convert decrypt key from hex to bytes and encode in base 64 for fernet function
     encoded_decrypt_key = bytes.fromhex(fernet_key)
