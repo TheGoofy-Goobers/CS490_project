@@ -152,7 +152,7 @@ const TwoFA = () => {
     return (
         <div>           
                 {
-                    !passIsVerified &&
+                    !localStorage.getItem("passIsVerified") &&
                     <div>
                         <div className="delete-box-container">
                             <div className='login-form-box'>
@@ -181,7 +181,7 @@ const TwoFA = () => {
                 }
            
             {
-                passIsVerified &&
+                localStorage.getItem("passIsVerified") &&
                 <div className="delete-box-container">
                     <form onSubmit={handleSubmit}>
                         <div className='change_password'>
