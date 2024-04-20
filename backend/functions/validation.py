@@ -42,3 +42,27 @@ def validate_username(username: str) -> bool:
         errorMessage.append("Username does not follow correct format. Usernames must contain only alphanumeric characters, underscores, and hyphens, and cannot begin or end with a hyphen.")
     
     return valid, errorMessage
+
+#TODO: backend code validation
+def validate_code(language, code):
+    error = ""
+
+    if language == "Python":
+        pass
+    elif language == "Java":
+        pass
+    elif language == "JavaScript":
+        pass
+    elif language == "C++":
+        pass
+    elif language == "Rust":
+        pass
+    else:
+        return False, "Language not supported"
+    
+    return True, ""
+    
+# def validate_python(code):
+#     python_code_pattern = r'^(?:\s*(?:(?:def|class|if|elif|else|for|while|try|except|finally|with)\b\s*\w+\s*\(.*?\)|import\s+\w+\s*(?:as\s+\w+)?\s*(?:,\s*\w+\s*(?:as\s+\w+)?)*|from\s+\w+\s+import\s+\w+\s*(?:as\s+\w+)?\s*(?:,\s*\w+\s*(?:as\s+\w+)?)*|return\b\s*.+|yield\b\s*.+|break\b|continue\b|(?:(?<!\S)[\w.]+\s*=))\s*:\s*|[\w.]+\s*\([^()]*\)\s*|[\w.]+\s*=.*|#.*)*$'
+    
+#     return bool(re.match(python_code_pattern, code))

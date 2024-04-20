@@ -5,6 +5,7 @@ from openai import OpenAI
 import datetime
 import openai
 from functions import get_user_id
+from functions.validation import validate_code
 
 accepted_languages = ["Python", "Rust", "C++", "JavaScript", "Java"]
 
@@ -37,6 +38,12 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     if srcLang not in accepted_languages or toLang not in accepted_languages:
         response["hasError"] = True
         response["errorMessage"] = f"Language not recognized. Accepted languages (case sensitive): {accepted_languages}"
+
+    # valid, error = validate_code(srcLang, message)
+    # if not valid:
+    #     response["hasError"] = True
+    #     response["errorMessage"] = error
+    #     return response
 
     cur = mysql.connection.cursor()
 
