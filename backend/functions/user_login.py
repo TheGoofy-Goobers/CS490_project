@@ -3,7 +3,7 @@ import json
 from flask import request
 from functions.validation import validate_username, validate_email
 import uuid
-from functions.get_user_id import id_cache
+from functions.cache import id_cache, User
 
 def login(mysql: MySQL) -> dict:
     response = {"hasError" : False}
@@ -73,6 +73,7 @@ def login(mysql: MySQL) -> dict:
 
         cur.execute("DELETE FROM logged_in WHERE user_id=%s", (user["user_id"],))
         cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (user["user_id"], id))
+        id_cache[id] = User(id, user["user_id"])
         mysql.connection.commit()
     except:
         mysql.connection.rollback()

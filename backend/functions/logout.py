@@ -1,7 +1,7 @@
 from flask_mysqldb import MySQL
 import json
 from flask import request
-from functions.get_user_id import id_cache
+from functions.cache import id_cache
 
 def logout(mysql: MySQL) -> dict:
     response = {"hasError": False}

@@ -1,14 +1,7 @@
 from flask import request
 import json
 from functions import get_user_id
-from typing import List
-
-class Translations:
-    def __init__(self, history: List[dict]):
-        self.history = history
-        self.updated = True
-
-translation_cache = {}
+from functions.cache import translation_cache, Translations
 
 def get_translation_history(mysql):
     response = {"hasError": False}

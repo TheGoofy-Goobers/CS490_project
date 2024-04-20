@@ -1,14 +1,6 @@
 from flask_mysqldb import MySQL
 import datetime
-
-EXPIRY_HOURS = 24
-class User:
-    def __init__(self, token, id, login_time):
-        self.token = token
-        self.id = id
-        self.expiry = login_time + datetime.timedelta(hours=24)
-
-id_cache = {}
+from functions.cache import id_cache, User
 
 def get_user_id(mysql: MySQL, token: str) -> int:
     error = ""
