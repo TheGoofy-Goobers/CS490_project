@@ -38,6 +38,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     if srcLang not in accepted_languages or toLang not in accepted_languages:
         response["hasError"] = True
         response["errorMessage"] = f"Language not recognized. Accepted languages (case sensitive): {accepted_languages}"
+        return response
 
     # valid, error = validate_code(srcLang, message)
     # if not valid:
@@ -45,6 +46,11 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     #     response["errorMessage"] = error
     #     return response
 
+    if len(message) > 16384:
+        response["hasError"] = True
+        response["errorMessage"] = f"Max code length is 16384. Your message length: {len(message)}"
+        return response
+    
     cur = mysql.connection.cursor()
 
     try:
@@ -116,7 +122,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
                 { "role": "system", "content": f"You are a helpful assistant who translates code from {srcLang} to {toLang}. Refrain from saying anything other than the translated code. The response can also omit the name of the language, and should not include the '`' character as a delimiter."},
                 { "role": "user", "content": f"Translate the following code if it is the correct syntax for {srcLang}. Otherwise, indicate that it is not the correct syntax for {srcLang}:\n{message}"}
                 ],
-            max_tokens=500,
+            max_tokens=3500,
             temperature=0
         )
         response["output"] = gpt_response.choices[0].message.content
