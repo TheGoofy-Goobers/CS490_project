@@ -87,7 +87,9 @@ def login(mysql: MySQL) -> dict:
     if not user["totp"]:
         response["sessionToken"] = id
         response["success"] = True
+        response["totp"] = False
         return response
+    response["totp"] = True
     totp_key = user["totp"]
 
     # if 2fa is enabled, add the key to the temporary table
