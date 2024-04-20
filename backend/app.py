@@ -117,10 +117,16 @@ def create_app(testing: bool):
         return two_factor.generate_qr_code(mysql)
     
 
-    # Verify the TOTP for 2Fa
-    @api.route('/verifyTOTP', methods=['POST'])
-    def validate_totp():
+    # Verify the setup TOTP for 2Fa
+    @api.route('/validateSetupTOTP', methods=['POST'])
+    def validate_setup_totp():
         return two_factor.validate_setup_totp(mysql)
+
+    
+    # Verify the TOTP for 2Fa
+    @api.route('/validateTOTP', methods=['POST'])
+    def validate_totp():
+        return two_factor.validate_totp(mysql)
 
 
     # Logout

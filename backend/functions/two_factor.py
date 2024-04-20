@@ -153,10 +153,6 @@ def validate_setup_totp(mysql: MySQL) -> dict:
     totp_key = user["totp_key"]
     fernet_key = user["fernet_key"]
 
-    # TODO: delete before merging
-    print(f"totp_key: {totp_key}")
-    print(f"fernet_key: {fernet_key}")
-
     # convert decrypt key from hex to bytes and encode in base 64 for fernet function
     encoded_decrypt_key = bytes.fromhex(fernet_key)
     encoded_decrypt_key = base64.urlsafe_b64encode(encoded_decrypt_key).decode('utf-8')
