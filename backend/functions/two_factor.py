@@ -104,7 +104,6 @@ def generate_qr_code(mysql: MySQL) -> dict:
 
     # generate and send the qr code to the frontend
     img = qrcode.make(uri)
-    img.save('qrcode.png') # TODO: REMOVE LINE BEFORE MERGING
     
     # encode the image
     buffer = io.BytesIO()
