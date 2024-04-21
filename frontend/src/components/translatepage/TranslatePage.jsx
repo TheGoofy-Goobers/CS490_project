@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
 import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight, FaTrash } from 'react-icons/fa';
 import CodeMirror from '@uiw/react-codemirror';
+import { material } from '@uiw/codemirror-theme-material';
 import { javascript} from '@codemirror/lang-javascript';
 import { python} from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { rust } from '@codemirror/lang-rust';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { vscodeDark, vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
 import axios from 'axios'
 import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
@@ -437,67 +438,109 @@ const TranslatePage = () => {
           <FaHistory className="history-icon" />
         </button>
         {showSidebar && (
-        <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
-          <div className="sorting-controls">
-            <div className="sort-by-date">
-              <label htmlFor="dateFilter">Date:</label>
-              <select id="dateFilter" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="form-control">
-                <option value="">All Dates</option>
-                <option value="Today">Today</option>
-                <option value="Yesterday">Yesterday</option>
-                <option value="Previous 30 Days">Previous 30 Days</option>
-              </select>
+          <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+            <div className="sorting-controls">
+              <div className="sort-by-date">
+                <label htmlFor="dateFilter">Date:</label>
+                <select
+                  id="dateFilter"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="date-filter"
+                >
+                  <option value="">All Dates</option>
+                  <option value="Today">Today</option>
+                  <option value="Yesterday">Yesterday</option>
+                  <option value="Previous 30 Days">Previous 30 Days</option>
+                </select>
+              </div>
+              <div className="sort-by-source-language">
+                <label htmlFor="sourceLanguageFilter">Source Language:</label>
+                <select
+                  id="sourceLanguageFilter"
+                  value={sourceLanguageFilter}
+                  onChange={(e) => setSourceLanguageFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="source-language-filter"
+                >
+                  <option value="">All Languages</option>
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
+                  <option value="Java">Java</option>
+                  <option value="Rust">Rust</option>
+                </select>
+              </div>
+              <div className="sort-by-target-language">
+                <label htmlFor="targetLanguageFilter">Target Language:</label>
+                <select
+                  id="targetLanguageFilter"
+                  value={targetLanguageFilter}
+                  onChange={(e) => setTargetLanguageFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="target-language-filter"
+                >
+                  <option value="">All Languages</option>
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
+                  <option value="Java">Java</option>
+                  <option value="Rust">Rust</option>
+                </select>
+              </div>
             </div>
-            <div className="sort-by-source-language">
-              <label htmlFor="sourceLanguageFilter">Source Language:</label>
-              <select id="sourceLanguageFilter" value={sourceLanguageFilter} onChange={(e) => setSourceLanguageFilter(e.target.value)} className="form-control">
-                <option value="">All Languages</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="C++">C++</option>
-                <option value="Java">Java</option>
-                <option value="Rust">Rust</option>
-              </select>
-            </div>
-            <div className="sort-by-target-language">
-              <label htmlFor="targetLanguageFilter">Target Language:</label>
-              <select id="targetLanguageFilter" value={targetLanguageFilter} onChange={(e) => setTargetLanguageFilter(e.target.value)} className="form-control">
-                <option value="">All Languages</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="C++">C++</option>
-                <option value="Java">Java</option>
-                <option value="Rust">Rust</option>
-              </select>
-            </div>
-          </div>
 
-          <div className="translation-history-title" onMouseOver={() => setShowDots(true)} onMouseOut={() => setShowDots(false)}>
-            Translation History
-            {showDots && <FaTrash className="dots-icon" onClick={confirmClearAll} title="Clear Translation History"/>}
-          </div>
-        {Object.entries(groupByDate).map(([date, items], dateIndex) => (
-          <div key={dateIndex}>
-            <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
-            {items.map((item, itemIndex) => (
-              <div key={itemIndex} 
-                  className="history-item" 
-                  data-testid="history-item" 
-                  onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
-                {getLanguageIconElement(item.source_language)}
-                <span className="source-language">{item.source_language}</span>
-                <FaArrowRight className="arrow-icon" />
-                {getLanguageIconElement(item.target_language)}
-                <span className="target-language">{item.target_language}</span>
-                <FaTrash className="delete-icon" 
-                        onClick={(event) => handleDeleteClick(event, item.translation_id)} 
-                        title="Delete Translation"/>
+            <div
+              className="translation-history-title"
+              onMouseOver={() => setShowDots(true)}
+              onMouseOut={() => setShowDots(false)}
+              data-testid="translation-history-title"
+            >
+              <div className="translation-history-title" onMouseOver={() => setShowDots(true)} onMouseOut={() => setShowDots(false)}>
+                Translation History
+                {showDots && (
+                  <FaTrash
+                    className="dots-icon"
+                    onClick={confirmClearAll}
+                    data-testid="clear-all-icon" // Add a consistent data-testid
+                    title="Clear Translation History"
+                  />
+                )}
+              </div>
+            </div>
+
+            {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+              <div key={dateIndex}>
+                <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
+                {items.map((item, itemIndex) => (
+                  <div
+                    key={itemIndex}
+                    className="history-item"
+                    data-testid={`history-item-${item.translation_id}`} // Make it unique
+                    onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}
+                  >
+                    {getLanguageIconElement(item.source_language)}
+                    <span className="source-language">{item.source_language}</span>
+                    <FaArrowRight className="arrow-icon" />
+                    {getLanguageIconElement(item.target_language)}
+                    <span className="target-language">{item.target_language}</span>
+                    <FaTrash
+                      className="delete-icon"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteClick(event, item.translation_id);
+                      }}
+                      data-testid={`delete-button-${item.translation_id}`} // Make it unique
+                      title="Delete Translation"
+                    />
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>      
-      )}
+        )}
+
       </div>
         <div className="container main-content">
           <div className="status">
@@ -554,6 +597,7 @@ const TranslatePage = () => {
                     setCharCount(value.length)
                   }
                 }}
+                testIdSuffix="input"
                 basicSetup={{ lineNumbers: true }}
               />
               
@@ -585,6 +629,7 @@ const TranslatePage = () => {
                 extensions={[
                   getLanguageExtension(targetLanguage) // This function will select the proper language mode
                 ]}
+                testIdSuffix="output"
                 editable={true} // Makes the editor read-only
                 basicSetup={{ lineNumbers: true }} // Line numbers and other basic setups
               />
