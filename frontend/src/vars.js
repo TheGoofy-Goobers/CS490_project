@@ -15,9 +15,9 @@ export const SITE_URL = window.location.origin;
 //     }, 60 * 60 * 1000); // 60 minutes in milliseconds
 // }
 
-export const setLocal = (session_token, username, loginTime, rememberMe) => {
+export const setLocal = (session_token, username, loginTime, rememberMe, isLoggedIn = false) => {
     localStorage.setItem("lastLogIn", loginTime)
-    localStorage.setItem("isLoggedIn", "true")
+    localStorage.setItem("isLoggedIn", isLoggedIn.toString())
     localStorage.setItem("sessionToken", session_token)
     // const sessionToken = uuidv4();
     // localStorage.setItem("sessionToken", sessionToken)

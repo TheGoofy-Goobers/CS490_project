@@ -80,7 +80,6 @@ const TwoFA = () => {
                     showAlert("success");
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
-                alert()
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     setMessage(`Session expired. Please login again.`);
@@ -127,7 +126,7 @@ const TwoFA = () => {
             passcode: pinValue,
         };
     
-        axios.post(`${FLASK_URL}/verifyTOTP`, passcodeData)
+        axios.post(`${FLASK_URL}/validateSetupTOTP`, passcodeData)
             .then(response => {
                 console.log('Verification response:', response.data);
                 // TODO: redirect to home page and show success message
