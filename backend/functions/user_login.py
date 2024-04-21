@@ -9,7 +9,7 @@ def login(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'username' not in responseJson or 'password' not in responseJson:
+    if 'username' not in responseJson or 'password' not in responseJson or 'key' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
@@ -90,12 +90,13 @@ def login(mysql: MySQL) -> dict:
         response["totp"] = "disabled"
         return response
     response["totp"] = "enabled"
-    totp_key = user["totp"]
+    
+    fernet_key = response["key"]
 
     # if 2fa is enabled, add the key to the temporary table
     try:
         cur.execute("DELETE FROM twofa_login WHERE user_id = %s", (user_id,))
-        cur.execute("INSERT INTO twofa_login(user_id, fernet_key) VALUES(%s, %s)", (user_id, totp_key))
+        cur.execute("INSERT INTO twofa_login(user_id, fernet_key) VALUES(%s, %s)", (user_id, fernet_key))
         mysql.connection.commit()
         cur.close()
     except Exception as e:
