@@ -63,10 +63,12 @@ const LoginPage = () => {
   var res;
   const login = () => {
     const hashedPassword = SHA256(credentials.password + "CS490!").toString();
+    const key = SHA256(credentials.password + "2FAkey").toString();
     delete credentials.password;
     const loginData = {
       ...credentials,
       password: hashedPassword,
+      key: key,
     };
 
     axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)

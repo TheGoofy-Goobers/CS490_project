@@ -10,9 +10,13 @@ import { useLocation } from 'react-router-dom';
 
 const TwoFA = () => {
 
-
+    const [code, setCode] = useState(Array(6).fill(""));
+    const inputsRef = useRef([]);
+    const [qrCode, setQrCode] = useState('');
     const [message, setMessage] = useState('Default message');
     const [alertOpen, setAlertOpen] = useState(false);
+    const [pass, setPass] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const showAlert = () => {
         setAlertOpen(true);
@@ -23,9 +27,7 @@ const TwoFA = () => {
         }, 2000); // This should match the duration in AlertBox or be longer
     };
 
-    const [code, setCode] = useState(Array(6).fill(""));
-    const inputsRef = useRef([]);
-    const [qrCode, setQrCode] = useState('');
+    
 
     // setQrCode('SGVsbG8sIHdvcmxkIQ==');
 
@@ -57,7 +59,7 @@ const TwoFA = () => {
         checkPass();
     };
 
-    const [pass, setPass] = useState('');
+    
     
     const checkPass = () => {
         const hashedPassword = SHA256(pass + "CS490!").toString();
@@ -77,7 +79,7 @@ const TwoFA = () => {
                     setQrCode(res.qr);
                     setPass('');
                     setMessage(`Password confirmed successfully!`);
-                    showAlert("success");
+                    showAlert();
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
@@ -118,6 +120,7 @@ const TwoFA = () => {
     };
 
     const handleSubmit = (event) => {
+        setIsLoading(true);
         event.preventDefault();
         const pinValue = code.join('');
         const user = localStorage.getItem("sessionToken");
@@ -125,11 +128,28 @@ const TwoFA = () => {
             sessionToken: user,
             passcode: pinValue,
         };
+
+        // console.log(`PASSCODE ${pinValue}`);
+        // console.log(`token ${user}`);
     
         axios.post(`${FLASK_URL}/validateSetupTOTP`, passcodeData)
             .then(response => {
                 console.log('Verification response:', response.data);
-                // TODO: redirect to home page and show success message
+                const res = response.data;
+                if(res.success){
+                    setMessage(`2FA setup successful!`);
+                    showAlert(message);
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                }
+                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                console.log(`Response has error: ${res.hasError}`);
+                if (res.logout) {
+                    setMessage(`Session expired. Please login again.`);
+                    showAlert();
+                    setTimeout(Logout, 4000);
+                }
             })
             .catch(error => {
                 console.error('Verification error:', error);
@@ -149,9 +169,10 @@ const TwoFA = () => {
 
 
     return (
-        <div>           
+        <div>       
+            {<AlertBox message={message} isOpen={alertOpen} />}    
                 {
-                    !localStorage.getItem("passIsVerified") &&
+                !(localStorage.getItem("passIsVerified") === "true") &&
                     <div>
                         <div className="delete-box-container">
                             <div className='login-form-box'>
@@ -180,7 +201,7 @@ const TwoFA = () => {
                 }
            
             {
-                localStorage.getItem("passIsVerified") &&
+                (localStorage.getItem("passIsVerified") === "true") &&
                 <div className="delete-box-container">
                     <form onSubmit={handleSubmit}>
                         <div className='change_password'>
@@ -208,7 +229,14 @@ const TwoFA = () => {
                                 </div>
                             </div>
                             <div className="login-button-container">
-                                <button type="submit" className="login-form-button">Submit</button>
+                                <button 
+                                    type="submit" 
+                                    className={`login-form-button${isLoading ? '-loading' : '-regular'}`}
+                                    
+                                    disabled={isLoading}
+                                    >
+                                        Submit
+                                </button>
                             </div>
                         </div>
                     </form>

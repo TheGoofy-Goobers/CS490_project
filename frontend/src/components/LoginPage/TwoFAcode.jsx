@@ -46,9 +46,9 @@ const TwoFAcode = () => {
                 const res = response.data;
                 if (res.success) {
                     // setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe, true);
-                    // localStorage.setItem("isLoggedIn", true);
-                    // setMessage(`Login successful!`);
-                    // showAlert("success");
+                    localStorage.setItem("isLoggedIn", true);
+                    setMessage(`Login successful!`);
+                    showAlert(message);
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
@@ -84,7 +84,9 @@ const TwoFAcode = () => {
     };
 
     return (
+        
         <div className="delete-box-container">
+            {<AlertBox message={message} isOpen={alertOpen} />}
             <form onSubmit={handleSubmit}>
                 <div className='change_password'>
                     <div className="login-form-group">

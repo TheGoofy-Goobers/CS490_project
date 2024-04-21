@@ -10,9 +10,8 @@ const NavBar = () => {
 
 const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const isLoggedIn = (localStorage.getItem("isLoggedIn") === "true");
   const username = localStorage.getItem("username");
-
 
 
   return (
