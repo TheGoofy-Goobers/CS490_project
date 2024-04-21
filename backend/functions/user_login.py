@@ -9,7 +9,7 @@ def login(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'username' not in responseJson or 'password' not in responseJson or 'key' not in responseJson:
+    if 'username' not in responseJson or 'password' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
         return response
@@ -91,7 +91,12 @@ def login(mysql: MySQL) -> dict:
         return response
     response["totp"] = "enabled"
     
-    fernet_key = response["key"]
+    if 'key' not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "2FA fernet key not found"
+        return response
+
+    fernet_key = responseJson["key"]
 
     # if 2fa is enabled, add the key to the temporary table
     try:
