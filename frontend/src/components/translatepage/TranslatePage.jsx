@@ -337,7 +337,9 @@ const TranslatePage = () => {
         ids: "all"
       }).then(response => {
         if (response.data.success) {
-          setTranslationHistory([]);
+          setTranslationHistory([]); // Clear the history
+          setInputText(''); // Clear input text box
+          setOutputText(''); // Clear output text box
           alert("All translations have been deleted.");
         } else {
           alert("Failed to clear translations: " + response.data.errorMessage);
@@ -435,7 +437,7 @@ const TranslatePage = () => {
       {<AlertBox message={message} isOpen={alertOpen} />}
         <div className="sidebar-container">
         <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
-          <FaHistory className="history-icon" />
+          <FaHistory className="history-icon" title="Translation History" />
         </button>
         {showSidebar && (
           <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>

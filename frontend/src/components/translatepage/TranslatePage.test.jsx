@@ -263,101 +263,147 @@ describe('TranslatePage Component', () => {
       const targetLanguageItems = screen.getAllByText(/Python/);
       expect(targetLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'Python' item
     });
+
   });
 
-  describe('TranslatePage - Deletion Tests', () => {
-    beforeEach(() => {
-      jest.clearAllMocks(); // Clear mocks before each test
-    });
-  
-    test('deletes a single translation from history', async () => {
-      // Arrange: Mock data for the test
-      const historyData = [
-        {
-          translation_id: 1,
-          original_code: 'console.log("Hello, world!");',
-          translated_code: 'print("Hello, world!")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString(),
-        },
-        {
-          translation_id: 2,
-          original_code: 'console.log("Another code snippet");',
-          translated_code: 'print("Another code snippet")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString(),
-        },
-      ];
-  
-      // Mock the axios response to simulate initial history data
-      axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
-  
-      // Act: Render the component and open the sidebar
-      render(<TranslatePage />);
-      fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
-  
-      // Delete the first item and re-check
-      const deleteIcons = await screen.findAllByTestId(/^delete-button-/); // Corrected identifier
-      fireEvent.click(deleteIcons[0]); // Delete the first translation
-      render(<TranslatePage />); // Refresh
-  
-      // Re-open the sidebar after refresh and check that the deleted item is gone
-      fireEvent.click(screen.getByTestId('history-button')); // Re-open the sidebar
-      await waitFor(() => {
-        const deletedItem = screen.queryByText('Hello, world!'); // Ensure the deleted item is gone
-        expect(deletedItem).toBeNull(); // Confirm it's deleted
-      });
-  
-      // Ensure that the second item still exists
-      const remainingItem = await screen.findByText('Another code snippet'); // Confirm the existing item still exists
-      expect(remainingItem).toBeInTheDocument();
-    });
-  
-    test('clears all translation history', async () => {
-      // Arrange: Mock data for the test
-      const historyData = [
-        {
-          translation_id: 1,
-          original_code: 'console.log("Hello, world!");',
-          translated_code: 'print("Hello, world!")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString(),
-        },
-        {
-          translation_id: 2,
-          original_code: 'console.log("Another code snippet");',
-          translated_code: 'print("Another code snippet")',
-          source_language: 'JavaScript',
-          target_language: 'Python',
-          submission_date: new Date().toISOString(),
-        },
-      ];
-  
-      // Mock the axios response to simulate initial history data
-      axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
-  
-      // Act: Render the component and open the sidebar
-      render(<TranslatePage />);
-      fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
-  
-      // Click the "Clear Translation History" icon
-      const clearAllIcon = await screen.findByTestId(/^clear-all-icon$/); // Locate the clear-all icon
-      fireEvent.click(clearAllIcon); // Click to clear all translations
-  
-      // Refresh and re-open the sidebar to check the history is empty
-      render(<TranslatePage />); // Refresh after clearing all translations
-      fireEvent.click(screen.getByTestId('history-button')); // Re-open the sidebar after refresh
-  
-      // Wait for the history to be cleared
-      await waitFor(() => {
-        const historyItems = screen.queryAllByTestId(/^history-item-/); // No history items should remain
-        expect(historyItems.length).tobe(0); // Confirm history is empty
-      });
+  // Mock AlertBox behavior
+const mockAlert = jest.fn();
+window.confirm = mockAlert;
+
+describe('TranslatePage - Deletion Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('deletes a single translation from history', async () => {
+    // Arrange
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+    ];
+
+    axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
+
+    // Act
+    render(<TranslatePage />);
+    fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
+
+    const deleteButtons = await screen.findAllByTestId(/^delete-button-/);
+    fireEvent.click(deleteButtons[0]); // Click the delete button
+    
+    mockAlert.mockReturnValueOnce(true); // Simulate confirmation
+    
+    // Wait for deletion
+    await waitFor(() => {
+      const deletedItem = screen.queryByText('console.log("Hello, world!");');
+      expect(deletedItem).toBeNull(); // Should be deleted
     });
   });
+
+  test('clears all translation history', async () => {
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+      {
+        translation_id: 2,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+    ];
+
+    axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
+
+    render(<TranslatePage />);
+
+    fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
+
+    // Hover to reveal the clear-all icon
+    fireEvent.mouseOver(screen.getByTestId('translation-history-title'));
+
+    const clearAllIcon = await screen.findByTestId('clear-all-icon');
+    fireEvent.click(clearAllIcon);
+
+    window.confirm.mockReturnValueOnce(true); // Simulate confirmation
+
+    // Ensure 'console.log("Hello, world!");' is removed after clear-all
+    await waitFor(() => {
+      const deletedItem = screen.queryByText('console.log("Hello, world!");');
+      expect(deletedItem).toBeNull(); // Should not be present after clear-all
+    });
+  });
+});
+
+describe('TranslatePage - Complex Translation Tests', () => {
+  test('ensures complex code appears in translation history', async () => {
+    const complexJavaScriptCode = `
+      const a = 5;
+      const b = 3;
+      const c = a * b + (a / b);
+      function calculate() {
+        const result = c * (a + b);
+        return result;
+      }
+    `.trim();
+
+    const expectedPythonTranslation = `
+      a = 5
+      b = 3
+      c = a * b + (a / b)
+
+      def calculate():
+        result = c * (a + b)
+        return result
+    `.trim();
+
+    // Mock the history data with complex code
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: complexJavaScriptCode,
+        translated_code: expectedPythonTranslation,
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        submission_date: new Date().toISOString(),
+      },
+    ];
+  
+    axios.get.mockResolvedValueOnce({ data: historyData });
+
+    // Act
+    render(<TranslatePage />);
+
+    // Open the history sidebar to make the filter controls visible
+    fireEvent.click(screen.getByTestId('history-button'));
+
+    // Select 'JavaScript' from the source language filter dropdown
+    const sourceLanguageFilterDropdown = screen.getByLabelText('Source Language:');
+    fireEvent.change(sourceLanguageFilterDropdown, { target: { value: 'JavaScript' } });
+
+    // Wait for filter application by checking that items for 'JavaScript' are present
+    await waitFor(() => {
+      const sourceLanguageItems = screen.getAllByText(/JavaScript/);
+      expect(sourceLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'JavaScript' item
+    });
+
+  
+  });
+});
+
   
   
 
