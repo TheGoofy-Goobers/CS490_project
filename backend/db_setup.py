@@ -41,9 +41,9 @@ CREATE TABLE IF NOT EXISTS translation_history (
     translation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     source_language VARCHAR(10),
-    original_code VARCHAR(2375),
+    original_code VARCHAR(16384),
     target_language VARCHAR(10),
-    translated_code VARCHAR(2375),
+    translated_code VARCHAR(16384),
     status VARCHAR(16),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_tokens INT NOT NULL,
@@ -84,11 +84,13 @@ cursor.execute(create_feedback_table_query)
 # create translation feedback table
 create_translation_feedback_table_query = """
 CREATE TABLE IF NOT EXISTS translation_feedback (
-    translation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    feedback_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    translation_id INT NOT NULL,
     user_id INT NOT NULL,
     star_rating INT CHECK (star_rating BETWEEN 1 AND 5),
     note VARCHAR(150),
     submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (translation_id) REFERENCES translation_history(translation_id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )
 """
