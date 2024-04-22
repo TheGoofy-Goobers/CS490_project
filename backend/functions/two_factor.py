@@ -159,10 +159,10 @@ def validate_setup_totp(mysql: MySQL) -> dict:
 
     # decrypt the totp key with the fernet key
     f = Fernet(encoded_decrypt_key)
-    totp_key = f.decrypt(totp_key).decode('utf-8')
+    decrypted_totp_key = f.decrypt(totp_key).decode('utf-8')
 
     # verify the code is correct
-    totp = pyotp.TOTP(totp_key)
+    totp = pyotp.TOTP(decrypted_totp_key)
     verified = totp.verify(passcode)
 
     if not verified:
@@ -244,16 +244,17 @@ def validate_totp(mysql: MySQL) -> dict:
         return response
 
     fernet_key = user["fernet_key"]
+
     # convert decrypt key from hex to bytes and encode in base 64 for fernet function
     encoded_decrypt_key = bytes.fromhex(fernet_key)
     encoded_decrypt_key = base64.urlsafe_b64encode(encoded_decrypt_key).decode('utf-8')
 
     # decrypt the totp key using the fernet key
     f = Fernet(encoded_decrypt_key)
-    totp_key = f.decrypt(totp_key).decode('utf-8')
+    decrypted_totp_key = f.decrypt(totp_key).decode('utf-8')
 
     # verify the code is correct
-    totp = pyotp.TOTP(totp_key)
+    totp = pyotp.TOTP(decrypted_totp_key)
     verified = totp.verify(passcode)
 
     if not verified:
