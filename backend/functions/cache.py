@@ -24,11 +24,10 @@ class Translations:
     def __init__(self, id, history: List[dict]):
         self.id = id
         self.history = history
-        self.updated = True
         self.last_access = datetime.datetime.now()
 
     def __str__(self):
-        return "{" + f"Up-To-Date: {self.updated}, Translations: {self.history}" + "}" 
+        return "{" + f"User ID: {self.id}, Last Accessed: {self.last_access}, Translations: {self.history}" + "}" 
     
     def __repr__(self):
         return self.__str__()

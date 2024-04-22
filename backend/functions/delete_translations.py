@@ -57,7 +57,7 @@ def delete_translations(mysql: MySQL):
             cur.execute(deletion, (user_id, *ids))
             with translation_cache_lock:
                 if user_id in translation_cache:
-                    translation_cache[user_id].updated = False
+                    del translation_cache[user_id]
         else:
             response["hasError"] = True
             response["errorMessage"] = "Frontend error: Passed data is invalid."

@@ -30,13 +30,10 @@ def get_translation_history(mysql):
     with translation_cache_lock:
         if user_id in translation_cache:
             history = translation_cache[user_id]
-            if history.updated:
-                history.last_access = datetime.datetime.now()
-                response["rows"] = history.history
-                response["success"] = True
-                return response
-            else:
-                del translation_cache[user_id]
+            history.last_access = datetime.datetime.now()
+            response["rows"] = history.history
+            response["success"] = True
+            return response
 
     rows = None
     try:
@@ -44,6 +41,7 @@ def get_translation_history(mysql):
         cur.execute("SELECT translation_id, source_language, original_code, target_language, translated_code, submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
         rows = cur.fetchall()
         with translation_cache_lock:
+            print("Caching!")
             translation_cache[user_id] = Translations(user_id, rows)
     except Exception as e:
         cur.close()

@@ -5,7 +5,7 @@ from openai import OpenAI
 import datetime
 import openai
 from functions import get_user_id
-from functions.validation import validate_code
+from functions.cache import translation_cache, translation_cache_lock
 
 accepted_languages = ["Python", "Rust", "C++", "JavaScript", "Java"]
 
@@ -88,6 +88,9 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
                     )
                 mysql.connection.commit()
 
+                with translation_cache_lock:
+                    del translation_cache[user_id]
+
                 response["output"] = entry["translated_code"]
                 response["finish_reason"] = "from_db"
                 response["success"] = True
@@ -134,6 +137,9 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         )
         mysql.connection.commit()
 
+        with translation_cache_lock:
+            del translation_cache[user_id]
+            
         response["success"] = True
     
     except openai.APIError as e:
