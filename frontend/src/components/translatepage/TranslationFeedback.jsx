@@ -2,6 +2,7 @@ import {React, useState} from 'react';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
 // import './TranslateFeedback.css';
+import { useNavigate } from 'react-router-dom';
 
 const Star = ({ selected = false, onClick }) => (
     <span onClick={onClick} style={{ cursor: 'pointer', color: selected ? 'orange' : 'gray', fontSize: '35px'}}>
@@ -11,7 +12,7 @@ const Star = ({ selected = false, onClick }) => (
 
 
 function TranslationFeedback(){
-
+    const navigate = useNavigate()
     const [rating, setRating] = useState('');
     const [openended, setOpenEnded] = useState('');
     const [limit, setLimit] = useState(150);
@@ -49,7 +50,7 @@ function TranslationFeedback(){
                 }
                 if (res.logout) {
                     alert("Session expired. Please login again..");
-                    Logout();
+                    Logout(navigate);
                 }
                 setOpenEnded('');
                 setRating('');

@@ -40,12 +40,13 @@ export const isExpired = () => {
     }
 }
 
-export const Logout = async () => {
+export const Logout = async (nav) => {
     var sessionToken = localStorage.getItem("sessionToken")
     localStorage.clear();
     console.log('User logged out');
     await LogoutBackend(sessionToken)
-    window.location.href = SITE_URL + "/login";
+    // window.location.href = SITE_URL + "/login";
+    nav("/login")
 }
 
 // *************** OTHER FUNCTIONS ***************

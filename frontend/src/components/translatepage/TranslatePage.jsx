@@ -14,6 +14,7 @@ import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
 import AlertBox from '../AlertBox/AlertBox';
 import TranslationFeedback from './TranslationFeedback';
+import { useNavigate } from 'react-router-dom';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -36,6 +37,8 @@ const TranslatePage = () => {
   const maxCharLimit = 2375; // Define maximum character limit
   const [showDots, setShowDots] = useState(false);
   let goodapi;
+  
+  const navigate = useNavigate()
 
   const filterTranslationHistory = (history) => {
     return history
@@ -169,7 +172,7 @@ const TranslatePage = () => {
         }
         if (res.logout) {
           alert("Please login again.")
-          Logout()
+          Logout(navigate)
         }
       })
       .catch(error => console.error("Error fetching translation history:", error));
@@ -383,7 +386,7 @@ const TranslatePage = () => {
         }
         if (res.logout) {
           alert("Session expired. Please login again..")
-          Logout()
+          Logout(navigate)
         }
       }).catch((error) => {
         if (error.response) {

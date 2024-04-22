@@ -3,10 +3,11 @@ import './ResetPass.css';
 import { FLASK_URL, SITE_URL, setSessionLogin, setLocal, isExpired, Logout } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useNavigate } from 'react-router-dom';
 
 const ForgotPass = () => {
-
+    const navigate = useNavigate()
+    
     const [newPass, setNewPass] = useState({
         password: '',
         conf: ''
@@ -72,7 +73,7 @@ const ForgotPass = () => {
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     alert("Session expired. Please login again..")
-                    Logout()
+                    Logout(navigate)
                 }
             }).catch((error) => {
                 if (error.response) {
