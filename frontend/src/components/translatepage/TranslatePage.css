@@ -15,16 +15,16 @@ h1, h2 {
   color: #fff;
 }
 
-
-.CodeMirror {
+.custom-codemirror-wrapper .cm-editor {
   text-align: left;
   width: 100%;
-  height: auto;
-  min-height: 300px;
+  height: 300px;
   padding: 0;
   margin: 0;
   line-height: normal;
 }
+
+
 
 .main-content {
   position: relative;

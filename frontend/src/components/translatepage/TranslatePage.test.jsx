@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TranslatePage from './TranslatePage'; // Adjust the import path as necessary
+import TranslatePage from './TranslatePage';
 import axios from 'axios';
-import { FLASK_URL } from '../../vars'
+import { FLASK_URL } from '../../vars';
 
 // Mock Axios
 jest.mock('axios');
@@ -20,69 +20,69 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-  // Adjust the mock implementation to check for the presence of required properties
+  jest.clearAllMocks();
   axios.post.mockImplementation((url, data) => {
     if (url === `${FLASK_URL}/translate` && data.text && data.srcLang && data.toLang && data.sessionToken) {
-      // Check if the text to translate is the specific JavaScript function we expect
       if (data.text.includes('function add(a, b)')) {
         return Promise.resolve({
           data: {
             success: true,
-            output: 'def add(a, b):\n    return a + b', // Simulated translation output
+            output: 'def add(a, b):\n    return a + b',
             finish_reason: 'completed'
           }
         });
       }
     }
-    return Promise.resolve({ data: {} }); // Fallback for any other calls
+    return Promise.resolve({ data: {} });
   });
 });
 
 beforeAll(() => {
-  // Mock the window.location.assign with a jest function
   delete window.location;
   window.location = { assign: jest.fn() };
 });
 
-// Reset the clipboard mock before each test with improved setup
 beforeEach(() => {
   axios.get.mockResolvedValue({ data: { code: 200, reason: 'OK' } });
-  Object.assign(navigator, {
-    clipboard: {
-      writeText: jest.fn().mockResolvedValue(), // Ensure it returns a resolved promise for chaining `.then()`
-    },
-  });
-});
-
-beforeEach(() => {
-  Storage.prototype.getItem = jest.fn(() => "true"); // Adjust the returned value as needed for your tests
-});
-
-beforeEach(() => {
-  // Mock both axios.get and axios.post calls
-  axios.get.mockResolvedValue({ data: { code: 200, reason: 'OK' } });
-  axios.post.mockResolvedValue({
-    data: [] // Mock response for post requests, adjust according to what your component expects
-  });
-
-  // Mock navigator.clipboard.writeText
   Object.assign(navigator, {
     clipboard: {
       writeText: jest.fn().mockResolvedValue(),
     },
   });
+});
 
-  // Mock localStorage.getItem
+beforeEach(() => {
   Storage.prototype.getItem = jest.fn(() => "true");
 });
 
-// Mock for react-codemirror2
-jest.mock('react-codemirror2', () => ({
-  UnControlled: ({ value, onChange, options }) => {
-    const handleChange = (event) => onChange({ getValue: () => event.target.value });
-    return <textarea value={value} onChange={handleChange} readOnly={options.readOnly} data-testid={options.readOnly ? 'mockedCodeMirrorOutput' : 'mockedCodeMirrorInput'} />;
-  },
-}));
+jest.mock('@uiw/react-codemirror', () => {
+  const { useState } = require('react');
+  return {
+    __esModule: true,
+    default: ({ value, onChange, testIdSuffix }) => {
+      const [localValue, setLocalValue] = useState(value);
+      
+      function handleChange(event) {
+        const newValue = event.target.value;
+        setLocalValue(newValue); // Update local state
+        onChange({ getValue: () => newValue });
+      }
+      
+      return (
+        <textarea
+          value={localValue}
+          onChange={handleChange}
+          data-testid={`codemirror-input-${testIdSuffix}`}
+        />
+      );
+    },
+  };
+});
+
+
+
+
+
 
 
 describe('TranslatePage Component', () => {
@@ -93,6 +93,7 @@ describe('TranslatePage Component', () => {
     expect(screen.getByText('Source Language')).toBeInTheDocument();
     expect(screen.getByText('Target Language')).toBeInTheDocument();
   });
+  
 
   test('copies text to clipboard', async () => {
     render(<TranslatePage />);
@@ -115,7 +116,7 @@ describe('TranslatePage Component', () => {
 
   test('allows code input and language selection', async () => {
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
   
@@ -131,7 +132,7 @@ describe('TranslatePage Component', () => {
 
   test('validates language selection and code input', async () => {
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: 'console.log("Hello World");' } });
     expect(inputCodeMirror.value).toBe('console.log("Hello World");');
     const translateButton = screen.getByText('Get Translation');
@@ -144,7 +145,7 @@ describe('TranslatePage Component', () => {
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
     render(<TranslatePage />);
-    const inputCodeMirror = screen.getByTestId('mockedCodeMirrorInput');
+    const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: longText } });
     const downloadButton = screen.getByTitle('Download Code');
     fireEvent.click(downloadButton);
@@ -262,7 +263,149 @@ describe('TranslatePage Component', () => {
       const targetLanguageItems = screen.getAllByText(/Python/);
       expect(targetLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'Python' item
     });
+
   });
+
+  // Mock AlertBox behavior
+const mockAlert = jest.fn();
+window.confirm = mockAlert;
+
+describe('TranslatePage - Deletion Tests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('deletes a single translation from history', async () => {
+    // Arrange
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+    ];
+
+    axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
+
+    // Act
+    render(<TranslatePage />);
+    fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
+
+    const deleteButtons = await screen.findAllByTestId(/^delete-button-/);
+    fireEvent.click(deleteButtons[0]); // Click the delete button
+    
+    mockAlert.mockReturnValueOnce(true); // Simulate confirmation
+    
+    // Wait for deletion
+    await waitFor(() => {
+      const deletedItem = screen.queryByText('console.log("Hello, world!");');
+      expect(deletedItem).toBeNull(); // Should be deleted
+    });
+  });
+
+  test('clears all translation history', async () => {
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+      {
+        translation_id: 2,
+        original_code: 'console.log("Hello, world!");',
+        translated_code: 'print("Hello, world!")',
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        formattedDate: 'Today',
+      },
+    ];
+
+    axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
+
+    render(<TranslatePage />);
+
+    fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
+
+    // Hover to reveal the clear-all icon
+    fireEvent.mouseOver(screen.getByTestId('translation-history-title'));
+
+    const clearAllIcon = await screen.findByTestId('clear-all-icon');
+    fireEvent.click(clearAllIcon);
+
+    window.confirm.mockReturnValueOnce(true); // Simulate confirmation
+
+    // Ensure 'console.log("Hello, world!");' is removed after clear-all
+    await waitFor(() => {
+      const deletedItem = screen.queryByText('console.log("Hello, world!");');
+      expect(deletedItem).toBeNull(); // Should not be present after clear-all
+    });
+  });
+});
+
+describe('TranslatePage - Complex Translation Tests', () => {
+  test('ensures complex code appears in translation history', async () => {
+    const complexJavaScriptCode = `
+      const a = 5;
+      const b = 3;
+      const c = a * b + (a / b);
+      function calculate() {
+        const result = c * (a + b);
+        return result;
+      }
+    `.trim();
+
+    const expectedPythonTranslation = `
+      a = 5
+      b = 3
+      c = a * b + (a / b)
+
+      def calculate():
+        result = c * (a + b)
+        return result
+    `.trim();
+
+    // Mock the history data with complex code
+    const historyData = [
+      {
+        translation_id: 1,
+        original_code: complexJavaScriptCode,
+        translated_code: expectedPythonTranslation,
+        source_language: 'JavaScript',
+        target_language: 'Python',
+        submission_date: new Date().toISOString(),
+      },
+    ];
+  
+    axios.get.mockResolvedValueOnce({ data: historyData });
+
+    // Act
+    render(<TranslatePage />);
+
+    // Open the history sidebar to make the filter controls visible
+    fireEvent.click(screen.getByTestId('history-button'));
+
+    // Select 'JavaScript' from the source language filter dropdown
+    const sourceLanguageFilterDropdown = screen.getByLabelText('Source Language:');
+    fireEvent.change(sourceLanguageFilterDropdown, { target: { value: 'JavaScript' } });
+
+    // Wait for filter application by checking that items for 'JavaScript' are present
+    await waitFor(() => {
+      const sourceLanguageItems = screen.getAllByText(/JavaScript/);
+      expect(sourceLanguageItems.length).toBeGreaterThan(0); // Check there's at least one 'JavaScript' item
+    });
+
+  
+  });
+});
+
+  
+  
 
   
 });
