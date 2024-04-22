@@ -14,6 +14,7 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
+    print(responseJson)
     if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
@@ -87,9 +88,9 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
                     (user_id, srcLang, message, toLang, entry["translated_code"], "from_db", 0)
                     )
                 mysql.connection.commit()
-
                 with translation_cache_lock:
-                    del translation_cache[user_id]
+                    if user_id in translation_cache:
+                        del translation_cache[user_id]
 
                 response["output"] = entry["translated_code"]
                 response["finish_reason"] = "from_db"
@@ -138,8 +139,9 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         mysql.connection.commit()
 
         with translation_cache_lock:
-            del translation_cache[user_id]
-            
+            if user_id in translation_cache:
+                del translation_cache[user_id]
+
         response["success"] = True
     
     except openai.APIError as e:
