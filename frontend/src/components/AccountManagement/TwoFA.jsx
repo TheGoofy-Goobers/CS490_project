@@ -207,7 +207,7 @@ const TwoFA = () => {
                         <div className='change_password'>
                             <h2>Set up 2-factor authentication</h2>
                              <div>
-                                {qrCode && <img src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}
+                                {qrCode && <img className="qrcode" src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}
                                 {!qrCode && <p>Loading QR code...</p>}
                             </div> 
                             <p className="note">Scan the above QR code with the Google Authenticator app</p>

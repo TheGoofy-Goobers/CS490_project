@@ -49,6 +49,9 @@ const TwoFAcode = () => {
                     localStorage.setItem("isLoggedIn", true);
                     setMessage(`Login successful!`);
                     showAlert(message);
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 500);
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);

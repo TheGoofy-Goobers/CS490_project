@@ -112,13 +112,13 @@ const LoginPage = () => {
       console.log(`check token b4 2FA ${localStorage.getItem("sessionToken")}`);
       setTimeout(() => {
         window.location.href = '/login/2FA';
-      }, 2000);
+      }, 500);
     }
     else {
       localStorage.setItem("isLoggedIn", true);
       setTimeout(() => {
         window.location.href = '/';
-      }, 2000);
+      }, 500);
       setMessage(`Welcome to codeCraft!`);
       showAlert();
 

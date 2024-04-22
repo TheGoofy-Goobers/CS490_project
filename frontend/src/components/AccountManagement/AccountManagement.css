@@ -81,3 +81,7 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+.qrcode{
+  width: 90%;
+}
