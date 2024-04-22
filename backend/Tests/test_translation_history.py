@@ -5,6 +5,7 @@ from app import create_app
 import json
 from functions import get_user_id
 import datetime
+from functions.cache import translation_cache
 
 class TestTranslationHistory:
     @pytest.fixture()
@@ -37,6 +38,8 @@ class TestTranslationHistory:
         rows = response["rows"]
         assert length == len(rows)
         assert rows[0]['source_language'] == "JavaScript"
+        assert 1 in translation_cache and translation_cache[1].history == retVal #ensures that translation_cache is functioning
+        translation_cache.clear()
 
     @pytest.mark.parametrize("sessionToken,userId,error", [("cbcc70c5-a45c-48e0-83df-b9714c9122a2", -1, ""), ("cbcc70c5-a45c-48e0-83df-b9714c9122a2", 1, "Error")])
     def test_get_translation_history_invalid_session_token(self, sessionToken, userId, error, client, monkeypatch):

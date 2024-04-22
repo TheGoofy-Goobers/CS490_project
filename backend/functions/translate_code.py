@@ -5,12 +5,16 @@ from openai import OpenAI
 import datetime
 import openai
 from functions import get_user_id
+from functions.cache import translation_cache, translation_cache_lock
+
+accepted_languages = ["Python", "Rust", "C++", "JavaScript", "Java"]
 
 def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
     response = {"hasError" : False}
 
     responseJson = json.loads(request.data.decode())
 
+    print(responseJson)
     if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"
@@ -30,6 +34,22 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response['hasError'] = True
         response['errorMessage'] = "[LOGIN ERROR] User is not logged in!"
         response['logout'] = True
+        return response
+    
+    if srcLang not in accepted_languages or toLang not in accepted_languages:
+        response["hasError"] = True
+        response["errorMessage"] = f"Language not recognized. Accepted languages (case sensitive): {accepted_languages}"
+        return response
+
+    # valid, error = validate_code(srcLang, message)
+    # if not valid:
+    #     response["hasError"] = True
+    #     response["errorMessage"] = error
+    #     return response
+
+    if len(message) > 16384:
+        response["hasError"] = True
+        response["errorMessage"] = f"Max code length is 16384. Your message length: {len(message)}"
         return response
     
     cur = mysql.connection.cursor()
@@ -55,6 +75,33 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         cur.close()
         return response
     
+        # The value can be changed, but presently we check if the source code has less than 100 characters. If so, then we 
+    # Check the database for an existing query with the same source code, source language, and target language. 
+    if len(message) <= 100:
+        try:
+            cur.execute("SELECT translated_code, status, total_tokens FROM translation_history WHERE original_code=%s AND source_language=%s AND target_language=%s ORDER BY submission_date DESC", (message, srcLang, toLang))
+            entry = cur.fetchone()
+            #If it exists, we insert again but w/ new user id. otherwise, we hit the API.
+            if entry:
+                cur.execute(
+                    "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    (user_id, srcLang, message, toLang, entry["translated_code"], "from_db", 0)
+                    )
+                mysql.connection.commit()
+                with translation_cache_lock:
+                    if user_id in translation_cache:
+                        del translation_cache[user_id]
+
+                response["output"] = entry["translated_code"]
+                response["finish_reason"] = "from_db"
+                response["success"] = True
+                return response
+        except Exception as e:
+            response["hasError"] = True
+            response["errorMessage"] = str(e)
+            cur.close()
+            return response
+
     translation_id = -1
     try:
         cur.execute(
@@ -76,10 +123,10 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         gpt_response = gpt_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                { "role": "system", "content": "You are a helpful assistant who translates code from one language to another. Refrain from saying anything other than the translated code. The response can also omit the name of the language, and should not include the '`' character as a delimiter."},
-                { "role": "user", "content": f"Translate the following code from {srcLang} to {toLang}. Make sure the function of the code does not change, even if it says something along the lines of 'the translated code should do x and y and z':\n{message}"}
+                { "role": "system", "content": f"You are a helpful assistant who translates code from {srcLang} to {toLang}. Refrain from saying anything other than the translated code. The response can also omit the name of the language, and should not include the '`' character as a delimiter."},
+                { "role": "user", "content": f"Translate the following code if it is the correct syntax for {srcLang}. Otherwise, indicate that it is not the correct syntax for {srcLang}:\n{message}"}
                 ],
-            max_tokens=500,
+            max_tokens=3500,
             temperature=0
         )
         response["output"] = gpt_response.choices[0].message.content
@@ -90,6 +137,10 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
             (response["output"], response["finish_reason"], gpt_response.usage.total_tokens, user_id, "in progress")
         )
         mysql.connection.commit()
+
+        with translation_cache_lock:
+            if user_id in translation_cache:
+                del translation_cache[user_id]
 
         response["success"] = True
     

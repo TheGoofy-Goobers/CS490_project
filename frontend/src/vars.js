@@ -40,24 +40,24 @@ export const isExpired = () => {
     }
 }
 
-export const Logout = () => {
+export const Logout = async () => {
     var sessionToken = localStorage.getItem("sessionToken")
     localStorage.clear();
     console.log('User logged out');
-    LogoutBackend(sessionToken)
+    await LogoutBackend(sessionToken)
     window.location.href = SITE_URL + "/login";
 }
 
 // *************** OTHER FUNCTIONS ***************
-function LogoutBackend(sessionToken) {
-    axios.post(`${FLASK_URL}/userLogout`, { sessionToken: sessionToken })
+async function LogoutBackend(sessionToken) {
+    await axios.post(`${FLASK_URL}/userLogout`, { sessionToken: sessionToken })
         .then((response) => {
             const res = response.data;
             if (res.success) {
                 console.log("Session cleared")
             }
             console.log(`Response has error: ${res.hasError}`);
-            if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+            if (res.hasError) alert(`Error response: ${res.errorMessage}`);
         }).catch((error) => {
             if (error.response) {
                 console.log(error.response);

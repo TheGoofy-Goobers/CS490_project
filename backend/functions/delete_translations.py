@@ -1,8 +1,8 @@
-from typing import List
 from flask_mysqldb import MySQL
 import json
 from flask import request 
 from functions import get_user_id
+from functions.cache import translation_cache, translation_cache_lock
 
 def delete_translations(mysql: MySQL):
     response = {"hasError": False}
@@ -45,6 +45,9 @@ def delete_translations(mysql: MySQL):
         cur = mysql.connection.cursor()
         if ids == "all":
             cur.execute("DELETE FROM translation_history WHERE user_id=%s", (user_id,))
+            with translation_cache_lock:
+                if user_id in translation_cache:
+                    translation_cache[user_id].history = None
         elif type(ids) == list:
             deletion = "DELETE FROM translation_history WHERE user_id=%s AND ("
             for i in range(len(ids)):
@@ -52,6 +55,9 @@ def delete_translations(mysql: MySQL):
             deletion = deletion.strip(" OR ")
             deletion += ")"
             cur.execute(deletion, (user_id, *ids))
+            with translation_cache_lock:
+                if user_id in translation_cache:
+                    del translation_cache[user_id]
         else:
             response["hasError"] = True
             response["errorMessage"] = "Frontend error: Passed data is invalid."

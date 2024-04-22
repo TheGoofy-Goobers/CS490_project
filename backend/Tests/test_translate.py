@@ -36,7 +36,7 @@ class TestTranslate:
         return app.test_cli_runner()
     
     # The translated_before variable is a boolean just intended to change the behavior of the test's monkeypatch for cur.execute()
-    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken,translated_before", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", False), ("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", True)])
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken,translated_before", [("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", False), ("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", True)])
     def test_translation_success(self, client, text, srcLang, toLang, sessionToken, translated_before, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
