@@ -3,18 +3,19 @@ import './TranslatePage.css';
 import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight, FaTrash } from 'react-icons/fa';
 import CodeMirror from '@uiw/react-codemirror';
 import { material } from '@uiw/codemirror-theme-material';
-import { javascript} from '@codemirror/lang-javascript';
-import { python} from '@codemirror/lang-python';
+import { javascript } from '@codemirror/lang-javascript';
+import { python } from '@codemirror/lang-python';
 import { java } from '@codemirror/lang-java';
 import { cpp } from '@codemirror/lang-cpp';
 import { rust } from '@codemirror/lang-rust';
 import { vscodeDark, vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
-import axios from 'axios'
-import { SITE_URL, FLASK_URL, Logout } from '../../vars'
+import axios from 'axios';
+import { SITE_URL, FLASK_URL, Logout } from '../../vars';
 import { isExpired } from '../../vars';
 import { ToastContainer, toast } from 'react-toastify';
 import TranslationFeedback from './TranslationFeedback';
 import { useNavigate } from 'react-router-dom';
+import DisplayFeedback from './DisplayFeedback';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -34,6 +35,7 @@ const TranslatePage = () => {
   const [charCount, setCharCount] = useState(0); // State to track character count
   const maxCharLimit =  16383; // Define maximum character limit
   const [showDots, setShowDots] = useState(false);
+  const [currentTranslationId, setCurrentTranslationId] = useState(null);
 
   const handleCheck = (message) => {
     switch (message){
@@ -69,6 +71,16 @@ const TranslatePage = () => {
   
   const navigate = useNavigate()
 
+  const handleClickOnHistoryItem = (item) => {
+    populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language);
+    console.log(`inside translate page ${item.translation_id}`);
+    console.log(typeof item.translation_id);
+    setCurrentTranslationId(item.translation_id);  // Store the current translation ID in state
+    console.log(`inside translate CHECKING VAR ${currentTranslationId}`);
+    console.log(typeof currentTranslationId);
+  };
+
+
   const filterTranslationHistory = (history) => {
     return history
       .filter((item) => {
@@ -84,8 +96,8 @@ const TranslatePage = () => {
         return targetLanguageFilter ? item.target_language === targetLanguageFilter : true;
       });
   };
-  
-  
+
+
   // Function to get the appropriate icon based on the language
   const extensions = {
     'JavaScript': ['.js', '.jsx'],
@@ -109,25 +121,25 @@ const TranslatePage = () => {
     const IconComponent = languageIcons[language];
     return IconComponent ? <IconComponent className={`language-icon ${iconClass}`} /> : null;
   };
-  
+
   const handleClick = () => {
     setIsTranslating(true);
-    handleTranslate(); 
+    handleTranslate();
   };
 
   axios.get(`${FLASK_URL}/getApiStatus`)
     .then((response) => {
-      const res = response.data
-      console.log(`Status: ${res.code} ${res.reason}`)
+      const res = response.data;
+      console.log(`Status: ${res.code} ${res.reason}`);
       // by javascript selects background
       document.querySelector('.status').style.background = setBackgroundStats(res);
     }).catch((error) => {
       if (error.response) {
-        console.log(error.response)
-        console.log(error.response.status)
-        console.log(error.response.headers)
+        console.log(error.response);
+        console.log(error.response.status);
+        console.log(error.response.headers);
       }
-    })
+    });
 
   // checks response to determine background clor
   function setBackgroundStats(res) {
@@ -179,7 +191,7 @@ const TranslatePage = () => {
     axios.post(`${FLASK_URL}/translationHistory`, { sessionToken: sessionToken })
       .then(response => {
         // Process the data to format dates as 'Today', 'Yesterday', etc.
-        res = response.data
+        res = response.data;
         if (res.success) {
           const processedHistory = res.rows.map(item => {
             // Create a new Date object from item.submission_date
@@ -193,8 +205,8 @@ const TranslatePage = () => {
           setTranslationHistory(processedHistory);
         }
         else if (res.hasError) {
-          console.log(`Response has error: ${res.hasError}`)
-          console.log(`Error message: ${res.errorMessage}`)
+          console.log(`Response has error: ${res.hasError}`);
+          console.log(`Error message: ${res.errorMessage}`);
         }
         if (res.logout) {
           toast(handleCheck("Please login again."), {
@@ -206,13 +218,14 @@ const TranslatePage = () => {
       })
       .catch(error => console.error("Error fetching translation history:", error));
   }, [setTranslationHistory, sortMethod, dateFilter, sourceLanguageFilter, targetLanguageFilter]); // Add any other dependencies if needed
-  
+  //reruns whenever dependencies change 
+
   // Helper function to format the date
   function formatSubmissionDate(date) {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     if (date.toDateString() === today.toDateString()) {
       return 'Today';
     } else if (date.toDateString() === yesterday.toDateString()) {
@@ -317,7 +330,7 @@ const TranslatePage = () => {
         autoClose: 2000
       });
       console.error('inputText is undefined, not a string, or empty');
-      setIsTranslating(false)
+      setIsTranslating(false);
       return;
     }
 
@@ -401,7 +414,7 @@ const TranslatePage = () => {
     confirmDelete(id);
   };
 
-  var res
+  var res;
   const getTranslation = () => {
     setIsLoading(true);
     const message = {
@@ -409,11 +422,11 @@ const TranslatePage = () => {
       srcLang: sourceLanguage,
       toLang: targetLanguage,
       sessionToken: localStorage.getItem("sessionToken")
-    }
+    };
     setIsLoading(true);
     axios.post(`${FLASK_URL}/translate`, message)
       .then((response) => {
-        res = response.data
+        res = response.data;
         if (res.success) {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
@@ -423,8 +436,8 @@ const TranslatePage = () => {
             autoClose: 2000
           })
         }
-        console.log(`Response has error: ${res.hasError}`)
-        if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
+        console.log(`Response has error: ${res.hasError}`);
+        if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`);
         if (res.apiErrorMessage) {
           toast(handleCheck(`${res.errorCode}`), {
             className: 'fail',
@@ -440,14 +453,14 @@ const TranslatePage = () => {
         }
       }).catch((error) => {
         if (error.response) {
-          setIsTranslating(`Error enocuntered: ${res.errorMessage}`)
-          console.log(error.response)
-          console.log(error.response.status)
-          console.log(error.response.headers)
+          setIsTranslating(`Error enocuntered: ${res.errorMessage}`);
+          console.log(error.response);
+          console.log(error.response.status);
+          console.log(error.response.headers);
         }
         // Hide loading box after translation
       }).finally(() => {
-        setIsTranslating(false) // Call the callback function to reset the button state
+        setIsTranslating(false); // Call the callback function to reset the button state
       });
   };
 
@@ -483,120 +496,135 @@ const TranslatePage = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
-  if (!(localStorage.getItem("isLoggedIn") === "true")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+
+  useEffect(() => {
+    if (currentTranslationId) {
+      // You can perform actions here that depend on currentTranslationId being updated
+      console.log(`Updated currentTranslationId: ${currentTranslationId}`);
+      // If there are actions to perform, place them here
+    }
+  }, [currentTranslationId]);
+
+
+  if (!(localStorage.getItem("isLoggedIn") === "true")) window.location.assign(`${SITE_URL}/login?redirect=true`);
   else {
     return (
       <div className="translate-page">
       <ToastContainer position='top-center'/>
         <div className="sidebar-container">
-        <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
-          <FaHistory className="history-icon" title="Translation History" />
-        </button>
-        {showSidebar && (
-          <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
-            <div className="sorting-controls">
-              <div className="sort-by-date">
-                <label htmlFor="dateFilter">Date:</label>
-                <select
-                  id="dateFilter"
-                  value={dateFilter}
-                  onChange={(e) => setDateFilter(e.target.value)}
-                  className="form-control"
-                  data-testid="date-filter"
-                >
-                  <option value="">All Dates</option>
-                  <option value="Today">Today</option>
-                  <option value="Yesterday">Yesterday</option>
-                  <option value="Previous 30 Days">Previous 30 Days</option>
-                </select>
-              </div>
-              <div className="sort-by-source-language">
-                <label htmlFor="sourceLanguageFilter">Source Language:</label>
-                <select
-                  id="sourceLanguageFilter"
-                  value={sourceLanguageFilter}
-                  onChange={(e) => setSourceLanguageFilter(e.target.value)}
-                  className="form-control"
-                  data-testid="source-language-filter"
-                >
-                  <option value="">All Languages</option>
-                  <option value="JavaScript">JavaScript</option>
-                  <option value="Python">Python</option>
-                  <option value="C++">C++</option>
-                  <option value="Java">Java</option>
-                  <option value="Rust">Rust</option>
-                </select>
-              </div>
-              <div className="sort-by-target-language">
-                <label htmlFor="targetLanguageFilter">Target Language:</label>
-                <select
-                  id="targetLanguageFilter"
-                  value={targetLanguageFilter}
-                  onChange={(e) => setTargetLanguageFilter(e.target.value)}
-                  className="form-control"
-                  data-testid="target-language-filter"
-                >
-                  <option value="">All Languages</option>
-                  <option value="JavaScript">JavaScript</option>
-                  <option value="Python">Python</option>
-                  <option value="C++">C++</option>
-                  <option value="Java">Java</option>
-                  <option value="Rust">Rust</option>
-                </select>
-              </div>
-            </div>
-
-            <div
-              className="translation-history-title"
-              onMouseOver={() => setShowDots(true)}
-              onMouseOut={() => setShowDots(false)}
-              data-testid="translation-history-title"
-            >
-              <div className="translation-history-title" onMouseOver={() => setShowDots(true)} onMouseOut={() => setShowDots(false)}>
-                Translation History
-                {showDots && (
-                  <FaTrash
-                    className="dots-icon"
-                    onClick={confirmClearAll}
-                    data-testid="clear-all-icon" // Add a consistent data-testid
-                    title="Clear Translation History"
-                  />
-                )}
-              </div>
-            </div>
-
-            {Object.entries(groupByDate).map(([date, items], dateIndex) => (
-              <div key={dateIndex}>
-                <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
-                {items.map((item, itemIndex) => (
-                  <div
-                    key={itemIndex}
-                    className="history-item"
-                    data-testid={`history-item-${item.translation_id}`} // Make it unique
-                    onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}
+          <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
+            <FaHistory className="history-icon" title="Translation History" />
+          </button>
+          {showSidebar && (
+            <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+              <div className="sorting-controls">
+                <div className="sort-by-date">
+                  <label htmlFor="dateFilter">Date:</label>
+                  <select
+                    id="dateFilter"
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="form-control"
+                    data-testid="date-filter"
                   >
-                    {getLanguageIconElement(item.source_language)}
-                    <span className="source-language">{item.source_language}</span>
-                    <FaArrowRight className="arrow-icon" />
-                    {getLanguageIconElement(item.target_language)}
-                    <span className="target-language">{item.target_language}</span>
-                    <FaTrash
-                      className="delete-icon"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleDeleteClick(event, item.translation_id);
-                      }}
-                      data-testid={`delete-button-${item.translation_id}`} // Make it unique
-                      title="Delete Translation"
-                    />
-                  </div>
-                ))}
+                    <option value="">All Dates</option>
+                    <option value="Today">Today</option>
+                    <option value="Yesterday">Yesterday</option>
+                    <option value="Previous 30 Days">Previous 30 Days</option>
+                  </select>
+                </div>
+                <div className="sort-by-source-language">
+                  <label htmlFor="sourceLanguageFilter">Source Language:</label>
+                  <select
+                    id="sourceLanguageFilter"
+                    value={sourceLanguageFilter}
+                    onChange={(e) => setSourceLanguageFilter(e.target.value)}
+                    className="form-control"
+                    data-testid="source-language-filter"
+                  >
+                    <option value="">All Languages</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="C++">C++</option>
+                    <option value="Java">Java</option>
+                    <option value="Rust">Rust</option>
+                  </select>
+                </div>
+                <div className="sort-by-target-language">
+                  <label htmlFor="targetLanguageFilter">Target Language:</label>
+                  <select
+                    id="targetLanguageFilter"
+                    value={targetLanguageFilter}
+                    onChange={(e) => setTargetLanguageFilter(e.target.value)}
+                    className="form-control"
+                    data-testid="target-language-filter"
+                  >
+                    <option value="">All Languages</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="C++">C++</option>
+                    <option value="Java">Java</option>
+                    <option value="Rust">Rust</option>
+                  </select>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
 
-      </div>
+              <div
+                className="translation-history-title"
+                onMouseOver={() => setShowDots(true)}
+                onMouseOut={() => setShowDots(false)}
+                data-testid="translation-history-title"
+              >
+                <div className="translation-history-title" onMouseOver={() => setShowDots(true)} onMouseOut={() => setShowDots(false)}>
+                  Translation History
+                  {showDots && (
+                    <FaTrash
+                      className="dots-icon"
+                      onClick={confirmClearAll}
+                      data-testid="clear-all-icon" // Add a consistent data-testid
+                      title="Clear Translation History"
+                    />
+                  )}
+                </div>
+              </div>
+
+              {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+                <div key={dateIndex}>
+                  <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
+                  {items.map((item, itemIndex) => (
+                    <div>
+                      <div
+                        key={itemIndex}
+                        className="history-item"
+                        data-testid={`history-item-${item.translation_id}`} // Make it unique
+                        // onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}
+                        onClick={() => handleClickOnHistoryItem(item)}
+
+                      >
+                        {getLanguageIconElement(item.source_language)}
+                        <span className="source-language">{item.source_language}</span>
+                        <FaArrowRight className="arrow-icon" />
+                        {getLanguageIconElement(item.target_language)}
+                        <span className="target-language">{item.target_language}</span>
+                        <FaTrash
+                          className="delete-icon"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleDeleteClick(event, item.translation_id);
+                          }}
+                          data-testid={`delete-button-${item.translation_id}`} // Make it unique
+                          title="Delete Translation"
+                        />
+                      </div>
+                      {/* <DisplayFeedback currentTranslationId={item.translation_id}/> */}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )}
+
+        </div>
         <div className="container main-content">
           <div className="status">
             <a className='status_display' >Chat-GPT Status</a>
@@ -614,11 +642,11 @@ const TranslatePage = () => {
                     onChange={(e) => {
                       // Set the new source language
                       setSourceLanguage(e.target.value);
-                      
+
                       // Clear the input text and reset the character count
                       setInputText('');
                       setCharCount(0);
-                      
+
                       // Optionally clear the output text if you also want to clear translations
                       setOutputText('');
                     }}
@@ -641,21 +669,21 @@ const TranslatePage = () => {
                 />
               </div>
               <div className="custom-codemirror-wrapper">
-              
-              <CodeMirror
-                value={inputText}
-                theme={vscodeDark}
-                extensions={[getLanguageExtension(sourceLanguage)]}
-                onChange={(value) => {
-                  if (value.length <= maxCharLimit) {
-                    setInputText(value)
-                    setCharCount(value.length)
-                  }
-                }}
-                testIdSuffix="input"
-                basicSetup={{ lineNumbers: true }}
-              />
-              
+
+                <CodeMirror
+                  value={inputText}
+                  theme={vscodeDark}
+                  extensions={[getLanguageExtension(sourceLanguage)]}
+                  onChange={(value) => {
+                    if (value.length <= maxCharLimit) {
+                      setInputText(value);
+                      setCharCount(value.length);
+                    }
+                  }}
+                  testIdSuffix="input"
+                  basicSetup={{ lineNumbers: true }}
+                />
+
               </div>
               <div className="char-count">Characters: {charCount}/{maxCharLimit}</div> {/* Display character count */}
             </div>
@@ -677,18 +705,18 @@ const TranslatePage = () => {
                 </select>
               </div>
               <div className="position-relative textarea-container">
-              <div className="custom-codemirror-wrapper">
-              <CodeMirror
-                value={outputText}
-                theme={vscodeDark}
-                extensions={[
-                  getLanguageExtension(targetLanguage) // This function will select the proper language mode
-                ]}
-                testIdSuffix="output"
-                editable={true} // Makes the editor read-only
-                basicSetup={{ lineNumbers: true }} // Line numbers and other basic setups
-              />
-              </div>
+                <div className="custom-codemirror-wrapper">
+                  <CodeMirror
+                    value={outputText}
+                    theme={vscodeDark}
+                    extensions={[
+                      getLanguageExtension(targetLanguage) // This function will select the proper language mode
+                    ]}
+                    testIdSuffix="output"
+                    editable={true} // Makes the editor read-only
+                    basicSetup={{ lineNumbers: true }} // Line numbers and other basic setups
+                  />
+                </div>
                 <div className="icons">
                   <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
                   <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
@@ -708,12 +736,12 @@ const TranslatePage = () => {
           </div>
         </div>
         <div>
-          <TranslationFeedback/>
+          <TranslationFeedback currentTranslationId={currentTranslationId} />
         </div>
       </div>
     );
   }
-}
+};
 
 
 export default TranslatePage;

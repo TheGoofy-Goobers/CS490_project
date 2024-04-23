@@ -210,16 +210,16 @@ class TestSql:
         if cur:
             cur.close()
     
-    @pytest.mark.parametrize("user_id,star_rating,note, expectInsert", [(1, 1, "Unique note", True), (1, 6, "Bad star rating value", False), (1, 5, "I Will make this note far too long so that it does not insert. There are no more test cases after this one, so you do not need to look further than this. _-----------------------------------------------------------------------------------------------------------------------------------------------------------", False)])
-    def test_translation_feedback_sql(self, user_id, star_rating, note, expectInsert):
+    @pytest.mark.parametrize("translation_id,user_id,star_rating,note, expectInsert", [(1, 1, 1, "Unique note", True), (2, 1, 6, "Bad star rating value", False), (3, 1, 5, "I Will make this note far too long so that it does not insert. There are no more test cases after this one, so you do not need to look further than this. _-----------------------------------------------------------------------------------------------------------------------------------------------------------", False)])
+    def test_translation_feedback_sql(self, translation_id, user_id, star_rating, note, expectInsert):
         cur = connection.cursor(dictionary=True)
         
         try:
-            cur.execute("INSERT INTO translation_feedback (user_id, star_rating, note) VALUES (%s, %s, %s)", (user_id, star_rating, note))
+            cur.execute("INSERT INTO translation_feedback (translation_id, user_id, star_rating, note) VALUES (%s, %s, %s, %s)", (translation_id, user_id, star_rating, note))
             connection.commit()
 
             if expectInsert:
-                cur.execute("SELECT * FROM translation_feedback WHERE user_id=%s AND star_rating=%s AND note=%s", (user_id, star_rating, note))
+                cur.execute("SELECT * FROM translation_feedback WHERE translation_id=%s AND user_id=%s AND star_rating=%s AND note=%s", (translation_id, user_id, star_rating, note))
                 feedback = cur.fetchone()
                 cur.close()
                 assert feedback
@@ -554,4 +554,28 @@ class TestSql:
 
         cur.close()
 
-    
+    def test_aggregated_feedback(self, client):
+        cur = connection.cursor(dictionary=True)
+
+        try:
+            cur.execute("DELETE FROM translation_feedback")
+            cur.execute("INSERT INTO translation_feedback(translation_id, user_id, star_rating, note) VALUES (%s, %s, %s, %s)", (1, 3, 3, "Okay translation."))
+            cur.execute("INSERT INTO translation_feedback(translation_id, user_id, star_rating, note) VALUES (%s, %s, %s, %s)", (2, 1, 5, "AMAZING!"))
+            cur.execute("INSERT INTO translation_feedback(translation_id, user_id, star_rating, note) VALUES (%s, %s, %s, %s)", (3, 2, 1, "Horrible and broken."))
+            connection.commit()
+        except Exception as e:
+            cur.close()
+            connection.rollback()
+            assert str(e) and False
+        
+        try:
+            selection = "SELECT AVG(star_rating) AS average_rating, COUNT(star_rating) AS total_ratings FROM translation_feedback"
+            cur.execute(selection)
+            data = cur.fetchone()
+        except Exception as e:
+            if cur:
+                cur.close()
+            assert str(e) and False
+        
+        assert data["average_rating"] == 3
+        assert data["total_ratings"] == 3

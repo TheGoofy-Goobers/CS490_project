@@ -131,6 +131,11 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         response["output"] = gpt_response.choices[0].message.content
         response["finish_reason"] = gpt_response.choices[0].finish_reason
 
+        cur.execute("SELECT translation_id FROM translation_history WHERE translated_code = %s AND status = %s", (user_id, "in progress",))
+        ident = cur.fetchone()
+        if ident:
+            response["translation_id"] = ident["translation_id"]
+
         cur.execute(
             "UPDATE translation_history SET translated_code = %s, status = %s, total_tokens = %s WHERE translated_code = %s AND status = %s", 
             (response["output"], response["finish_reason"], gpt_response.usage.total_tokens, user_id, "in progress")
@@ -159,6 +164,8 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         return response
     
     cur.close()
+
+    response["translation_id"] = translation_id
 
     return response
 

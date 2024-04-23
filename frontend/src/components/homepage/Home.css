@@ -137,3 +137,25 @@ h2 h3 h1 {
     height: 8%;
     width: 8%;
 }
+
+.star {
+    color: gold;
+    font-size: 1.5rem; /* Adjust size as needed */
+    position: relative;
+    width: 10%;
+}
+
+.halfstar{
+    width:10%;
+}
+
+
+.rating-number {
+    color: gold;
+    font-size: 2rem;
+}
+
+.reviews{
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
