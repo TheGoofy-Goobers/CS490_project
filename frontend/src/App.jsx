@@ -3,7 +3,7 @@ import TranslatePage from './components/translatepage/TranslatePage';
 import NavBar from './components/navbar/NavBar';
 import Home from './components/homepage/Home' 
 import './App.css'; // Assuming you have global styles here
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
 import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'
@@ -21,6 +21,7 @@ import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
 import ResetPass from './components/ForgotPass/ResetPass.jsx'
 import ReleaseNotes from './components/ReleaseNotes/ReleaseNotes.jsx';
 import Loadtesting from './components/ReleaseNotes/Loadtesting.jsx'
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
  setInterval(isExpired(), 1000); //checks every second

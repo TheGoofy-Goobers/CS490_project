@@ -12,7 +12,7 @@ import { vscodeDark, vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
 import axios from 'axios'
 import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
-import AlertBox from '../AlertBox/AlertBox';
+import { ToastContainer, toast } from 'react-toastify';
 import TranslationFeedback from './TranslationFeedback';
 
 const TranslatePage = () => {
@@ -30,12 +30,41 @@ const TranslatePage = () => {
   const [dateFilter, setDateFilter] = useState('');
   const [sourceLanguageFilter, setSourceLanguageFilter] = useState('');
   const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [message, setMessage] = useState('Default message');
   const [charCount, setCharCount] = useState(0); // State to track character count
-  const maxCharLimit = 2375; // Define maximum character limit
+  const maxCharLimit =  16384; // Define maximum character limit
   const [showDots, setShowDots] = useState(false);
-  let goodapi;
+
+  const handleCheck = (message) => {
+    switch (message){
+      case 'stop': case 'from_db':
+        return "Translation Success!!"
+        break;
+      case 'length':
+        return "Unsuccessful Translation :((, input text is too long"
+        break;
+      case 'content_filter':
+        return "Code content was flagged by openai content filters"
+        break;
+      case '401':
+        return "OpenAI API Authentication failed "
+        break;
+      case '403':
+        return "Country not supported with OpenAI"
+        break;
+      case '429':
+        return "Please wait you sent too many characters"
+        break;
+      case '500':
+        return "Unknown OpenAI server error"
+        break;
+      case '503':
+        return "OpenAI server is currently being overloaded, please before submitting again"
+        break;
+      default:
+        return message
+        break;
+    }
+  }
 
   const filterTranslationHistory = (history) => {
     return history
@@ -93,22 +122,11 @@ const TranslatePage = () => {
   function setBackgroundStats(res) {
     if (res.code === 200) {
       return 'green';
-      goodapi = true
     }
     else {
-      goodapi = false
       return 'red';
     }
   }
-
-  const showAlert = () => {
-    setAlertOpen(true);
-
-    // Optionally, automatically close the alert after some time
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 2000); // This should match the duration in AlertBox or be longer
-  };
   
   const fileInputRef = useRef(null);
 
@@ -168,7 +186,10 @@ const TranslatePage = () => {
           console.log(`Error message: ${res.errorMessage}`)
         }
         if (res.logout) {
-          alert("Please login again.")
+          toast(handleCheck("Please login again."), {
+            className: 'fail',
+            autoClose: 2000
+          })
           Logout()
         }
       })
@@ -220,7 +241,10 @@ const TranslatePage = () => {
     const fileExtension = `.${file.name.split('.').pop()}`;
 
     if (!expectedExtensions.includes(fileExtension)) {
-      alert(`Please upload a file with the following extensions: ${expectedExtensions.join(', ')}`);
+      toast(handleCheck(`Please upload a file with the following extensions: ${expectedExtensions.join(', ')}`), {
+        className: 'fail',
+        autoClose: 2000
+      });
       return;
     }
 
@@ -284,7 +308,10 @@ const TranslatePage = () => {
 
   const handleTranslate = () => {
     if (typeof inputText !== 'string' || inputText.trim() === '') {
-      alert('inputText is undefined, not a string, or empty');
+      toast(handleCheck('inputText is undefined, not a string, or empty'), {
+        className: 'fail',
+        autoClose: 2000
+      });
       console.error('inputText is undefined, not a string, or empty');
       setIsTranslating(false)
       return;
@@ -292,7 +319,10 @@ const TranslatePage = () => {
 
     // Validate input text before translating
     if (!isValidInput(inputText, sourceLanguage)) {
-      alert(`Invalid ${sourceLanguage} code. Please check your input and try again.`);
+      toast(handleCheck(`Invalid ${sourceLanguage} code. Please check your input and try again.`), {
+        className: 'fail',
+        autoClose: 2000
+    });
       setIsTranslating(false)
       return; // Prevent translation from proceeding
     }
@@ -320,9 +350,15 @@ const TranslatePage = () => {
               setOutputText('');
             }
           }
-          alert("Translation deleted successfully.");
+          toast(handleCheck("Translation deleted successfully."),  {
+            className: 'success',
+            autoClose: 2000
+          });
         } else {
-          alert("Failed to delete translation: " + response.data.errorMessage);
+          toast(handleCheck("Failed to delete translation: " + response.data.errorMessage), {
+            className: 'fail',
+            autoClose: 2000
+          });
         }
       }).catch(error => {
         console.error("Deletion error:", error);
@@ -340,9 +376,15 @@ const TranslatePage = () => {
           setTranslationHistory([]); // Clear the history
           setInputText(''); // Clear input text box
           setOutputText(''); // Clear output text box
-          alert("All translations have been deleted.");
+          toast(handleCheck("All translations have been deleted."), {
+            className: 'success',
+            autoClose: 2000
+          });
         } else {
-          alert("Failed to clear translations: " + response.data.errorMessage);
+          toast(handleCheck("Failed to clear translations: " + response.data.errorMessage), {
+            className: 'fail',
+            autoClose: 2000
+          });
         }
       }).catch(error => {
         console.error("Clear all error:", error);
@@ -372,17 +414,24 @@ const TranslatePage = () => {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
           const reasonMessage = res.finish_reason || 'No reason provided'
-          setMessage(reasonMessage)
-          showAlert();
+          toast(handleCheck(reasonMessage), {
+            className: 'success',
+            autoClose: 2000
+          })
         }
         console.log(`Response has error: ${res.hasError}`)
         if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
         if (res.apiErrorMessage) {
-          setMessage(`${res.errorCode}`)
-          showAlert()
+          toast(handleCheck(`${res.errorCode}`), {
+            className: 'fail',
+            autoClose: 2000
+          })
         }
         if (res.logout) {
-          alert("Session expired. Please login again..")
+          toast(handleCheck("Session expired. Please login again.."), {
+            className: 'fail',
+            autoClose: 2000
+          })
           Logout()
         }
       }).catch((error) => {
@@ -434,7 +483,7 @@ const TranslatePage = () => {
   else {
     return (
       <div className="translate-page">
-      {<AlertBox message={message} isOpen={alertOpen} />}
+      <ToastContainer position='top-center'/>
         <div className="sidebar-container">
         <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
           <FaHistory className="history-icon" title="Translation History" />

@@ -5,12 +5,9 @@ import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom'
 import { setLocal } from '../../vars';
-import AlertBox from '../AlertBox/AlertBox';
+import { ToastContainer, toast } from 'react-toastify';
 
 const RegistrationPage = () => {
-  const [message, setMessage] = useState('Default message');
-  const [alertOpen, setAlertOpen] = useState(false);
-
   const [user, setUser] = useState({
     username: '',
     email: '',
@@ -22,6 +19,38 @@ const RegistrationPage = () => {
 
   const navigate = useNavigate(); // Initialize useNavigate hook
 
+  const handleCheck = (message) => {
+    switch (message){
+      case 'stop': case 'from_db':
+        return "Translation Success!!"
+        break;
+      case 'length':
+        return "Unsuccessful Translation :((, input text is too long"
+        break;
+      case 'content_filter':
+        return "Code content was flagged by openai content filters"
+        break;
+      case '401':
+        return "OpenAI API Authentication failed "
+        break;
+      case '403':
+        return "Country not supported with OpenAI"
+        break;
+      case '429':
+        return "Please wait you sent too many characters"
+        break;
+      case '500':
+        return "Unknown OpenAI server error"
+        break;
+      case '503':
+        return "OpenAI server is currently being overloaded, please before submitting again"
+        break;
+      default:
+        return message
+        break;
+    }
+  }
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
@@ -31,19 +60,25 @@ const RegistrationPage = () => {
     e.preventDefault();
 
     if (!validateUsername()) {
-      setMessage("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.");
-      showAlert();
+      toast(handleCheck("Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens."), {
+        className: 'fail',
+        autoClose: 2000
+      });
       return;
     }
     if (!validateEmail()) {
-      setMessage("Please enter a valid email address.");
-      showAlert();
+      toast(handleCheck("Please enter a valid email address."), {
+        className: 'fail',
+        autoClose: 2000
+      });
       return;
     }
 
      if (!validatePassword(user.password)) {
-      setMessage('Password must be at least 8 characters long, have a special character, and number.');
-      showAlert();
+      toast(handleCheck('Password must be at least 8 characters long, have a special character, and number.'), {
+          className: 'fail',
+          autoClose: 2000
+        });
       return;
      }
 
@@ -76,15 +111,6 @@ const RegistrationPage = () => {
     return true;
   }
 
-  const showAlert = () => {
-    setAlertOpen(true);
-
-    // Optionally, automatically close the alert after some time
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 2000); // This should match the duration in AlertBox or be longer
-  };
-
   var res
   const register = () => {
     
@@ -103,30 +129,40 @@ const RegistrationPage = () => {
         localStorage.setItem("isLoggedIn", true);
         delete user.username 
         delete user.email
-        alert('Registration Success!')
-        setMessage('Registration Success!');
-        showAlert()
-        setTimeout(() => {window.location.href = '/'}, 4000);
+        toast(handleCheck('Registration Success!'),  {
+          className: 'success',
+          autoClose: 2000
+        })
+        setTimeout(() => {window.location.href = '/'}, 2000);
       }
       console.log(`Response has error: ${res.hasError}`)
       if(res.usernameErrors) {
         console.log(`Username errors: ${res.usernameErrors}`)
-        setMessage(`${res.usernameErrors}`)
-        showAlert();}
+        toast(handleCheck(`${res.usernameErrors}`),  {
+          className: 'fail',
+          autoClose: 2000
+        })
       if(res.emailErrors) {
         console.log(`Email errors: ${res.emailErrors}`)
-        setMessage(`${res.emailErrors}`)
-        showAlert();}
+        toast(handleCheck(`${res.emailErrors}`), {
+          className: 'fail',
+          autoClose: 2000
+        })
+        }
       if(res.errorMessage) console.log(`Other errors: ${res.errorMessage}`)
       if(res.sqlErrors && res.sqlErrors.length > 0) { // TODO: This is where we will see information on duplicate username or email - make sure to handle this
-        setMessage(`${res.sqlErrors}`)
-        showAlert();
+        toast(handleCheck(`${res.sqlErrors}`),  {
+          className: 'fail',
+          autoClose: 2000
+        })
         console.log(`SQL Errors: ${res.sqlErrors}`)
       }
-    }).catch((error) => {
+    }}).catch((error) => {
       if (error.response) {
-        setMessage(`${error.response}`)
-        showAlert();
+        toast(handleCheck(`${error.response}`), {
+          className: 'fail',
+          autoClose: 2000
+        })
         console.log(error.response)
         console.log(error.response.status)
         console.log(error.response.headers)
@@ -140,7 +176,7 @@ const RegistrationPage = () => {
     return (
       <div className="registration-page-container">
         <div className="registration-form-box">
-        {<AlertBox message={message} isOpen={alertOpen} />}
+        <ToastContainer position='top-center'/>
           <form onSubmit={handleSubmit}>
             <h2 className="registration-form-title">Register</h2>
             <div className="registration-form-group">

@@ -6,27 +6,13 @@ import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
 import NavBar from '../navbar/NavBar';
 import eyeicon from './eyeicon.svg';
-import AlertBox from '../AlertBox/AlertBox';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const TwoFAcode = () => {
-
     const navigate = useNavigate();
-
-    const [message, setMessage] = useState('Default message');
-    const [alertOpen, setAlertOpen] = useState(false);
-
     const [code, setCode] = useState(Array(6).fill(""));
     const inputsRef = useRef([]);
-
-    const showAlert = () => {
-        setAlertOpen(true);
-
-        // Optionally, automatically close the alert after some time
-        setTimeout(() => {
-            setAlertOpen(false);
-        }, 2000); // This should match the duration in AlertBox or be longer
-    };
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -47,8 +33,10 @@ const TwoFAcode = () => {
                 if (res.success) {
                     // setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe, true);
                     localStorage.setItem("isLoggedIn", true);
-                    setMessage(`Login successful!`);
-                    showAlert(message);
+                    toast(`Login successful!`, {
+                        className: 'success',
+                        autoClose: 2000
+                      });
                     setTimeout(() => {
                         window.location.href = '/';
                     }, 500);
@@ -56,8 +44,10 @@ const TwoFAcode = () => {
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
-                    setMessage(`Session expired. Please login again.`);
-                    showAlert();
+                    toast(`Session expired. Please login again.`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      });
                     setTimeout(Logout, 4000);
                 }
             })
@@ -89,7 +79,7 @@ const TwoFAcode = () => {
     return (
         
         <div className="delete-box-container">
-            {<AlertBox message={message} isOpen={alertOpen} />}
+            <ToastContainer position='top-center'/>
             <form onSubmit={handleSubmit}>
                 <div className='change_password'>
                     <div className="login-form-group">

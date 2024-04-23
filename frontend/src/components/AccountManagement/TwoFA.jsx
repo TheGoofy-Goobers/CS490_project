@@ -3,30 +3,17 @@ import { SITE_URL, FLASK_URL, set2FAVerification, Logout, passIsVerified } from 
 import axios from 'axios';
 import './AccountManagement.css';
 import { useNavigate } from 'react-router-dom';
-import AlertBox from '../AlertBox/AlertBox';
 import SHA256 from 'crypto-js/sha256';
 import eyeicon from './eyeicon.svg';
-import { useLocation } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+
 
 const TwoFA = () => {
-
     const [code, setCode] = useState(Array(6).fill(""));
     const inputsRef = useRef([]);
     const [qrCode, setQrCode] = useState('');
-    const [message, setMessage] = useState('Default message');
-    const [alertOpen, setAlertOpen] = useState(false);
     const [pass, setPass] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-
-    const showAlert = () => {
-        setAlertOpen(true);
-
-        // Optionally, automatically close the alert after some time
-        setTimeout(() => {
-            setAlertOpen(false);
-        }, 2000); // This should match the duration in AlertBox or be longer
-    };
-
     
 
     // setQrCode('SGVsbG8sIHdvcmxkIQ==');
@@ -78,21 +65,27 @@ const TwoFA = () => {
                     set2FAVerification(true);
                     setQrCode(res.qr);
                     setPass('');
-                    setMessage(`Password confirmed successfully!`);
-                    showAlert();
+                    toast(`Password confirmed successfully!`, {
+                        className: 'success',
+                        autoClose: 2000
+                      });
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
-                    setMessage(`Session expired. Please login again.`);
-                    showAlert();
+                    toast(`Session expired. Please login again.`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      });
                     setTimeout(Logout, 4000);
                 }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == '500 (INTERNAL SERVER ERROR)') {
-                        setMessage(`BACKEND FAILED contact support`);
-                        showAlert();
+                        toast(`BACKEND FAILED contact support`, {
+                            className: 'fail',
+                            autoClose: 2000
+                          });
                     }
                     console.log(error.response);
                     console.log(error.response.status);
@@ -137,8 +130,10 @@ const TwoFA = () => {
                 console.log('Verification response:', response.data);
                 const res = response.data;
                 if(res.success){
-                    setMessage(`2FA setup successful!`);
-                    showAlert(message);
+                    toast(`2FA setup successful!`,{
+                        className: 'success',
+                        autoClose: 2000
+                      });
                     setTimeout(() => {
                         window.location.href = '/';
                     }, 2000);
@@ -146,8 +141,10 @@ const TwoFA = () => {
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
-                    setMessage(`Session expired. Please login again.`);
-                    showAlert();
+                    toast(`Session expired. Please login again.`,{
+                        className: 'fail',
+                        autoClose: 2000
+                      });
                     setTimeout(Logout, 4000);
                 }
             })
@@ -170,7 +167,7 @@ const TwoFA = () => {
 
     return (
         <div>       
-            {<AlertBox message={message} isOpen={alertOpen} />}    
+            <ToastContainer position='top-center'/>    
                 {
                 !(localStorage.getItem("passIsVerified") === "true") &&
                     <div>
