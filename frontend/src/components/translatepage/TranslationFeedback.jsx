@@ -56,7 +56,7 @@ const TranslationFeedback = ({ currentTranslationId }) => {
 
 
         console.log('Sending feedback request with data:', translationFBData);
-        axios.post(`${FLASK_URL}/translationFeedback`, translationFBData)
+        axios.post(`${FLASK_URL}/submitTranslationFeedback`, translationFBData)
             .then((response) => {
                 const res = response.data;
                 console.log(`Response has error: ${res.hasError}`);
