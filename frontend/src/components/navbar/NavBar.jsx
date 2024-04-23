@@ -9,9 +9,8 @@ const NavBar = () => {
 
 const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-const isLoggedIn = localStorage.getItem("isLoggedIn");
+  const isLoggedIn = (localStorage.getItem("isLoggedIn") === "true");
   const username = localStorage.getItem("username");
-
 
 
   return (
@@ -52,7 +51,7 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
         </div> */}
         <div className='nav-bar-log-in'>
           { //if they're not logged in, when they click, send to login
-            !isLoggedIn && 
+            !(isLoggedIn) && 
             <div>
               <Link to={'/login'} data-testid='prof'>
                 <img src={profile} height={40} alt="Profile" />

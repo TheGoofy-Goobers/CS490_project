@@ -30,10 +30,33 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(24) NOT NULL UNIQUE,
     email VARCHAR(64) NOT NULL UNIQUE,
-    password VARCHAR(64) NOT NULL
+    password VARCHAR(64) NOT NULL,
+    totp VARCHAR(144)
 )
 """
 cursor.execute(create_user_table_query)
+
+create_twofa_setup_table_query = """
+CREATE TABLE IF NOT EXISTS twofa_setup (
+    twofa_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    fernet_key VARCHAR(64),
+    totp_key VARCHAR(144),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_twofa_setup_table_query)
+
+create_twofa_login_table_query = """
+CREATE TABLE IF NOT EXISTS twofa_login (
+    twofa_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL UNIQUE,
+    fernet_key VARCHAR(64),
+    login_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)
+"""
+cursor.execute(create_twofa_login_table_query)
 
 # create translation table
 create_translation_table_query = """
@@ -137,6 +160,27 @@ BEGIN
 END;
 """
 cursor.execute(create_remove_old_email_tokens_event_query)
+
+create_remove_old_fernet_keys_procedure_query = """
+CREATE PROCEDURE IF NOT EXISTS RemoveOldFernetKeys()
+BEGIN
+    DECLARE cutoff_time TIMESTAMP;
+    SET cutoff_time = NOW() - INTERVAL 5 MINUTE;
+
+    DELETE FROM twofa_login WHERE login_date < cutoff_date;
+END
+"""
+cursor.execute(create_remove_old_fernet_keys_procedure_query)
+
+create_remove_old_fernet_keys_event_query = """
+CREATE EVENT IF NOT EXISTS RemoveOldFernetKeysEvent
+ON SCHEDULE EVERY 1 MINUTE
+DO
+BEGIN
+    CALL RemoveOldFernetKeys();
+END;
+"""
+cursor.execute(create_remove_old_fernet_keys_event_query)
 
 create_remove_old_logins_procedure_query = """
 CREATE PROCEDURE IF NOT EXISTS RemoveOldLogins()

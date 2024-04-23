@@ -14,11 +14,16 @@ const MiniMenuComponent = () => {
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const handlePWVerificationReset = () => {
+        localStorage.setItem("passIsVerified", false);
+    }
+    
+    if ((localStorage.getItem("isLoggedIn") === "true")){
     return (
         <div className="mini-menu">
             <ul>
                 <li className='user'>{localStorage.getItem("username")}</li>
-                <li onMouseEnter={() => setShowAccountMenu(true)}
+                <li onClick={() => setShowAccountMenu(true)}
                 >
                     <Link className="acc-button">Account Management</Link>
                     {showAccountMenu && (
@@ -26,7 +31,9 @@ const MiniMenuComponent = () => {
                             <ul>
                                 <li className="change-user-li"><Link to="/accountmanagement/changeusername" className="acc-button">Edit Username</Link></li>
                                 <li><Link to="/accountmanagement/changepassword" className="acc-button">Edit Password</Link></li>
-                                <li className="delete-account-li"><Link to="/accountmanagement/deleteaccount" className="acc-button">Delete Account</Link></li>
+                                <li className="acc-button"><Link to="/accountmanagement/deleteaccount" className="acc-button">Delete Account</Link></li>
+                                <li className="delete-account-li"><Link to="/accountmanagement/twoFA" className="acc-button" 
+                                    onClick={handlePWVerificationReset}>2 Factor Authentication</Link></li>
                             </ul>
                         </div>
                     )}
@@ -35,6 +42,7 @@ const MiniMenuComponent = () => {
             </ul>
         </div>
     );
+ };
 };
 
 export default MiniMenuComponent;
