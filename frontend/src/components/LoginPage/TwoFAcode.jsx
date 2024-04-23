@@ -49,9 +49,7 @@ const TwoFAcode = () => {
                     localStorage.setItem("isLoggedIn", true);
                     setMessage(`Login successful!`);
                     showAlert(message);
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 500);
+                    window.location.href = '/'
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
@@ -86,36 +84,38 @@ const TwoFAcode = () => {
         }
     };
 
-    return (
-        
-        <div className="delete-box-container">
-            {<AlertBox message={message} isOpen={alertOpen} />}
-            <form onSubmit={handleSubmit}>
-                <div className='change_password'>
-                    <div className="login-form-group">
-                        <label>Please enter your 6-digit code:</label>
-                        <div className="input-container">
-                            {code.map((num, index) => (
-                                <input
-                                    key={index}
-                                    type="text"
-                                    maxLength="1"
-                                    value={num}
-                                    onChange={e => handleInput(index, e)}
-                                    onKeyDown={e => handleBackspace(index, e)}
-                                    className="login-form-control digit-input"
-                                    ref={el => inputsRef.current[index] = el}
-                                />
-                            ))}
+    if (localStorage.getItem("isLoggedIn") != "false") window.location.href = "/"
+        else {
+        return (
+            <div className="delete-box-container">
+                {<AlertBox message={message} isOpen={alertOpen} />}
+                <form onSubmit={handleSubmit}>
+                    <div className='change_password'>
+                        <div className="login-form-group">
+                            <label>Please enter your 6-digit code:</label>
+                            <div className="input-container">
+                                {code.map((num, index) => (
+                                    <input
+                                        key={index}
+                                        type="text"
+                                        maxLength="1"
+                                        value={num}
+                                        onChange={e => handleInput(index, e)}
+                                        onKeyDown={e => handleBackspace(index, e)}
+                                        className="login-form-control digit-input"
+                                        ref={el => inputsRef.current[index] = el}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="login-button-container">
+                            <button type="submit" className="login-form-button">Submit</button>
                         </div>
                     </div>
-                    <div className="login-button-container">
-                        <button type="submit" className="login-form-button">Submit</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    );
+                </form>
+            </div>
+        );
+    }
 };
 
 export default TwoFAcode; 
