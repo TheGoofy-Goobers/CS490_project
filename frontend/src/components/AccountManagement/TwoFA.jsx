@@ -185,9 +185,10 @@ const TwoFA = () => {
                                         <h2>Verify Password</h2>
                                         <p className="note">Please verify your password to setup or edit your 2-factor authentication</p>
                                         <div className="login-form-group">
-                                            <label>Password</label>
+                                            <label htmlFor='password'>Password</label>
                                             <div className="password-container">
                                             <input
+                                                id='password'
                                                 type={showPassword ? 'text' : 'password'}
                                                 value={pass}
                                                 onChange={handlePassChange}
