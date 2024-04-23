@@ -204,23 +204,24 @@ const RegistrationPage = () => {
             </div>
             <div className="registration-form-group">
               <label htmlFor='Password:' >Password:</label>
-              <input
-                data-testid="Password:"
-                id='Password:'
-                type="password" 
-                name="password" 
-                value={user.password} 
-                onChange={handleChange} 
-                className="registration-form-control"
-                required
-              />
-              <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="show-password-button"
-                >
-                    <img src={eyeicon} className='eye-icon' alt="eyeicon" />
-                </button>
+              <div className="password-container">
+                <input
+                  data-testid="Password:"
+                  id='Password:'
+                  type="password" 
+                  name="password" 
+                  value={user.password} 
+                  onChange={handleChange} 
+                  className="registration-form-control"
+                  required
+                />
+                <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="show-password-button"
+                  >
+                      <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                  </button></div>
             </div>
             <div className="registration-button-container">
               <button type="submit" className="registration-form-button">Register</button>
