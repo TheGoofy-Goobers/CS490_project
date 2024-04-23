@@ -18,7 +18,7 @@ const ReleaseNotes = () => {
                     This command allows you to send requests of (-n) with a concurrent request of (-c). However this has limiations with the threading in my example it only allows for 1000 requests. Here is an example of what output with this command would look like.</p>
                     <img src={AB} />
                     <p>However, there is a better command for the siege command, with no connection to the siege video game. 
-                    Seige allows for multi-threading which send out more requests with not capped unlike ab, the example I used <pre><code>$ siege -c 255 -t 60s http://165.22.39.24/80</code></pre> 
+                    Seige allows for multi-threading which send out more requests with not capped unlike ab, the example I used <pre><code className='code-block'> $ siege -c 255 -t 60s http://165.22.39.24/80</code></pre> 
                     To explain what this command does (-c) produces the amount of thread the default limit is 255 since anymore on lower systems would cause crashing. I could push it further but it seemed to prove that my frontend was good.
                     Here is what the command would produce. Along with the cpu usage.</p>
                     <img src={siege}/>
@@ -32,8 +32,8 @@ const ReleaseNotes = () => {
                         Finally, for scaling this website we may be able to switch our plan to scablable plan so we can not worry about the server dying. Only what we can afford. Thank you for read this far.
                     </p>
                 </div>
-                <div className='space'></div>
             </div>
+            <div className='space'></div>
         </div>
     )
 }

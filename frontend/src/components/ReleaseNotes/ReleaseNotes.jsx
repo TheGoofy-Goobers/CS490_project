@@ -1,6 +1,8 @@
 import React from 'react';
 import './ReleaseNotes.css'
 import { Link } from 'react-router-dom';
+import tottime from './CS490 screenshots/total time.png'
+import caching from './CS490 screenshots/caching comparison.png'
 
 
 const ReleaseNotes = () => {
@@ -30,7 +32,10 @@ const ReleaseNotes = () => {
                     <h2 className='titles'>New Features and Improvments</h2>
                     <p>We added some new features for you to enjoy, explore them in the translation, account management features and some new backend features. Read details below </p>
                     <ul>
-                        <li>Translation history now has backend cahcing making it more effiecent and less time waiting for you. Translation histroy now has the ability to delete entries or clear history all together.</li>
+                        <li>Translation history now has backend cahcing making it more effiecent and less time waiting for you. Translation histroy now has the ability to delete entries or clear history all together.
+                            Here are some images:
+                            <img src={tottime}/> <img src={caching} width='80%'/>
+                        </li>
                         <li>Docuementation has been updated with a new video make the most of your codecraft experience.</li>
                         <li>2FA has been added with the Google Authenciator app. Try it out in the profile icon.</li>
                         <li>Improved translation for more accuracy</li>
