@@ -21,6 +21,8 @@ const ChangePassword = lazy(() => import('./components/AccountManagement/ChangeP
 const DeleteAccount = lazy(() => import('./components/AccountManagement/DeleteAccount.jsx'));
 const ForgotPass = lazy(() => import('./components/ForgotPass/ForgotPass.jsx'));
 const ResetPass = lazy(() => import('./components/ForgotPass/ResetPass.jsx'));
+const TwoFA = lazy(() => import('./components/AccountManagement/TwoFA.jsx'));
+const TwoFAcode = lazy(() => import('./components/LoginPage/TwoFAcode.jsx'));
 
 function App() {
   setInterval(isExpired, 1000); //checks every second
