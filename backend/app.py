@@ -149,7 +149,7 @@ def create_app(testing: bool):
 
     
     # Fetch aggregated feedback
-    @api.route('/aggregatedFeedback')
+    @api.route('/getAggregatedFeedback')
     def aggregated_feedback():
         return translation_feedback.aggregated_feedback(mysql)
 
