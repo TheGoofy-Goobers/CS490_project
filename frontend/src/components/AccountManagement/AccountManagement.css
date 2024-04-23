@@ -36,6 +36,19 @@
   width: 100%;
 }
 
+.login-form-box-2fa {
+  background-color: #23272b;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width:35%;
+  
+  margin-top:5rem;
+  margin-bottom:5rem;
+   display: flex;
+    justify-content: center;
+}
+
 
 .login-form-box h2 {
   color: #fff;
