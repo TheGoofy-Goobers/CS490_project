@@ -20,7 +20,6 @@ const TwoFA = () => {
 
     const showAlert = () => {
         setAlertOpen(true);
-
         // Optionally, automatically close the alert after some time
         setTimeout(() => {
             setAlertOpen(false);
@@ -81,7 +80,12 @@ const TwoFA = () => {
                     setMessage(`Password confirmed successfully!`);
                     showAlert();
                 }
-                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                if (res.hasError) {
+                    console.log(`Error response: ${res.errorMessage}`);
+                    setMessage(`Error!: ${res.errorMessage}`);
+                    showAlert();
+
+                }
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     setMessage(`Session expired. Please login again.`);
@@ -141,9 +145,14 @@ const TwoFA = () => {
                     showAlert(message);
                     setTimeout(() => {
                         window.location.href = '/';
-                    }, 2000);
+                    }, 0);
                 }
-                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                if (res.hasError) {
+                    console.log(`Error response: ${res.errorMessage}`);
+                    setMessage(`Error!: ${res.errorMessage}`);
+                    showAlert(message);
+                    setIsLoading(false);
+                }
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     setMessage(`Session expired. Please login again.`);

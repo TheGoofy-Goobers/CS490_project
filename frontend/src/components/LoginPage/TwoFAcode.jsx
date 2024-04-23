@@ -53,7 +53,11 @@ const TwoFAcode = () => {
                         window.location.href = '/';
                     }, 500);
                 }
-                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                if (res.hasError) {
+                    console.log(`Error response: ${res.errorMessage}`);
+                    setMessage(`Error!: ${res.errorMessage}`);
+                    showAlert(message);
+                }
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     setMessage(`Session expired. Please login again.`);
