@@ -46,3 +46,66 @@
 .note{
   color: white;
 }
+
+.digit-input {
+    width: 40px;    /* Adjust width as needed */
+    margin: 0 5px;  /* Adds spacing between inputs */
+    text-align: center;
+    font-size: 16px;
+}
+
+.input-container {
+    display: flex;
+    justify-content: center;
+}
+
+.login-form-button-regular{
+    background-color: #007bff;
+    border: none;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-form-button-loading{
+    background-color: #0052ab;
+    border: none;
+    padding: 0.5rem 2rem;
+    font-size: 1rem;
+    color: white;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.qrcode{
+  width: 90%;
+}
+
+.eye-icon{
+  width: 1.3rem;
+}
+
+.show-password-button {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.15rem;
+  height: calc(100% - 1rem);
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.show-password-button:active .eye-icon {
+    filter: brightness(75%); /* Makes the image 25% darker when the button is clicked */
+}
+
+.password-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}

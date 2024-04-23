@@ -4,7 +4,7 @@ import HelpContent from './HelpContent'; // Changed to uppercase
 import './Help.css';
 import UserGuide from './UserGuide';
 import faq from './faq.svg';
-
+import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 
 function Help() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -14,6 +14,8 @@ function Help() {
     setSearchQuery(query);
   };
 
+  if (!(localStorage.getItem("isLoggedIn") === "true")) window.location.assign(`${SITE_URL}/login?redirect=true`);
+  else {
   return (
     <div>
           <div className='help-title-container'>
@@ -52,6 +54,7 @@ function Help() {
         </div>
     </div>
   );
+ }
 }
 
 export default Help;

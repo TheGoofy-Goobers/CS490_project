@@ -1,7 +1,7 @@
 import {React, useState} from 'react';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
-// import './TranslateFeedback.css';
+import './TranslationFeedback.css';
 import { useNavigate } from 'react-router-dom';
 
 const Star = ({ selected = false, onClick }) => (

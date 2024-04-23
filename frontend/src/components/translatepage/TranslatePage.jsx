@@ -433,7 +433,7 @@ const TranslatePage = () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(href);
   };
-  if (!localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}/login?redirect=true`)
+  if (!(localStorage.getItem("isLoggedIn") === "true")) window.location.assign(`${SITE_URL}/login?redirect=true`)
   else {
     return (
       <div className="translate-page">

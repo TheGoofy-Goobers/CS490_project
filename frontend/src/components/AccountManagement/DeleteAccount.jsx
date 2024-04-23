@@ -20,7 +20,9 @@ const DeleteAccount = () => {
 
     const handleDelete = (e) => {
         e.preventDefault();
-        deleteAccount()
+        if (window.confirm("Are you sure you want to delete your account?")) {
+            deleteAccount();
+        }
     }
     
     const deleteAccount = () => {
@@ -31,15 +33,15 @@ const DeleteAccount = () => {
                 const res = response.data;
                 if (res.success) {
                     setMessage(`Account deleted!`);
-                    showAlert();
-                    setTimeout(Logout, 4000);
-                    setTimeout(() => {window.location.href = SITE_URL}, 4000);
+                    showAlert(message);
+                    setTimeout(Logout, 0);
+                    setTimeout(() => { window.location.href = `${SITE_URL}/login?redirect=true`; }, 500);
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     setMessage(`Deletion failed, session expired. Please login again.`);
-                    showAlert();
+                    showAlert(message);
                     setTimeout(Logout, 2000);
                     setTimeout(() => {window.location.href = SITE_URL}, 2000);
                 }
