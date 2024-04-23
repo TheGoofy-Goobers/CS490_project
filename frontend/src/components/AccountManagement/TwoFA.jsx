@@ -70,7 +70,12 @@ const TwoFA = () => {
                         autoClose: 2000
                       });
                 }
-                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                if (res.hasError) {
+                    console.log(`Error response: ${res.errorMessage}`)
+                    toast(`Invalid Password`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      })};
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     toast(`Session expired. Please login again.`, {

@@ -92,6 +92,14 @@ const TranslatePage = () => {
     'Rust': ['.rs'],
   };
 
+  const languageIcons = {
+    'JavaScript': FaJsSquare,
+    'Python': FaPython,
+    'C++': FaCuttlefish,
+    'Java': FaJava,
+    'Rust': FaRust,
+  }
+
   // Function to create icon elements with proper classes
   const getLanguageIconElement = (language) => {
     const iconClass = language.replace('+', 'p').toLowerCase(); // Replace '+' with 'p' and make it lowercase
