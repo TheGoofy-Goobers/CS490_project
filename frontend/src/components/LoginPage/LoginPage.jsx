@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
-import { FLASK_URL, setLocal, isExpired, Logout } from '../../vars';
+import { FLASK_URL, setLocal, isExpired, Logout, SITE_URL } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate } from 'react-router-dom';
@@ -73,9 +73,9 @@ const LoginPage = () => {
           setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
           delete credentials.username;
           delete credentials.password;
-          setMessage(`Welcome to codeCraft!`);
-          showAlert();
-          window.location.href = '/'
+          // setMessage(`Welcome to codeCraft!`); This can be uncommented if we want to try to get the alert to show
+          // showAlert();
+          window.location.href = "/?redirect=loginSuccess"
           // setTimeout(() => {
           //   window.location.href = '/';}, 2000)
         }
@@ -95,70 +95,72 @@ const LoginPage = () => {
         }
       });
   };
+  if(localStorage.getItem("isLoggedIn")) window.location.href = "/"
+  else {
+    return (
 
-  return (
-
-    <div>
-    {<AlertBox message={message} isOpen={alertOpen} />}
-    <div className="login-page-container">
-      <div className="login-form-box">
-        {!localStorage.getItem("isLoggedIn") &&
-          <form onSubmit={handleSubmit}>
-            <h2>Login</h2>
-            <div className="login-form-group">
-              <label>Username or Email:</label>
-              <input
-                type="text"
-                name="username"
-                value={credentials.username}
-                onChange={handleChange}
-                className="login-form-control"
-              />
-            </div>
-            <div className="login-form-group">
-              <label>Password:</label>
-              <div className="password-container">
+      <div>
+      {<AlertBox message={message} isOpen={alertOpen} />}
+      <div className="login-page-container">
+        <div className="login-form-box">
+          {!localStorage.getItem("isLoggedIn") &&
+            <form onSubmit={handleSubmit}>
+              <h2>Login</h2>
+              <div className="login-form-group">
+                <label>Username or Email:</label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={credentials.password}
+                  type="text"
+                  name="username"
+                  value={credentials.username}
                   onChange={handleChange}
                   className="login-form-control"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="show-password-button"
-                >
-                  <img src={eyeicon} className='eye-icon' alt="eyeicon" />
-                </button>
               </div>
               <div className="login-form-group">
-                <label>
+                <label>Password:</label>
+                <div className="password-container">
                   <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={credentials.rememberMe}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={credentials.password}
                     onChange={handleChange}
-                  /> Remember Me
-                </label>
+                    className="login-form-control"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="show-password-button"
+                  >
+                    <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                  </button>
+                </div>
+                <div className="login-form-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={credentials.rememberMe}
+                      onChange={handleChange}
+                    /> Remember Me
+                  </label>
+                </div>
+                <p><a href='/register'>
+                  Don't have an account? Register here
+                </a></p>
+                <a href='/forgotpassword'>
+                  Forgot password?
+                </a>
+                <div className="login-button-container">
+                  <button type="submit" className="login-form-button">Login</button>
+                </div>
               </div>
-              <p><a href='/register'>
-                Don't have an account? Register here
-              </a></p>
-              <a href='/forgotpassword'>
-                Forgot password?
-              </a>
-              <div className="login-button-container">
-                <button type="submit" className="login-form-button">Login</button>
-              </div>
-            </div>
-            </form>
-          }
+              </form>
+            }
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default LoginPage;
