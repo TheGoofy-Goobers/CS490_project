@@ -90,7 +90,7 @@ const TranslatePage = () => {
   const extensions = {
     'JavaScript': ['.js', '.jsx'],
     'Python': ['.py'],
-    'C++': ['.cpp', '.cxx', '.cc', '.h'],
+    'C++': ['.cpp', '.cxx', '.cc', '.h', '.hh', '.hpp'],
     'Java': ['.java'],
     'Rust': ['.rs'],
   };
@@ -232,14 +232,7 @@ const TranslatePage = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Extensions based on the source language
-    const extensions = {
-      'JavaScript': ['.js'],
-      'Python': ['.py'],
-      'C++': ['.cpp', '.cxx', '.cc', '.h'],
-      'Java': ['.java'],
-      'Rust': ['.rs'],
-    };
+  
 
     // Ensure the sourceLanguage matches the keys in the extensions object
     const expectedExtensions = extensions[sourceLanguage];
