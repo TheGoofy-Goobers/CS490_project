@@ -56,12 +56,7 @@ def create_app(testing: bool):
     # code translation backend
     @api.route('/translate', methods=['POST'])
     def translate_code():
-        time_before = time.time()
-        response = translate.translate(mysql, gpt_client)
-        time_after = time.time()
-        elapsed_time = time_after - time_before
-        print(f"Elapsed time: {elapsed_time}")
-        return response
+        return translate.translate(mysql, gpt_client)
 
     # translation feedback
     @api.route('/translationFeedback', methods=['POST'])
