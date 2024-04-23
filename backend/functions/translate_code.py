@@ -75,39 +75,6 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
         return response
     
     translation_id = -1
-        # The value can be changed, but presently we check if the source code has less than 100 characters. If so, then we 
-    # Check the database for an existing query with the same source code, source language, and target language. 
-    if len(message) <= 100:
-        try:
-            cur.execute("SELECT translated_code, status, total_tokens FROM translation_history WHERE original_code=%s AND source_language=%s AND target_language=%s ORDER BY submission_date DESC", (message, srcLang, toLang))
-            entry = cur.fetchone()
-            #If it exists, we insert again but w/ new user id. otherwise, we hit the API.
-            if entry:
-                cur.execute(
-                    "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                    (user_id, srcLang, message, toLang, entry["translated_code"], "from_db", 0)
-                    )
-                mysql.connection.commit()
-                cur.execute("SELECT translation_id FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC LIMIT 1", (user_id,))
-                entry = cur.fetchone()
-                if entry:
-                    translation_id = entry["translation_id"]
-
-                with translation_cache_lock:
-                    if user_id in translation_cache:
-                        del translation_cache[user_id]
-
-                response["output"] = entry["translated_code"]
-                response["finish_reason"] = "from_db"
-                response["success"] = True
-                response["translation_id"] = translation_id
-                return response
-        except Exception as e:
-            response["hasError"] = True
-            response["errorMessage"] = str(e)
-            cur.close()
-            return response
-
     try:
         cur.execute(
             "INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)",

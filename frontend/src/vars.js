@@ -34,9 +34,9 @@ export const isExpired = () => {
     const lastLogIn = parseInt(localStorage.getItem("lastLogIn"), 10);
     const currentTime = Math.floor(Date.now() / 1000)
     const elapsedTime = currentTime - lastLogIn;
-    console.log(`current time: ${currentTime}`)
-    console.log(`lastLogin: ${lastLogIn}`)
-    console.log(`elapsed time: ${elapsedTime}`)
+    // console.log(`current time: ${currentTime}`)
+    // console.log(`lastLogin: ${lastLogIn}`)
+    // console.log(`elapsed time: ${elapsedTime}`)
 
     if (elapsedTime > expires){
         localStorage.clear();
