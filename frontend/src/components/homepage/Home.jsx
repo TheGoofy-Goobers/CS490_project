@@ -6,8 +6,7 @@ import py from './Image 10.webp';
 import cprog from './Image 11.webp';
 import jav from './Image 12.webp';
 import { Link } from 'react-router-dom';
-import paste from './computer-icons-clipboard-cut-copy-and-paste-symbol-removebg-preview.png';
-import congrats from './confetti.png';
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FLASK_URL, setLocal, isExpired, Logout, isLoggedIn } from '../../vars';

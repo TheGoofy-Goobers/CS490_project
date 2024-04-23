@@ -14,7 +14,7 @@ import { SITE_URL, FLASK_URL, Logout } from '../../vars';
 import { isExpired } from '../../vars';
 import { ToastContainer, toast } from 'react-toastify';
 import TranslationFeedback from './TranslationFeedback';
-
+import { useNavigate } from 'react-router-dom';
 import DisplayFeedback from './DisplayFeedback';
 
 const TranslatePage = () => {
