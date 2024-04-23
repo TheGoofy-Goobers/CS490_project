@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import logo3 from './logo3.png';
 import './NavBar.css';
 import profile from '../translatepage/Profile.png';
-import github from '../translatepage/github-logo.png';
 import MiniMenu from './MiniMenu';
 
 const NavBar = () => {
@@ -33,8 +32,11 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
             <Link to={'/feedback'} style={{ textDecoration: 'none' }} data-testid='feedlink'>
             <li>Feedback</li>
             </Link>
-             <Link to={'/help'} style={{ textDecoration: 'none' }} data-testid='helplink'>
+            <Link to={'/help'} style={{ textDecoration: 'none' }} data-testid='helplink'>
             <li>Help</li>
+            </Link>
+            <Link to={'/releasenotes'} style={{ textDecoration: 'none' }} data-testid='releaselink'>
+            <li>Release Notes</li>
             </Link>
           </ul>
         </div>

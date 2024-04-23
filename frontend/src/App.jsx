@@ -18,8 +18,9 @@ import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
 import TwoFA from './components/AccountManagement/TwoFA.jsx'
 import TwoFAcode from './components/LoginPage/TwoFAcode.jsx'
 import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
-import ResetPass from './components/ForgotPass/ResetPass.jsx';
-
+import ResetPass from './components/ForgotPass/ResetPass.jsx'
+import ReleaseNotes from './components/ReleaseNotes/ReleaseNotes.jsx';
+import Loadtesting from './components/ReleaseNotes/Loadtesting.jsx'
 
 function App() {
  setInterval(isExpired(), 1000); //checks every second
@@ -44,6 +45,8 @@ function App() {
             <Route path='/login/2FA' element={<TwoFAcode />} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
             <Route path='/resetpassword' element={<ResetPass />}/>
+            <Route path='/releasenotes' element={<ReleaseNotes/>}/>
+            <Route path='/releasenotes/loadtesting' element={<Loadtesting/>} />
           </Routes>
       </div>
     </div>
