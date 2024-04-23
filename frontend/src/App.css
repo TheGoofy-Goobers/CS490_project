@@ -36,3 +36,21 @@
     transform: rotate(360deg);
   }
 }
+
+.success {
+  background-color: #4BB543;
+  color: white; 
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}
+
+.fail {
+  background-color: #FF414D; 
+  color: white; 
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
+}

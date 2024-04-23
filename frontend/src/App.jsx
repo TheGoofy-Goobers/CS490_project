@@ -21,6 +21,7 @@ import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
 import ResetPass from './components/ForgotPass/ResetPass.jsx'
 import ReleaseNotes from './components/ReleaseNotes/ReleaseNotes.jsx';
 import Loadtesting from './components/ReleaseNotes/Loadtesting.jsx'
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
  setInterval(isExpired(), 1000); //checks every second

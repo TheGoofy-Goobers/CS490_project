@@ -6,12 +6,10 @@ import SHA256 from 'crypto-js/sha256';
 import { useNavigate, useLocation } from 'react-router-dom';
 import NavBar from '../navbar/NavBar';
 import eyeicon from './eyeicon.svg';
-import AlertBox from '../AlertBox/AlertBox';
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const LoginPage = () => {
-  const [message, setMessage] = useState('Default message');
-  const [alertOpen, setAlertOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const location = useLocation();
@@ -27,15 +25,6 @@ const LoginPage = () => {
   const [loggedInUser, setLoggedInUser] = useState('');
   const navigate = useNavigate(); // Initialize useNavigate hook
   const [width, setWidth] = useState();
-
-  const showAlert = () => {
-    setAlertOpen(true);
-
-    // Optionally, automatically close the alert after some time
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 2000); // This should match the duration in AlertBox or be longer
-  };
 
   useEffect(() => {
     // Check if user is already logged in
@@ -77,7 +66,7 @@ const LoginPage = () => {
         if (res.success) {
           setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
           const is2FAEnabled = (res.totp === "enabled");
-          console.log(`2FA enabled: ${is2FAEnabled}`);
+          console.log(`enabled is ${is2FAEnabled}`);
           check2FA(is2FAEnabled);
           // delete credentials.username;
           // delete credentials.password;
@@ -89,14 +78,18 @@ const LoginPage = () => {
         }
         if (res.hasError) {
           console.log(`Error response: ${res.errorMessage}`);
-          setMessage(`${res.errorMessage}`);
-          showAlert();
+          toast(`${res.errorMessage}`, {
+            className: 'fail',
+            autoClose: 2000
+          });
         }
         console.log(`Response has error: ${res.hasError}`);
       }).catch((error) => {
         if (error.response) {
-          setMessage(`${error.response}`);
-          showAlert();
+          toast(`${error.response}`, {
+            className: 'fail',
+            autoClose: 2000
+          });
           console.log(error.response);
           console.log(error.response.status);
           console.log(error.response.headers);
@@ -106,85 +99,91 @@ const LoginPage = () => {
 
   const check2FA = (isEnabled) => {
 
+    console.log("im HEREEEEEE");
+
     if (isEnabled == true) {
-      navigate('/login/2FA');
+      console.log(`check token b4 2FA ${localStorage.getItem("sessionToken")}`);
+      setTimeout(() => {
+        window.location.href = '/login/2FA';
+      }, 500);
     }
     else {
       localStorage.setItem("isLoggedIn", true);
-      window.location.href = '/?redirect=loginSuccess';
-      setMessage(`Welcome to codeCraft!`);
-      showAlert();
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+      toast(`Welcome to codeCraft!`, {
+        className: 'success',
+        autoClose: 2000
+      });
 
     }
   };
 
 
-  if (localStorage.getItem("isLoggedIn") && localStorage.getItem("isLoggedIn") != "false") window.location.href = '/'
-  else {
-    return (
-      <div>
-        {<AlertBox message={message} isOpen={alertOpen} />}
-        {/* //ask hamdi wtf this does */}
-        <div className="login-page-container">
-          <div className="login-form-box">
-            {!(localStorage.getItem("isLoggedIn") === "true") &&
-              <form onSubmit={handleSubmit}>
-                <h2>Login</h2>
-                <div className="login-form-group">
-                  <label>Username or Email:</label>
+
+  return (
+    <div>
+      <ToastContainer position='top-center'/>
+      <div className="login-page-container">
+        <div className="login-form-box">
+          {!(localStorage.getItem("isLoggedIn") === "true") &&
+            <form onSubmit={handleSubmit}>
+              <h2>Login</h2>
+              <div className="login-form-group">
+                <label htmlFor="Username or Email:" id="Username or Email:">Username or Email:</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={credentials.username}
+                  onChange={handleChange}
+                  className="login-form-control"
+                />
+              </div>
+              <div className="login-form-group">
+                <label htmlFor="password">Password:</label>
+                <div className="password-container">
                   <input
-                    type="text"
-                    name="username"
-                    value={credentials.username}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={credentials.password}
                     onChange={handleChange}
                     className="login-form-control"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="show-password-button"
+                  >
+                    <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                  </button>
                 </div>
                 <div className="login-form-group">
-                  <label>Password:</label>
-                  <div className="password-container">
+                  <label>
                     <input
-                      type={showPassword ? 'text' : 'password'}
-                      name="password"
-                      value={credentials.password}
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={credentials.rememberMe}
                       onChange={handleChange}
-                      className="login-form-control"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="show-password-button"
-                    >
-                      <img src={eyeicon} className='eye-icon' alt="eyeicon" />
-                    </button>
-                  </div>
-                  <div className="login-form-group">
-                    <label>
-                      <input
-                        type="checkbox"
-                        name="rememberMe"
-                        checked={credentials.rememberMe}
-                        onChange={handleChange}
-                      /> Remember Me
-                    </label>
-                  </div>
-                  <p><a href='/register'>
-                    Don't have an account? Register here
-                  </a></p>
-                  <a href='/forgotpassword'>
-                    Forgot password?
-                  </a>
-                  <div className="login-button-container">
-                    <button type="submit" className="login-form-button">Login</button>
-                  </div>
+                    /> Remember Me
+                  </label>
                 </div>
-              </form>
-            }
-          </div>
+                <p><a href='/register'>
+                  Don't have an account? Register here
+                </a></p>
+                <a href='/forgotpassword'>
+                  Forgot password?
+                </a>
+                <div className="login-button-container">
+                  <button type="submit" className="login-form-button">Login</button>
+                </div>
+              </div>
+            </form>
+          }
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 };
 
 export default LoginPage;

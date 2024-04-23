@@ -20,6 +20,7 @@
     margin: auto;
     flex-direction: column;
     padding-top: 2rem;
+    padding-right: 17rem;
 }
 
 .release-container h1 {

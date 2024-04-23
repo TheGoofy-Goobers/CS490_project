@@ -3,23 +3,10 @@ import { SITE_URL, FLASK_URL, setSessionLogin, isExpired, Logout } from '../../v
 import axios from 'axios';
 import './AccountManagement.css';
 import { Link } from 'react-router-dom';
-import AlertBox from '../AlertBox/AlertBox';
-import SHA256 from 'crypto-js/sha256';
-
+import SHA256 from 'crypto-js/sha256'; 
+import { ToastContainer, toast } from 'react-toastify';
 
 const ChangePassword = () => {
-    const [message, setMessage] = useState('Default message');
-    const [alertOpen, setAlertOpen] = useState(false);
-
-    const showAlert = () => {
-        setAlertOpen(true);
-    
-        // Optionally, automatically close the alert after some time
-        setTimeout(() => {
-          setAlertOpen(false);
-        }, 2000); // This should match the duration in AlertBox or be longer
-      };
-    
     const [newPass, setPass] = useState({
         current: '',
         new: '',
@@ -64,14 +51,18 @@ const ChangePassword = () => {
         };
 
         if (newPass.new != newPass.conf) {
-            setMessage(`New and confirmed are different. Change it to match!`);
-            showAlert();
+            toast(`New and confirmed are different. Change it to match!`, {
+                className: 'fail',
+                autoClose: 2000
+            });
             return;
         }
 
         if (!validatePassword(newPass.new)) {
-            setMessage(`Password must be at least 8 characters long, have a special character, and number.`);
-            showAlert();
+            toast(`Password must be at least 8 characters long, have a special character, and number.`, {
+                className: 'fail',
+                autoClose: 2000
+              });
             return;
            }
 
@@ -82,21 +73,27 @@ const ChangePassword = () => {
                     delete newPass.conf;
                     delete newPass.current;
                     delete newPass.new;
-                    setMessage(`Password changed successfuly!`);
-                    showAlert()
+                    toast(`Password changed successfuly!`,{
+                        className: 'success',
+                        autoClose: 2000
+                      });
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
-                    setMessage(`Session expired. Please login again.`)
-                    showAlert();
+                    toast(`Session expired. Please login again.`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      })
                     setTimeout(Logout, 4000)
                 }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == '500 (INTERNAL SERVER ERROR)') {
-                        setMessage(`BACKEND FAILED contact support`);
-                        showAlert();
+                        toast(`BACKEND FAILED contact support`, {
+                            className: 'fail',
+                            autoClose: 2000
+                          });
                     }
                     console.log(error.response);
                     console.log(error.response.status);
@@ -108,7 +105,7 @@ const ChangePassword = () => {
 
     return(
         <div>
-            {<AlertBox message={message} isOpen={alertOpen} />}
+        <ToastContainer position='top-center'/>
             <div className="delete-box-container">
                 <div className='login-form-box'>
                     <form onSubmit={handlePassSubmit}> 
@@ -116,7 +113,7 @@ const ChangePassword = () => {
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
                             <div className="login-form-group">
-                                <label>Current Password:</label>
+                                <label htmlFor='Current Password' data>Current Password:</label>
                                 <input
                                     type="password"
                                     name="current"

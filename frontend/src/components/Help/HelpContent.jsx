@@ -7,7 +7,7 @@ function HelpContent({ searchQuery }) {
     { id: 1, title: 'How do I use the translator?', content: 'Just paste ur code and press "translate"' },
     { id: 2, title: 'What coding languages are accepted?', content: 'JavaScript, Python, C++, Java, Rust' },
     { id: 3, title: 'How complex can code be?', content: 'Sky is the limit with codeCraft!' },
-    { id: 4, title: 'What is the max length for the translation?', content: '4,000 characters' },
+    { id: 4, title: 'What is the max length for the translation?', content: '16,384 characters' },
     { id: 5, title: 'Why am I getting errors when I try to translate?', 
     content: 'You are most likely seeing errors because your code does not comply with the selected language. Please check your code and double check the selected language and try again!' },
     { id: 6, title: 'How do I see my past translations?', content: 'Click on the history icon in the top left corner! You will be able to see your past translations.' },

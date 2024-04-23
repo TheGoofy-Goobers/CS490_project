@@ -3,22 +3,12 @@ import { SITE_URL, FLASK_URL, setSessionLogin, setLocal, isExpired, Logout } fro
 import axios from 'axios';
 import './AccountManagement.css';
 import { useNavigate } from 'react-router-dom';
-import AlertBox from '../AlertBox/AlertBox';
+import { ToastContainer, toast } from 'react-toastify';
 
 // USERNAME CHANGING
 
 const ChangeUserame = () => {
-    const [message, setMessage] = useState('Default message');
-    const [alertOpen, setAlertOpen] = useState(false);
 
-    const showAlert = () => {
-        setAlertOpen(true);
-    
-        // Optionally, automatically close the alert after some time
-        setTimeout(() => {
-          setAlertOpen(false);
-        }, 2000); // This should match the duration in AlertBox or be longer
-      };
     
     const [newUser, setUser] = useState({
         current: '',
@@ -47,8 +37,10 @@ const ChangeUserame = () => {
                 console.log(`Has error: ${res.hasError}`)
                 if (res.success) {
                     localStorage.setItem("username", newUser.new);
-                    setMessage(`USERNAME CHANGED!`);
-                    showAlert();
+                    toast(`USERNAME CHANGED!`, {
+                        className: 'success',
+                        autoClose: 2000
+                      });
                     delete newUser.current;
                     delete newUser.new;
                     setTimeout(() => { 
@@ -58,17 +50,25 @@ const ChangeUserame = () => {
                 }
                 else if(res.hasError) {
                     console.log(`Errors: ${res.errorMessage}`)
+                    toast(`${res.errorMessage}`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      })
                 }
                 if (res.logout) {
-                    setMessage(`Session expired. Please login again.`)
-                    showAlert();
+                    toast(`Session expired. Please login again.`, {
+                        className: 'fail',
+                        autoClose: 2000
+                      })
                     setTimeout(Logout, 4000)
                 }
             }).catch((error) => {
                 if (error.response) {
                     if (error.response == 500) {
-                        setMessage(`Backend failed please contact support!`)
-                        showAlert();
+                        toast(`Backend failed please contact support!`, {
+                            className: 'fail',
+                            autoClose: 2000
+                          })
                     }
                     console.log(error.response);
                     console.log(error.response.status);
@@ -80,7 +80,7 @@ const ChangeUserame = () => {
 
     return(
         <div className="box-container">
-        {<AlertBox message={message} isOpen={alertOpen} />}
+        <ToastContainer position='top-center'/>
         <div className="login-form-box">
             <div className='manage_prof'>
 

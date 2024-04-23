@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import './FeedbackForm.css';
 import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
-import AlertBox from '../AlertBox/AlertBox.jsx';
+import { ToastContainer, toast } from 'react-toastify';
 
 function FeedbackForm() {
-  const [message, setMessage] = useState('Default message');
-  const [alertOpen, setAlertOpen] = useState(false);
   const [limit, setLimit] = useState(300);
   const [ratings, setRatings] = useState({
     question1: '',
@@ -15,15 +13,6 @@ function FeedbackForm() {
     question4: ''
   });
   const [openended, setOpenEnded] = useState('');
-
-  const showAlert = () => {
-    setAlertOpen(true);
-
-    // Optionally, automatically close the alert after some time
-    setTimeout(() => {
-      setAlertOpen(false);
-    }, 2000); // This should match the duration in AlertBox or be longer
-  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -43,13 +32,17 @@ function FeedbackForm() {
       console.log(`Response has error: ${res.hasError}`);
       if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
       else if (res.success) {
-        setMessage(`FEEDBACK SUBMITTED SUCCESFULLY!`);
-        showAlert();
+        toast(`FEEDBACK SUBMITTED SUCCESFULLY!`, {
+          className: 'fail',
+          autoClose: 2000
+        });
         console.log('Feedback submitted successfully')
       }
       if (res.logout) {
-        setMessage("Session expired. Please login again..");
-        showAlert();
+        toast("Session expired. Please login again..", {
+          className: 'fail',
+          autoClose: 2000
+        });
         setTimeout(Logout, 4000);
         setTimeout(() => {window.location.href = '/'}, 4000);
       }
@@ -64,8 +57,10 @@ function FeedbackForm() {
       setLimit(300);
     }).catch((error) => {
       if (error.response) {
-        setMessage(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`);
-        showAlert();
+        toast(`FEEBACK NOT SUBMITTED DUE TO: BACKEND, please contact Support`, {
+          className: 'fail',
+          autoClose: 2000
+        });
         console.log(error.response);
         console.log(error.response.status);
         console.log(error.response.headers);
@@ -92,7 +87,7 @@ function FeedbackForm() {
   {
     return (
       <div>
-      {<AlertBox message={message} isOpen={alertOpen} />}
+        <ToastContainer position='top-center'/> 
         <form onSubmit={handleSubmit}>
           <div className="background-page">
             <div className="title">
@@ -116,8 +111,9 @@ function FeedbackForm() {
             </div>
             <div className="radio-buttons">
               {[1, 2, 3, 4, 5].map(value => (
-                <label key={value}>
+                <label key={value} i>
                   <input
+                    id='changing-test'
                     type="radio"
                     name="question1"
                     value={value}
