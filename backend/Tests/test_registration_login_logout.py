@@ -99,38 +99,54 @@ class TestRegistrationLoginLogout:
         assert "sqlErrors" in response
         assert len(response["sqlErrors"]) == 1 and response["sqlErrors"][0] == "Chosen email already in use"
 
-    @pytest.mark.parametrize("username,password", [("validUser", "validPassword"), ("valid@email.com", "validPassword")])
-    def test_user_login_success(self, client, username, password, monkeypatch):
+    @pytest.mark.parametrize("username,password,key", [("validUser", "validPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a"), ("valid@email.com", "validPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a")])
+    def test_user_login_success_two_factor_disabled(self, client, username, password, key, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None])
+        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None, {"totp": None}])
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
 
-        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))
         response = response.json
 
         assert "success" in response and response["success"]
         assert not response["hasError"]      #sessionToken is uuid, so should be len 36
+        assert response["totp"] == "disabled"
         assert "sessionToken" in response and len(response["sessionToken"]) == 36
 
-    @pytest.mark.parametrize("username,password", [("unrecognizedUser", "validPassword")])
-    def test_user_login_unrecognized_username_or_email_returns_error_response(self, client, username, password, monkeypatch):
+    @pytest.mark.parametrize("username,password,key", [("validUser", "validPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a"), ("valid@email.com", "validPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a")])
+    def test_user_login_success_two_factor_enabled(self, client, username, password, key, monkeypatch):
+        # mocks
+        monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
+        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None, {"totp": "gAAAAABmIzSHEOp2tWCwNXilYPDIAzO4Ugp-274gAS50Dr9XsHfIDzMFPkjsrrpw5p5EkpFkj8_TgTXy8i47k3Dhq7VS6V2zyvqrOZo4sg1jmIhdKgXZs4naldLw3MKZVHn-EmcpdPcn"}])
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
+
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))
+        response = response.json
+
+        assert "success" in response and response["success"]
+        assert not response["hasError"]      #sessionToken is uuid, so should be len 36
+        assert response["totp"] == "enabled"
+        assert "sessionToken" in response and len(response["sessionToken"]) == 36
+
+    @pytest.mark.parametrize("username,password,key", [("unrecognizedUser", "validPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a")])
+    def test_user_login_unrecognized_username_or_email_returns_error_response(self, client, username, password, key, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         
-        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))
         response = response.json
 
         assert "success" not in response
         assert response["hasError"]
         assert "errorMessage" in response and response["errorMessage"] == "User not found"
-    @pytest.mark.parametrize("username,password", [("validUser", "incorrectPassword")])
-    def test_user_login_incorrect_password_returns_error_response(self, client, username, password, monkeypatch):
+    @pytest.mark.parametrize("username,password,key", [("validUser", "incorrectPassword", "9d832321b2d6e7c8c7d89671825b26fff21be4f4bbaf664f2df7e46d2336963a")])
+    def test_user_login_incorrect_password_returns_error_response(self, client, username, password, key, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1, "password": "correctPassword"})
 
-        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password}))
+        response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))
         response = response.json
         
         assert "success" not in response
