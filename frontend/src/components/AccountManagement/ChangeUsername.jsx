@@ -80,7 +80,7 @@ const ChangeUserame = () => {
 
     return(
         <div className="box-container">
-        <ToastContainer position='top-center'/>
+        <ToastContainer position='top-center' style={{ zIndex: 1100 }}/>
         <div className="login-form-box">
             <div className='manage_prof'>
 

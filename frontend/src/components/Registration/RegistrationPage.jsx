@@ -135,6 +135,10 @@ const RegistrationPage = () => {
         setTimeout(() => {window.location.href = '/'}, 2000);
       }
       console.log(`Response has error: ${res.hasError}`)
+      toast(handleCheck(`${res.errorMessage}`),  {
+        className: 'fail',
+        autoClose: 2000
+      })
       if(res.usernameErrors) {
         console.log(`Username errors: ${res.usernameErrors}`)
         toast(handleCheck(`${res.usernameErrors}`),  {

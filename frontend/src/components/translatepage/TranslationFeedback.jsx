@@ -3,6 +3,7 @@ import { FLASK_URL, SITE_URL, Logout } from '../../vars.js';
 import axios from 'axios';
 import './TranslationFeedback.css';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Star = ({ selected = false, onClick }) => (
     <span onClick={onClick} style={{ cursor: 'pointer', color: selected ? 'orange' : 'gray', fontSize: '35px' }}>
@@ -66,10 +67,10 @@ const TranslationFeedback = ({ currentTranslationId }) => {
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 else if (res.success) {
                     console.log('Translation Feedback submitted successfully');
-                    alert(`TRANSLATION FEEDBACK SUBMITTED SUCCESFULLY!`);
+                    toast(`TRANSLATION FEEDBACK SUBMITTED SUCCESFULLY!`);
                 }
                 if (res.logout) {
-                    alert("Session expired. Please login again..");
+                    toast("Session expired. Please login again..");
                     Logout(navigate);
                 }
                 setOpenEnded('');
@@ -77,7 +78,7 @@ const TranslationFeedback = ({ currentTranslationId }) => {
                 setLimit(150);
             }).catch((error) => {
                 if (error.response) {
-                    alert(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`);
+                    toast(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`);
                     console.log(error.response);
                     console.log(error.response.status);
                     console.log(error.response.headers);
@@ -89,6 +90,7 @@ const TranslationFeedback = ({ currentTranslationId }) => {
 
     return (
         <div>
+            <ToastContainer position='top-center' style={{ zIndex: 1100 }}/>
             <p>Rate Translation:</p>
             <p>note: any new feedback will overwrite previous feedback for this translation</p>
             <div>

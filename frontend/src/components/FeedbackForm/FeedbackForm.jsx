@@ -92,7 +92,7 @@ function FeedbackForm() {
   {
     return (
       <div>
-        <ToastContainer position='top-center'/> 
+        <ToastContainer position='top-center' style={{ zIndex: 1100 }}/> 
         <form onSubmit={handleSubmit}>
           <div className="background-page">
             <div className="title">

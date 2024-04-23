@@ -53,7 +53,7 @@ const DeleteAccount = () => {
 
     return(
         <div className="box-container">
-            <ToastContainer position='top-center'/>
+            <ToastContainer position='top-center' style={{ zIndex: 1100 }}/>
             <div className='login-form-box'>
                 <p className="note">Please note that once you delete your account, you cannot log back in or reactivate your account</p>
                 <form onSubmit={handleDelete}>
