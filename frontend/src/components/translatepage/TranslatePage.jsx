@@ -31,7 +31,7 @@ const TranslatePage = () => {
   const [sourceLanguageFilter, setSourceLanguageFilter] = useState('');
   const [targetLanguageFilter, setTargetLanguageFilter] = useState('');
   const [charCount, setCharCount] = useState(0); // State to track character count
-  const maxCharLimit =  16384; // Define maximum character limit
+  const maxCharLimit =  16383; // Define maximum character limit
   const [showDots, setShowDots] = useState(false);
 
   const handleCheck = (message) => {
@@ -84,12 +84,12 @@ const TranslatePage = () => {
   
   
   // Function to get the appropriate icon based on the language
-  const languageIcons = {
-    'JavaScript': FaJsSquare,
-    'Python': FaPython,
-    'C++': FaCuttlefish, // Replace with the appropriate icon for C++
-    'Java': FaJava,
-    'Rust': FaRust,
+  const extensions = {
+    'JavaScript': ['.js', '.jsx'],
+    'Python': ['.py'],
+    'C++': ['.cpp', '.cxx', '.cc', '.h'],
+    'Java': ['.java'],
+    'Rust': ['.rs'],
   };
 
   // Function to create icon elements with proper classes
