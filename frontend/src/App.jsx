@@ -7,6 +7,8 @@ import { isExpired } from './vars.js';
 //non-lazy components
 import Home from './components/homepage/Home';
 import TranslatePage from './components/translatepage/TranslatePage';
+import ReleaseNotes from './components/ReleaseNotes/ReleaseNotes.jsx';
+import LoadTesting from './components/ReleaseNotes/Loadtesting.jsx'
 
 //lazy load is used to import components only when theyre needed. non-lazy = needed fast and consistently
 //lazy load heavy components
@@ -48,6 +50,8 @@ function App() {
             <Route path='/login/2FA' element={<TwoFAcode />} />
             <Route path='/forgotpassword' element={<ForgotPass />} />
             <Route path='/resetpassword' element={<ResetPass />}/>
+            <Route path='/releasenotes' element={<ReleaseNotes />} />
+            <Route path='/releasenotes/loading' element={<LoadTesting />}/>
           </Routes>
         </Suspense>
       </div>
