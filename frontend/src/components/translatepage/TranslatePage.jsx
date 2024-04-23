@@ -437,7 +437,7 @@ const TranslatePage = () => {
           })
         }
         console.log(`Response has error: ${res.hasError}`);
-        if (res.errorMessage) console.log(`Other errors: ${res.errorMessage}`);
+        if (res.errorMessage) console.log(`Errors: ${res.errorMessage}`);
         if (res.apiErrorMessage) {
           toast(handleCheck(`${res.errorCode}`), {
             className: 'fail',
