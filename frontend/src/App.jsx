@@ -3,7 +3,7 @@ import TranslatePage from './components/translatepage/TranslatePage';
 import NavBar from './components/navbar/NavBar';
 import Home from './components/homepage/Home' 
 import './App.css'; // Assuming you have global styles here
-import { Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
 import Register from './components/Registration/RegistrationPage.jsx'
 import Feedback from './components/FeedbackForm/FeedbackForm.jsx'

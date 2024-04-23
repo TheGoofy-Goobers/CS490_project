@@ -70,7 +70,9 @@ const LoginPage = () => {
           check2FA(is2FAEnabled);
           // delete credentials.username;
           // delete credentials.password;
-          // setMessage(`Welcome to codeCraft!`);
+          // toast(`Welcome to codeCraft!`, {
+          // 
+          //});
           // showAlert();
           // setTimeout(() => {
           //   window.location.href = '/';
@@ -131,8 +133,9 @@ const LoginPage = () => {
             <form onSubmit={handleSubmit}>
               <h2>Login</h2>
               <div className="login-form-group">
-                <label>Username or Email:</label>
+                <label htmlFor="username">Username or Email:</label>
                 <input
+                  id='username'
                   type="text"
                   name="username"
                   value={credentials.username}
@@ -141,9 +144,10 @@ const LoginPage = () => {
                 />
               </div>
               <div className="login-form-group">
-                <label>Password:</label>
+                <label htmlFor="password">Password:</label>
                 <div className="password-container">
                   <input
+                    id='password'
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={credentials.password}
@@ -175,7 +179,7 @@ const LoginPage = () => {
                   Forgot password?
                 </a>
                 <div className="login-button-container">
-                  <button type="submit" className="login-form-button">Login</button>
+                  <button type="submit" className="login-form-button" id='login-button'>Login</button>
                 </div>
               </div>
             </form>

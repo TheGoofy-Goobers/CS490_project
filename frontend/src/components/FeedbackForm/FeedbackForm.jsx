@@ -57,7 +57,7 @@ function FeedbackForm() {
       setLimit(300);
     }).catch((error) => {
       if (error.response) {
-        toast(`FEEBACK NOT SUBMITTED DUE TO: ${error.response}`, {
+        toast(`FEEBACK NOT SUBMITTED DUE TO: BACKEND, please contact Support`, {
           className: 'fail',
           autoClose: 2000
         });
@@ -111,8 +111,9 @@ function FeedbackForm() {
             </div>
             <div className="radio-buttons">
               {[1, 2, 3, 4, 5].map(value => (
-                <label key={value}>
+                <label key={value} i>
                   <input
+                    id='changing-test'
                     type="radio"
                     name="question1"
                     value={value}
