@@ -67,7 +67,7 @@ def aggregated_feedback(mysql: MySQL) -> dict:
 
     try:
         cur = mysql.connection.cursor()
-        selection = "SELECT AVG(rating) AS average_rating, COUNT(rating) AS total_ratings FROM translation_feedback"
+        selection = "SELECT AVG(star_rating) AS average_rating, COUNT(star_rating) AS total_ratings FROM translation_feedback"
         cur.execute(selection)
         agg = cur.fetchone()
         response["average_rating"] = agg["average_rating"]

@@ -84,11 +84,13 @@ def setup_module():
     # create translation feedback table
     create_translation_feedback_table_query = """
     CREATE TABLE IF NOT EXISTS translation_feedback (
-        translation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        feedback_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+        translation_id INT NOT NULL,
         user_id INT NOT NULL,
         star_rating INT CHECK (star_rating BETWEEN 1 AND 5),
         note VARCHAR(150),
         submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (translation_id) REFERENCES translation_history(translation_id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
     )
     """
@@ -181,7 +183,7 @@ def setup_module():
         translated = "console.log('Hello world " + i + "!');"
         cursor.execute("INSERT INTO translation_history(user_id, source_language, original_code, target_language, translated_code, status, total_tokens) VALUES (%s, %s, %s, %s, %s, %s, %s)", (1, "python", original, "javascript", translated, "stop", 85))
 
-    cursor.execute("INSERT INTO translation_feedback(user_id, star_rating, note) VALUES(%s, %s, %s)", (1, 5, "note"))
+    # cursor.execute("INSERT INTO translation_feedback(user_id, star_rating, note) VALUES(%s, %s, %s)", (1, 5, "note"))
 
     # save changes and close
     connection.commit()
