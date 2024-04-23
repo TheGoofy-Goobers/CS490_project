@@ -147,7 +147,7 @@ const ChangePassword = () => {
                                     className="login-form-control"
                                 />
                                 <div className="login-button-container">
-                                    <button type="submit" className="login-form-button">Submit</button>
+                                    <button type="submit" className="login-form-button-regular">Submit</button>
                                 </div>
                             </div>
                         </div>

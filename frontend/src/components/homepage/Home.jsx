@@ -6,7 +6,6 @@ import py from './Image 10.webp';
 import cprog from './Image 11.webp';
 import jav from './Image 12.webp';
 import { Link } from 'react-router-dom';
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { FLASK_URL, setLocal, isExpired, Logout, isLoggedIn } from '../../vars';
