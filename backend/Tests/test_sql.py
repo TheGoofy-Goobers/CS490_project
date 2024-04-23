@@ -240,7 +240,7 @@ class TestSql:
             cur.close()
 
     @pytest.mark.parametrize("user_id,srcLang,message,toLang,translation", [(1, "python", "print('Hi')", "javascript", "console.log('Hi')")])
-    def test_translate_sql(self, user_id, srcLang, message, toLang, translation):
+    def test_translate_log_translate_errors_and_delete_translation_sql(self, user_id, srcLang, message, toLang, translation):
         cur = connection.cursor(dictionary=True)
 
         #Testing initial check for rate limit
@@ -284,6 +284,7 @@ class TestSql:
             entry = cur.fetchone()
             assert entry
             assert entry["translated_code"] == translation and entry["total_tokens"] == 85
+            translation_id = entry["translation_id"]
         except Exception as e:
             cur.close()
             assert str(e) and False
@@ -320,6 +321,23 @@ class TestSql:
         except Exception as e:
             cur.close()
             assert str(e) and False 
+        
+        ids = [translation_id, 12123] #random id
+        deletion = "DELETE FROM translation_history WHERE user_id=%s AND ("
+        for i in range(len(ids)):
+            deletion += "translation_id=%s OR "
+        deletion = deletion.strip(" OR ")
+        deletion += ")"
+
+        try:
+            cur.execute(deletion, (user_id, *ids))
+            connection.commit()
+            cur.execute("SELECT * FROM translation_history WHERE user_id=%s AND original_code=%s", (user_id, message)) # This entry should have been removed
+            entry = cur.fetchone()
+            assert not entry
+        except Exception as e:
+            cur.close()
+            assert str(e) and False
 
         cur.close()
     

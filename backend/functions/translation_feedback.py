@@ -10,7 +10,7 @@ def submit_feedback(mysql: MySQL) -> dict:
 
     if 'sessionToken' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
         response['hasError'] = True
-        response['errorMessage'] = "Hamdi Error"
+        response['errorMessage'] = "Unexpected Error"
         return response
     
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])

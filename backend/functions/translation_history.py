@@ -1,6 +1,8 @@
 from flask import request
 import json
 from functions import get_user_id
+from functions.cache import translation_cache, Translations, translation_cache_lock
+import datetime
 
 def get_translation_history(mysql):
     response = {"hasError": False}
@@ -25,11 +27,21 @@ def get_translation_history(mysql):
         response['logout'] = True
         return response
 
+    with translation_cache_lock:
+        if user_id in translation_cache:
+            history = translation_cache[user_id]
+            history.last_access = datetime.datetime.now()
+            response["rows"] = history.history
+            response["success"] = True
+            return response
+
     rows = None
     try:
         cur = mysql.connection.cursor()
-        cur.execute("SELECT source_language, original_code, target_language, translated_code, submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
+        cur.execute("SELECT translation_id, source_language, original_code, target_language, translated_code, submission_date FROM translation_history WHERE user_id=%s ORDER BY submission_date DESC", (user_id,))
         rows = cur.fetchall()
+        with translation_cache_lock:
+            translation_cache[user_id] = Translations(user_id, rows)
     except Exception as e:
         cur.close()
         response["hasError"] = True

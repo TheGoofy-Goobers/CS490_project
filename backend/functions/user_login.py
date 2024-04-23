@@ -3,6 +3,7 @@ import json
 from flask import request
 from functions.validation import validate_username, validate_email
 import uuid
+from functions.cache import id_cache, User, id_cache_lock
 
 def login(mysql: MySQL) -> dict:
     response = {"hasError" : False}
@@ -63,8 +64,18 @@ def login(mysql: MySQL) -> dict:
 
     id = str(uuid.uuid4())
     try:
+        cur.execute("SELECT session_token FROM logged_in WHERE user_id=%s", (user["user_id"],))
+        old_login = cur.fetchone()
+        if old_login:
+            old_id = old_login["session_token"]
+            with id_cache_lock:
+                if old_id in id_cache:
+                    id_cache.pop(old_id)
+
         cur.execute("DELETE FROM logged_in WHERE user_id=%s", (user["user_id"],))
         cur.execute("INSERT INTO logged_in(user_id, session_token) VALUES(%s, %s)", (user["user_id"], id))
+        with id_cache_lock:
+            id_cache[id] = User(id, user["user_id"])
         mysql.connection.commit()
     except:
         mysql.connection.rollback()

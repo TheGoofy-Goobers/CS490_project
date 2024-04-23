@@ -36,7 +36,7 @@ class TestTranslate:
         return app.test_cli_runner()
     
     # The translated_before variable is a boolean just intended to change the behavior of the test's monkeypatch for cur.execute()
-    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken,translated_before", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", False), ("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", True)])
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken,translated_before", [("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", False), ("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2", True)])
     def test_translation_success(self, client, text, srcLang, toLang, sessionToken, translated_before, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
@@ -77,7 +77,7 @@ class TestTranslate:
         assert response["output"] == "System.out.println(\"hello world!\");"
 
 
-    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_database_connection_error(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",
@@ -118,7 +118,7 @@ class TestTranslate:
         assert "errorMessage" in response and response["errorMessage"] == "Database connection error."
 
 
-    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_api_connection_error(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         def seeded_error(self, model, messages, max_tokens, temperature):
             raise openai.APIConnectionError(message="GPT API connection error.", request=None)
@@ -136,7 +136,7 @@ class TestTranslate:
         assert "success" not in response
         assert "apiErrorMessage" in response and response["apiErrorMessage"] == "GPT API connection error."
 
-    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "python", "java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
+    @pytest.mark.parametrize("text,srcLang,toLang,sessionToken", [("print('hello world!')", "Python", "Java", "cbcc70c5-a45c-48e0-83df-b9714c9122a2")])
     def test_translation_rate_limit(self, client, text, srcLang, toLang, sessionToken, monkeypatch):
         choices = [MockGpt.completion_choice_builder(
             finish_reason="stop",

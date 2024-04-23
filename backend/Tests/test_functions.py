@@ -3,7 +3,7 @@ import pytest
 from flask_mysqldb import MySQL
 from Tests.Mocks.MockFlaskMysql import MockFlaskMysqlConnection, MockFlaskMysqlCursor
 from app import create_app
-import json
+import datetime
 import requests
 from requests import Response
 
@@ -47,7 +47,7 @@ class TestFunctions:
 
         #Test success
         monkeypatch.setattr(MockFlaskMysqlCursor, "execute", lambda self, query, format=None: None)
-        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1})
+        monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", lambda self: {"user_id": 1, "login_date": datetime.datetime.now()})
 
         user_id, error = get_user_id.get_user_id(mysql, "some token")
 

@@ -103,7 +103,7 @@ class TestRegistrationLoginLogout:
     def test_user_login_success_two_factor_disabled(self, client, username, password, key, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, {"totp": None}])
+        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None, {"totp": None}])
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
 
         response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))
@@ -118,7 +118,7 @@ class TestRegistrationLoginLogout:
     def test_user_login_success_two_factor_enabled(self, client, username, password, key, monkeypatch):
         # mocks
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
-        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, {"totp": "gAAAAABmIzSHEOp2tWCwNXilYPDIAzO4Ugp-274gAS50Dr9XsHfIDzMFPkjsrrpw5p5EkpFkj8_TgTXy8i47k3Dhq7VS6V2zyvqrOZo4sg1jmIhdKgXZs4naldLw3MKZVHn-EmcpdPcn"}])
+        mock = Mock(side_effect=[{"user_id": "1", "password" : "validPassword"}, None, {"totp": "gAAAAABmIzSHEOp2tWCwNXilYPDIAzO4Ugp-274gAS50Dr9XsHfIDzMFPkjsrrpw5p5EkpFkj8_TgTXy8i47k3Dhq7VS6V2zyvqrOZo4sg1jmIhdKgXZs4naldLw3MKZVHn-EmcpdPcn"}])
         monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
 
         response = client.post("/userLoginCredentials", data=json.dumps({"username": username, "password": password, "key": key}))

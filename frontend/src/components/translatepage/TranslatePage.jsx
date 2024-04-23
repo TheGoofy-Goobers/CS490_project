@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './TranslatePage.css';
-import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight } from 'react-icons/fa';
-import { UnControlled as CodeMirror } from 'react-codemirror2';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/material.css';
-import 'codemirror/mode/javascript/javascript.js';
-import 'codemirror/mode/python/python.js';
-import 'codemirror/mode/clike/clike.js'; // for C++
+import { FaRegClipboard, FaDownload, FaUpload, FaHistory, FaJsSquare, FaPython, FaCuttlefish, FaJava, FaRust, FaArrowRight, FaTrash } from 'react-icons/fa';
+import CodeMirror from '@uiw/react-codemirror';
+import { material } from '@uiw/codemirror-theme-material';
+import { javascript} from '@codemirror/lang-javascript';
+import { python} from '@codemirror/lang-python';
+import { java } from '@codemirror/lang-java';
+import { cpp } from '@codemirror/lang-cpp';
+import { rust } from '@codemirror/lang-rust';
+import { vscodeDark, vscodeDarkInit } from '@uiw/codemirror-theme-vscode';
 import axios from 'axios'
 import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
@@ -32,22 +34,8 @@ const TranslatePage = () => {
   const [message, setMessage] = useState('Default message');
   const [charCount, setCharCount] = useState(0); // State to track character count
   const maxCharLimit = 2375; // Define maximum character limit
+  const [showDots, setShowDots] = useState(false);
   let goodapi;
-
-  const handleBeforeChange = (editor, data, value) => {
-    // Calculate the length of the text after the change
-    const newTextLength = editor.getValue().length + value.length - data.text.join('\n').length;
-    if (newTextLength > maxCharLimit) {
-      // Prevent the change if it exceeds the limit
-      data.cancel();
-    }
-  };
-
-  const handleChange = (editor, data, value) => {
-    // Update input text and character count
-    setInputText(value);
-    setCharCount(editor.getValue().length); // Update character count based on current editor value
-  };
 
   const filterTranslationHistory = (history) => {
     return history
@@ -124,16 +112,20 @@ const TranslatePage = () => {
   
   const fileInputRef = useRef(null);
 
-  const getMode = (language) => {
+  const getLanguageExtension = (language) => {
     switch (language) {
       case 'JavaScript':
-        return 'javascript';
+        return javascript();
       case 'Python':
-        return 'python';
+        return python();
       case 'C++':
-        return 'text/x-c++src'; // Mode for C++
+        return cpp(); // Make sure you have the correct import for C++
+      case 'Java':
+        return java();
+      case 'Rust':
+        return rust(); // Assuming you find a suitable Rust extension
       default:
-        return 'javascript';
+        return javascript(); // Default case to handle any unforeseen values
     }
   };
 
@@ -311,6 +303,58 @@ const TranslatePage = () => {
     getTranslation();
   };
 
+  const confirmDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this translation?")) {
+      axios.post(`${FLASK_URL}/deleteTranslations`, {
+        sessionToken: localStorage.getItem("sessionToken"),
+        ids: [id]
+      }).then(response => {
+        if (response.data.success) {
+          const updatedHistory = translationHistory.filter(item => item.translation_id !== id);
+          setTranslationHistory(updatedHistory);
+          // Clear the input and output if the deleted translation was displayed
+          if (inputText || outputText) {
+            const currentDisplayed = translationHistory.find(item => item.translation_id === id);
+            if (currentDisplayed && (inputText === currentDisplayed.original_code && outputText === currentDisplayed.translated_code)) {
+              setInputText('');
+              setOutputText('');
+            }
+          }
+          alert("Translation deleted successfully.");
+        } else {
+          alert("Failed to delete translation: " + response.data.errorMessage);
+        }
+      }).catch(error => {
+        console.error("Deletion error:", error);
+      });
+    }
+  };
+
+  const confirmClearAll = () => {
+    if (window.confirm("Are you sure you want to clear all translation history?")) {
+      axios.post(`${FLASK_URL}/deleteTranslations`, {
+        sessionToken: localStorage.getItem("sessionToken"),
+        ids: "all"
+      }).then(response => {
+        if (response.data.success) {
+          setTranslationHistory([]); // Clear the history
+          setInputText(''); // Clear input text box
+          setOutputText(''); // Clear output text box
+          alert("All translations have been deleted.");
+        } else {
+          alert("Failed to clear translations: " + response.data.errorMessage);
+        }
+      }).catch(error => {
+        console.error("Clear all error:", error);
+      });
+    }
+  };
+
+  const handleDeleteClick = (event, id) => {
+    event.stopPropagation(); // This stops the click from affecting parent elements
+    confirmDelete(id);
+  };
+
   var res
   const getTranslation = () => {
     setIsLoading(true);
@@ -324,7 +368,6 @@ const TranslatePage = () => {
     axios.post(`${FLASK_URL}/translate`, message)
       .then((response) => {
         res = response.data
-        // TODO: Handle other data being sent from backend
         if (res.success) {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
@@ -394,61 +437,112 @@ const TranslatePage = () => {
       {<AlertBox message={message} isOpen={alertOpen} />}
         <div className="sidebar-container">
         <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} data-testid="history-button">
-          <FaHistory className="history-icon" />
+          <FaHistory className="history-icon" title="Translation History" />
         </button>
         {showSidebar && (
-        <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
-          <div className="sorting-controls">
-            <div className="sort-by-date">
-              <label htmlFor="dateFilter">Date:</label>
-              <select id="dateFilter" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="form-control">
-                <option value="">All Dates</option>
-                <option value="Today">Today</option>
-                <option value="Yesterday">Yesterday</option>
-                <option value="Previous 30 Days">Previous 30 Days</option>
-              </select>
+          <div className={`sidebar ${showSidebar ? 'show-sidebar' : ''}`}>
+            <div className="sorting-controls">
+              <div className="sort-by-date">
+                <label htmlFor="dateFilter">Date:</label>
+                <select
+                  id="dateFilter"
+                  value={dateFilter}
+                  onChange={(e) => setDateFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="date-filter"
+                >
+                  <option value="">All Dates</option>
+                  <option value="Today">Today</option>
+                  <option value="Yesterday">Yesterday</option>
+                  <option value="Previous 30 Days">Previous 30 Days</option>
+                </select>
+              </div>
+              <div className="sort-by-source-language">
+                <label htmlFor="sourceLanguageFilter">Source Language:</label>
+                <select
+                  id="sourceLanguageFilter"
+                  value={sourceLanguageFilter}
+                  onChange={(e) => setSourceLanguageFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="source-language-filter"
+                >
+                  <option value="">All Languages</option>
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
+                  <option value="Java">Java</option>
+                  <option value="Rust">Rust</option>
+                </select>
+              </div>
+              <div className="sort-by-target-language">
+                <label htmlFor="targetLanguageFilter">Target Language:</label>
+                <select
+                  id="targetLanguageFilter"
+                  value={targetLanguageFilter}
+                  onChange={(e) => setTargetLanguageFilter(e.target.value)}
+                  className="form-control"
+                  data-testid="target-language-filter"
+                >
+                  <option value="">All Languages</option>
+                  <option value="JavaScript">JavaScript</option>
+                  <option value="Python">Python</option>
+                  <option value="C++">C++</option>
+                  <option value="Java">Java</option>
+                  <option value="Rust">Rust</option>
+                </select>
+              </div>
             </div>
-            <div className="sort-by-source-language">
-              <label htmlFor="sourceLanguageFilter">Source Language:</label>
-              <select id="sourceLanguageFilter" value={sourceLanguageFilter} onChange={(e) => setSourceLanguageFilter(e.target.value)} className="form-control">
-                <option value="">All Languages</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="C++">C++</option>
-                <option value="Java">Java</option>
-                <option value="Rust">Rust</option>
-              </select>
-            </div>
-            <div className="sort-by-target-language">
-              <label htmlFor="targetLanguageFilter">Target Language:</label>
-              <select id="targetLanguageFilter" value={targetLanguageFilter} onChange={(e) => setTargetLanguageFilter(e.target.value)} className="form-control">
-                <option value="">All Languages</option>
-                <option value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-                <option value="C++">C++</option>
-                <option value="Java">Java</option>
-                <option value="Rust">Rust</option>
-              </select>
-            </div>
-          </div>
 
-        <p className="translation-history-title">Translation History</p>
-        {Object.entries(groupByDate).map(([date, items], dateIndex) => (
-          <div key={dateIndex}>
-            <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
-            {items.map((item, itemIndex) => (
-              <div key={itemIndex} className="history-item" data-testid="history-item" onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}>
-                {getLanguageIconElement(item.source_language)}
-                <span className="source-language">{item.source_language}</span>
-                <FaArrowRight className="arrow-icon" />
-                {getLanguageIconElement(item.target_language)}
-                <span className="target-language">{item.target_language}</span>
+            <div
+              className="translation-history-title"
+              onMouseOver={() => setShowDots(true)}
+              onMouseOut={() => setShowDots(false)}
+              data-testid="translation-history-title"
+            >
+              <div className="translation-history-title" onMouseOver={() => setShowDots(true)} onMouseOut={() => setShowDots(false)}>
+                Translation History
+                {showDots && (
+                  <FaTrash
+                    className="dots-icon"
+                    onClick={confirmClearAll}
+                    data-testid="clear-all-icon" // Add a consistent data-testid
+                    title="Clear Translation History"
+                  />
+                )}
+              </div>
+            </div>
+
+            {Object.entries(groupByDate).map(([date, items], dateIndex) => (
+              <div key={dateIndex}>
+                <div className={`${date.toLowerCase().replace(/\s/g, '-')}-section section-title`}>{date}</div>
+                {items.map((item, itemIndex) => (
+                  <div
+                    key={itemIndex}
+                    className="history-item"
+                    data-testid={`history-item-${item.translation_id}`} // Make it unique
+                    onClick={() => populateCodeMirror(item.original_code, item.translated_code, item.source_language, item.target_language)}
+                  >
+                    {getLanguageIconElement(item.source_language)}
+                    <span className="source-language">{item.source_language}</span>
+                    <FaArrowRight className="arrow-icon" />
+                    {getLanguageIconElement(item.target_language)}
+                    <span className="target-language">{item.target_language}</span>
+                    <FaTrash
+                      className="delete-icon"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleDeleteClick(event, item.translation_id);
+                      }}
+                      data-testid={`delete-button-${item.translation_id}`} // Make it unique
+                      title="Delete Translation"
+                    />
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        ))}
-      </div>      
-      )}
+        )}
+
       </div>
         <div className="container main-content">
           <div className="status">
@@ -464,7 +558,17 @@ const TranslatePage = () => {
                     className="form-control"
                     id="sourceLanguage"
                     value={sourceLanguage}
-                    onChange={(e) => setSourceLanguage(e.target.value)}
+                    onChange={(e) => {
+                      // Set the new source language
+                      setSourceLanguage(e.target.value);
+                      
+                      // Clear the input text and reset the character count
+                      setInputText('');
+                      setCharCount(0);
+                      
+                      // Optionally clear the output text if you also want to clear translations
+                      setOutputText('');
+                    }}
                   >
                     <option value="JavaScript">JavaScript</option>
                     <option value="Python">Python</option>
@@ -483,16 +587,23 @@ const TranslatePage = () => {
 
                 />
               </div>
+              <div className="custom-codemirror-wrapper">
+              
               <CodeMirror
                 value={inputText}
-                options={{
-                  mode: getMode(sourceLanguage),
-                  theme: 'material',
-                  lineNumbers: true,
+                theme={vscodeDark}
+                extensions={[getLanguageExtension(sourceLanguage)]}
+                onChange={(value) => {
+                  if (value.length <= maxCharLimit) {
+                    setInputText(value)
+                    setCharCount(value.length)
+                  }
                 }}
-                beforeChange={handleBeforeChange}
-                onChange={handleChange}
+                testIdSuffix="input"
+                basicSetup={{ lineNumbers: true }}
               />
+              
+              </div>
               <div className="char-count">Characters: {charCount}/{maxCharLimit}</div> {/* Display character count */}
             </div>
             <div className="code-box output-box">
@@ -513,15 +624,18 @@ const TranslatePage = () => {
                 </select>
               </div>
               <div className="position-relative textarea-container">
-                <CodeMirror
-                  value={outputText}
-                  options={{
-                    mode: getMode(targetLanguage),
-                    theme: 'material',
-                    lineNumbers: true,
-                    readOnly: true,
-                  }}
-                />
+              <div className="custom-codemirror-wrapper">
+              <CodeMirror
+                value={outputText}
+                theme={vscodeDark}
+                extensions={[
+                  getLanguageExtension(targetLanguage) // This function will select the proper language mode
+                ]}
+                testIdSuffix="output"
+                editable={true} // Makes the editor read-only
+                basicSetup={{ lineNumbers: true }} // Line numbers and other basic setups
+              />
+              </div>
                 <div className="icons">
                   <FaRegClipboard className="icon" onClick={handleCopyToClipboard} title="Copy to Clipboard" />
                   <FaDownload className="icon" onClick={handleDownloadCode} title="Download Code" />
