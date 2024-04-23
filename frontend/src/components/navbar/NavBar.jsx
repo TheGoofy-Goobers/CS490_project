@@ -1,10 +1,10 @@
 import { React, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo3 from './logo3.png';
+import logo3 from './logo3.webp';
 import './NavBar.css';
-import profile from '../translatepage/Profile.png';
-import github from '../translatepage/github-logo.png';
+import profile from './Profile.png'; 
 import MiniMenu from './MiniMenu';
+import LazyImage from './LazyImage';
 
 const NavBar = () => {
 
@@ -20,7 +20,7 @@ const isLoggedIn = localStorage.getItem("isLoggedIn");
       <div className="nav-bar-banner">
         <div className="nav-bar-logo-container">
           <Link to={'/'} data-testid='lin'>
-            <img src={logo3} height={80} alt="Logo"/>
+            <LazyImage src={logo3} alt="Logo" width="200px" height="90px" />
           </Link>
         </div>
         <div className="nav-bar-links">
