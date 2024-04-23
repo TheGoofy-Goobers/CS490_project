@@ -61,3 +61,10 @@ def submit_feedback(mysql: MySQL) -> dict:
         return response
 
     return response
+
+def submit_feedback(mysql: MySQL) -> dict:
+    response = {"hasError": False}
+
+    responseJson = json.loads(request.data.decode())
+    
+    pass
