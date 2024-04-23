@@ -100,6 +100,7 @@ const RegistrationPage = () => {
       res = response.data
       if (res.success) {
         setLocal(res.sessionToken, user.username, Math.floor(Date.now() / 1000))
+        localStorage.setItem("isLoggedIn", true);
         delete user.username 
         delete user.email
         alert('Registration Success!')
@@ -133,7 +134,7 @@ const RegistrationPage = () => {
     })
   }
 
-  if(localStorage.getItem("isLoggedIn")) window.location.assign(`${SITE_URL}?redirect=true`)
+  if ((localStorage.getItem("isLoggedIn") === "true")) window.location.assign(`${SITE_URL}?redirect=true`)
   else
   {  
     return (

@@ -82,7 +82,7 @@ const ChangePassword = () => {
                     delete newPass.conf;
                     delete newPass.current;
                     delete newPass.new;
-                    setMessage(`NEW PASSWORD CHANGED SUCCESSFUL!`);
+                    setMessage(`Password changed successfuly!`);
                     showAlert()
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
@@ -111,8 +111,8 @@ const ChangePassword = () => {
             {<AlertBox message={message} isOpen={alertOpen} />}
             <div className="delete-box-container">
                 <div className='login-form-box'>
-                    <form onSubmit={handlePassSubmit}>i 
-                        <div className='change_password'>
+                    <form onSubmit={handlePassSubmit}> 
+                        <div>
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
                             <div className="login-form-group">
