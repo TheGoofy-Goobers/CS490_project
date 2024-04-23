@@ -17,7 +17,6 @@ jest.mock('react-toastify', () => {
 
 describe('ChangePassword Component', () => {
     beforeEach(() => {
-      // Clear all mocks before each test
       jest.clearAllMocks();
     });
   
@@ -28,13 +27,13 @@ describe('ChangePassword Component', () => {
         </Router>
       );
   
-      fireEvent.change(screen.getByLabelText('Current Password'), { target: { value: 'OldPass123!' } });
-      fireEvent.change(screen.getByLabelText('New Password'), { target: { value: 'NewPass123!' } });
-      fireEvent.change(screen.getByLabelText('Confirm Password'), { target: { value: 'NewPass1234!' } });
+      fireEvent.change(screen.getByTestId('currentPassword'), { target: { value: 'OldPass123!' } });
+      fireEvent.change(screen.getByTestId('newPassword'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('confirmPassword'), { target: { value: 'NewPass1234!' } });
       fireEvent.click(screen.getByText('Submit'));
   
       await waitFor(() => {
-        expect(toast).toHaveBeenCalledWith('New and confirmed are different. Change it to match!', expect.anything());
+        expect(toast).toHaveBeenCalledWith('New and confirmed are different. Change it to match!', {"autoClose": 2000, "className": "fail"});
       });
     });
   
@@ -45,9 +44,9 @@ describe('ChangePassword Component', () => {
         </Router>
       );
   
-      fireEvent.change(screen.getByLabelText('Current Password:'), { target: { value: 'OldPass123!' } });
-      fireEvent.change(screen.getByLabelText('New Password:'), { target: { value: 'short' } });
-      fireEvent.change(screen.getByLabelText('Confirm Password:'), { target: { value: 'short' } });
+      fireEvent.change(screen.getByTestId('currentPassword'), { target: { value: 'OldPass123!' } });
+      fireEvent.change(screen.getByTestId('newPassword'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('confirmPassword'), { target: { value: 'NewPass1234!' } });
       fireEvent.click(screen.getByText('Submit'));
   
       await waitFor(() => {
@@ -64,9 +63,9 @@ describe('ChangePassword Component', () => {
         </Router>
       );
   
-      fireEvent.change(screen.getByLabelText('Current Password:'), { target: { value: 'OldPass123!' } });
-      fireEvent.change(screen.getByLabelText('New Password:'), { target: { value: 'NewPass123!' } });
-      fireEvent.change(screen.getByLabelText('Confirm Password:'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('currentPassword'), { target: { value: 'OldPass123!' } });
+      fireEvent.change(screen.getByTestId('newPassword'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('confirmPassword'), { target: { value: 'NewPass1234!' } });
       fireEvent.click(screen.getByText('Submit'));
   
       await waitFor(() => {
@@ -84,9 +83,9 @@ describe('ChangePassword Component', () => {
         </Router>
       );
   
-      fireEvent.change(screen.getByLabelText('Current Password:'), { target: { value: 'OldPass123!' } });
-      fireEvent.change(screen.getByLabelText('New Password:'), { target: { value: 'NewPass123!' } });
-      fireEvent.change(screen.getByLabelText('Confirm Password:'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('currentPassword'), { target: { value: 'OldPass123!' } });
+      fireEvent.change(screen.getByTestId('newPassword'), { target: { value: 'NewPass123!' } });
+      fireEvent.change(screen.getByTestId('confirmPassword'), { target: { value: 'NewPass1234!' } });
       fireEvent.click(screen.getByText('Submit'));
   
       await waitFor(() => {

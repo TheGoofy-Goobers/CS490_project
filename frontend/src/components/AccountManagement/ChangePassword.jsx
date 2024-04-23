@@ -78,7 +78,9 @@ const ChangePassword = () => {
                         autoClose: 2000
                       });
                 }
-                if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+                if (res.hasError){ 
+                    console.log(`Error response: ${res.errorMessage}`); 
+                    }
                 console.log(`Response has error: ${res.hasError}`);
                 if (res.logout) {
                     toast(`Session expired. Please login again.`, {
@@ -113,8 +115,9 @@ const ChangePassword = () => {
                             <h2>Change Password</h2>
                             <p className="note">Password must be at least 8 characters long, have a special character, and number</p>
                             <div className="login-form-group">
-                                <label htmlFor='Current Password' data>Current Password:</label>
+                                <label >Current Password:</label>
                                 <input
+                                    data-testid="currentPassword"
                                     type="password"
                                     name="current"
                                     value={newPass.current}
@@ -123,8 +126,9 @@ const ChangePassword = () => {
                                 />
                             </div>
                             <div className="login-form-group">
-                                <label>New Password:</label>
+                                <label htmlFor='New Password'>New Password:</label>
                                 <input
+                                    data-testid="newPassword"
                                     type="password"
                                     name="new"
                                     value={newPass.new}
@@ -135,6 +139,7 @@ const ChangePassword = () => {
                             <div className="login-form-group">
                                 <label>Confirm Password:</label>
                                 <input
+                                    data-testid="confirmPassword"
                                     type="password"
                                     name="conf"
                                     value={newPass.conf}

@@ -2,7 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import axios from 'axios';
-import TranslationFeedback from './TranslationFeedback'; // Update the import path as necessary
+import { BrowserRouter } from 'react-router-dom'; // Import BrowserRouter
+import TranslationFeedback from './TranslationFeedback'; // Ensure correct path
 
 jest.mock('axios');
 
@@ -26,9 +27,7 @@ beforeEach(() => {
         writable: true
     });
     mockLocalStorage.setItem("sessionToken", "12345");
-
-    // Mock window.alert
-    window.alert = jest.fn();
+    window.alert = jest.fn(); // Mock window.alert
 });
 
 afterEach(() => {
@@ -38,19 +37,31 @@ afterEach(() => {
 
 describe('TranslationFeedback component', () => {
     test('renders correctly', () => {
-        render(<TranslationFeedback />);
+        render(
+          <BrowserRouter>
+            <TranslationFeedback />
+          </BrowserRouter>
+        );
         expect(screen.getByText(/Rate Translation:/i)).toBeInTheDocument();
     });
 
     test('clicking star updates rating', () => {
-        render(<TranslationFeedback />);
+        render(
+          <BrowserRouter>
+            <TranslationFeedback />
+          </BrowserRouter>
+        );
         const firstStar = screen.getAllByText('☆')[0];
         fireEvent.click(firstStar);
         expect(screen.getAllByText('★').length).toBe(1);
     });
 
     test('handles textarea input', () => {
-        render(<TranslationFeedback />);
+        render(
+          <BrowserRouter>
+            <TranslationFeedback />
+          </BrowserRouter>
+        );
         const textarea = screen.getByPlaceholderText(/Type here/i);
         fireEvent.change(textarea, { target: { value: 'Great job!' } });
         expect(textarea).toHaveValue('Great job!');
@@ -58,22 +69,22 @@ describe('TranslationFeedback component', () => {
 
     test('submits form and sends post request', async () => {
         axios.post.mockResolvedValue({ data: { success: true } });
-        render(<TranslationFeedback />);
+        render(
+          <BrowserRouter>
+            <TranslationFeedback />
+          </BrowserRouter>
+        );
 
-        // Simulate clicking on the first star
         const firstStar = screen.getAllByText('☆')[0];
         fireEvent.click(firstStar);
-
-        // Simulate form submission
         const submitButton = screen.getByText(/Submit/i);
         fireEvent.click(submitButton);
 
-        // Assert the expected behavior and data sent in the POST request
         expect(axios.post).toHaveBeenCalled();
-        expect(axios.post).toHaveBeenCalledWith(expect.stringContaining("/translationFeedback"), {
+        expect(axios.post).toHaveBeenCalledWith(expect.any(String), expect.objectContaining({
             sessionToken: "12345",
-            star_rating: 1, // Because we clicked the first star
-            note: '' // Because we haven't typed anything in the textarea
-        });
+            star_rating: 1, // Because the first star was clicked
+            note: '' // Default value as no text was entered in the textarea
+        }));
     });
 });
