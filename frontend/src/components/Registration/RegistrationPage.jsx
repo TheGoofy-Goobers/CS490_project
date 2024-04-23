@@ -179,7 +179,7 @@ const RegistrationPage = () => {
     return (
       <div className="registration-page-container">
         <div className="registration-form-box">
-        <ToastContainer position='top-center'/>
+        <ToastContainer position='top-center' style={{ zIndex: 1100 }}/>
           <form onSubmit={handleSubmit}>
             <h2 className="registration-form-title">Register</h2>
             <div className="registration-form-group">
