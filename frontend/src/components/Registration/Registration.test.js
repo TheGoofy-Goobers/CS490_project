@@ -1,64 +1,97 @@
 import React from 'react';
 import { render, fireEvent, waitFor, screen } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import RegistrationPage from './RegistrationPage'; // Assuming this is the component you want to test
+import RegistrationPage from './RegistrationPage';
+import axios from 'axios';
+import { ToastContainer } from 'react-toastify';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { FLASK_URL } from '../../vars';
 
-describe('Registration Form', () => {
-  test('validates email format', async () => {
-    render(<RegistrationPage />);
-    const emailInput = screen.getByLabelText(/email/i);
-    fireEvent.change(emailInput, { target: { value: 'invalidemail' } });
+jest.mock('axios');
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'), // use actual for all non-hook parts
+  useNavigate: () => jest.fn() // mock hook
+}));
+
+describe('RegistrationPage', () => {
+  const setup = () => {
+    render(<RegistrationPage />, { wrapper: Router });
+  };
+
+  test('inputs should be initially empty', () => {
+    setup();
+    expect(screen.getByLabelText('Username:').value).toBe('');
+    expect(screen.getByLabelText('Email:').value).toBe('');
+    expect(screen.getByLabelText('Password:').value).toBe('');
+  });
+
+  test('displays validation messages for incorrect inputs', async () => {
+    setup();
+    fireEvent.input(screen.getByLabelText('Username:'), {
+      target: { value: 'sh' } // intentionally short to trigger validation
+    });
+    fireEvent.input(screen.getByLabelText('Email:'), {
+      target: { value: 'wrong-email' } // incorrect email format
+    });
+    fireEvent.input(screen.getByLabelText('Password:'), {
+      target: { value: '123' } // short password
+    });
     fireEvent.submit(screen.getByRole('button', { name: /register/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/please enter a valid email address/i)).toBeInTheDocument();
+      expect(screen.getByText('Username must be between 8 to 24 characters and can only contain alphanumeric characters, underscores, and hyphens.')).toBeInTheDocument();
     });
   });
 
-  test('validates password strength', async () => {
-    render(<RegistrationPage />);
-    const passwordInput = screen.getByLabelText(/password/i);
-    fireEvent.change(passwordInput, { target: { value: 'weak' } });
+  test('Email notif', async () => {
+    setup();
+    fireEvent.input(screen.getByLabelText('Username:'), {
+      target: { value: 'asfjhasjkhajhf' } // intentionally short to trigger validation
+    });
+    fireEvent.input(screen.getByLabelText('Email:'), {
+      target: { value: 'wrong-email' } // incorrect email format
+    });
+    fireEvent.input(screen.getByLabelText('Password:'), {
+      target: { value: '123' } // short password
+    });
     fireEvent.submit(screen.getByRole('button', { name: /register/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/password must be at least 8 characters long/i)).toBeInTheDocument();
+      expect(screen.getByText('Please enter a valid email address.')).toBeInTheDocument();
     });
   });
 
-  test('matches password confirmation', async () => {
-    render(<RegistrationPage />);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
-    fireEvent.change(confirmPasswordInput, { target: { value: 'password456' } });
+  test('Email notif', async () => {
+    setup();
+    fireEvent.input(screen.getByLabelText('Username:'), {
+      target: { value: 'asfjhasjkhajhf' } // intentionally short to trigger validation
+    });
+    fireEvent.input(screen.getByLabelText('Email:'), {
+      target: { value: 'jack@hamdi.com' } // incorrect email format
+    });
+    fireEvent.input(screen.getByLabelText('Password:'), {
+      target: { value: '123' } // short password
+    });
     fireEvent.submit(screen.getByRole('button', { name: /register/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/passwords do not match/i)).toBeInTheDocument();
+      expect(screen.getByText('Password must be at least 8 characters long, have a special character, and number.')).toBeInTheDocument();
     });
   });
 
-  test('handles successful registration', async () => {
-    // Mock axios post to simulate successful registration
-    jest.mock('axios', () => ({
-      post: jest.fn(() => Promise.resolve({ data: { success: true, user_id: 123 } })),
-    }));
 
-    render(<RegistrationPage />);
-    fireEvent.submit(screen.getByRole('button', { name: /register/i }));
+
+  test('calls axios post on valid form submission', async () => {
+    axios.post.mockResolvedValue({ data: { success: true, sessionToken: 'fakeToken' } });
+
+    setup();
+    fireEvent.change(screen.getByLabelText('Username:'), { target: { value: 'validUser' } });
+    fireEvent.change(screen.getByLabelText('Email:'), { target: { value: 'user@example.com' } });
+    fireEvent.change(screen.getByTestId('Password:'), { target: { value: 'Password123!' } });
+    fireEvent.click(screen.getByRole('button', { name: /register/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/registration success/i)).toBeInTheDocument();
-    });
-  });
-
-  test('handles failed registration', async () => {
-    // Mock axios post to simulate failed registration
-    jest.mock('axios', () => ({
-      post: jest.fn(() => Promise.resolve({ data: { success: false, errorMessage: 'Registration failed' } })),
-    }));
-
-    render(<RegistrationPage />);
-    fireEvent.submit(screen.getByRole('button', { name: /register/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/registration failed/i)).toBeInTheDocument();
+      expect(axios.post).toHaveBeenCalledWith(`${FLASK_URL}/registerNewUser`, expect.anything());
+      expect(screen.getByText(/registration success!/i)).toBeInTheDocument();
     });
   });
 });

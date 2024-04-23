@@ -32,15 +32,15 @@ const ReleaseNotes = () => {
                     <h2 className='titles'>New Features and Improvments</h2>
                     <p>We added some new features for you to enjoy, explore them in the translation, account management features and some new backend features. Read details below </p>
                     <ul>
-                        <li>Translation history now has backend cahcing making it more effiecent and less time waiting for you. Translation histroy now has the ability to delete entries or clear history all together.
+                        <li>Translation history now has backend caching making it more efficient and less time waiting for you. Translation histroy now has the ability to delete entries or clear history all together.
                             Here are some images:
                             <img src={tottime}/> <img src={caching} width='80%'/>
                         </li>
-                        <li>Docuementation has been updated with a new video make the most of your codecraft experience.</li>
-                        <li>2FA has been added with the Google Authenciator app. Try it out in the profile icon.</li>
+                        <li>Documentation has been updated with a new video make the most of your codecraft experience.</li>
+                        <li>2FA has been added with the Google Authenticator app. Try it out in the profile icon.</li>
                         <li>Improved translation for more accuracy</li>
                         <li>Improved UI look around see if you notice it.</li>
-                        <li>Upgraded code mirror to allowd for auto complete when typing out.</li>
+                        <li>Upgraded code mirror to allow for auto-complete when typing out.</li>
                     </ul>
                 </div>
             </div>
@@ -62,7 +62,7 @@ const ReleaseNotes = () => {
                     <p>Some information on our Deployment</p>
                     <ul>
                         <li>Hosted on DigitalOcean thorugh their github student package.</li>
-                        <li>Used nginx to display the static html frontend adn to reverse proxy to our backend.</li>
+                        <li>Used nginx to display the static html frontend and to reverse proxy to our backend.</li>
                         <li>Gunicorn hosts our backend flask for a WSGI server.</li>
                         <li>MySQL database is also deployed by DigitalOcean but configured by us.</li>
                     </ul>
@@ -74,8 +74,8 @@ const ReleaseNotes = () => {
                     <h2 className='titles'>Future Possiblities</h2>
                     <p>We have some potienal new paths for upgrading our new </p>
                     <ul>
-                        <li>Load testing is a important part of scalability so if you are intreseted go to the <Link to={'/releasenotes/loadtesting'} style={{color: 'blue', textDecoration: 'underline'}}>Load Testing</Link></li>
-                        <li>UCreating a more robust server for our MySQL server </li>
+                        <li>Load testing is a important part of scalability so if you are interested go to the <Link to={'/releasenotes/loadtesting'} style={{color: 'blue', textDecoration: 'underline'}}>Load Testing</Link></li>
+                        <li>Creating a more robust server for our MySQL server </li>
                         <li>Including more languages such as C or Rust etc.</li>
                     </ul>
                 </div>

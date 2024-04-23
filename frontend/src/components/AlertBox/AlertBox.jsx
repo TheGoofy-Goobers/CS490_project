@@ -49,7 +49,7 @@ function AlertBox({ message, isOpen }) {
   }
 
   return (
-    <div>
+    <div className="alertbox">
       {show && (
         <dialog open>
           <p>{handleResponse(message)}</p>

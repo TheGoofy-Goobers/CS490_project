@@ -27,7 +27,7 @@ function Help() {
                 <SearchBar onSearchChange={handleSearchChange} /> {/* Changed to uppercase */}
             </div>
             <div style={{ marginTop: '20px' }}>
-                <HelpContent searchQuery={searchQuery} /> 
+                <HelpContent searchQuery={searchQuery} style={{visibility:'visible'}}/> 
             </div>
             <div style={{ marginTop: '20px' }}>
                 <UserGuide/> 

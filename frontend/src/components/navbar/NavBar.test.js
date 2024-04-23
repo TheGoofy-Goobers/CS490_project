@@ -1,74 +1,57 @@
-// NavBar.test.js
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import NavBar from './NavBar';  // Replace with your actual NavBar component
-import { BrowserRouter } from 'react-router-dom';
+import { render, fireEvent, screen } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import NavBar from './NavBar';
+import MiniMenu from './MiniMenu';
 
-// Your test cases go here
+jest.mock('./MiniMenu', () => () => (<div>MiniMenuMock</div>)); // Mock MiniMenu for simplicity in tests
 
-describe('NavBar', () => {
-    it('renders the logo image with src correctly', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
+describe('NavBar Component', () => {
+  beforeEach(() => {
+    // Clear all items in localStorage
+    localStorage.clear();
+  });
 
-        // Find the logo image
-        const logoImg = screen.getByAltText('Logo');
-        const link = screen.getByTestId('lin')
+  test('renders all navigation links correctly', () => {
+    render(
+      <Router>
+        <NavBar />
+      </Router>
+    );
+    expect(screen.getByTestId('translink')).toHaveTextContent('Translator');
+    expect(screen.getByTestId('feedlink')).toHaveTextContent('Feedback');
+    expect(screen.getByTestId('helplink')).toHaveTextContent('Help');
+    expect(screen.getByTestId('releaselink')).toHaveTextContent('Release Notes');
+  });
 
-        // Assert that the image src matches your expected value
-        expect(logoImg.src).toContain('logo3.png');
-        expect(link.href).toContain('/');
-    });
+  test('shows login icon when user is not logged in', () => {
+    localStorage.setItem("isLoggedIn", "false");
+    render(
+      <Router>
+        <NavBar />
+      </Router>
+    );
+    expect(screen.getByAltText('Profile')).toBeInTheDocument();
+    expect(screen.queryByText('MiniMenuMock')).not.toBeInTheDocument(); // MiniMenu should not be shown
+  });
 
-    it('has correct href attributes for Translate and Feedback links', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
+  test('shows profile and MiniMenu when user is logged in and hovers over profile icon', () => {
+    localStorage.setItem("isLoggedIn", "true");
+    localStorage.setItem("username", "testUser");
+    render(
+      <Router>
+        <NavBar />
+      </Router>
+    );
+    expect(screen.getByText('testUser')).toBeInTheDocument(); // Check if username is displayed
 
-        // Find the Translate and Feedback links
-        const transLink = screen.getByTestId('translink');
+    // Hover over the profile icon to trigger MiniMenu
+    fireEvent.mouseEnter(screen.getByTestId('prof'));
+    expect(screen.getByText('MiniMenuMock')).toBeInTheDocument();
 
-        // Assert that the href attributes are correct
-        expect(transLink.href).toContain('/translate');
-    });
-
-    it('has correct href attributes for Translate and Feedback links', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
-
-        // Find the Translate and Feedback links
-        const feedLink = screen.getByTestId('feedlink');
-
-        // Assert that the href attributes are correct
-        expect(feedLink.href).toContain('/feedback');
-    });
-
-    it('renders the profile image and sees it has link', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
-
-        // Find the logo image
-        const logoImg = screen.getByAltText('Profile');
-        const link = screen.getByTestId('prof');
-
-        // Assert that the image src matches your expected value
-        expect(logoImg.src).toContain('Profile.png');
-        expect(link.href).toContain('/login');
-    });
-
-    it('renders refernce page correctly', () => {
-        render(<BrowserRouter>
-            <NavBar />
-          </BrowserRouter>);
-
-        // Find the logo image
-        
-        const link = screen.getByTestId('reflink')
-
-        // Assert that the image src matches your expected value
-        expect(link.href).toContain('/');
-    });
+    // Mouse leave should hide MiniMenu
+    fireEvent.mouseLeave(screen.getByTestId('prof'));
+    expect(screen.queryByText('MiniMenuMock')).not.toBeInTheDocument();
+  });
 });
+

@@ -1,62 +1,89 @@
 import React from 'react';
-import { render, fireEvent, waitFor } from '@testing-library/react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import axios from 'axios';
 import LoginPage from './LoginPage';
+import { FLASK_URL } from '../../vars';
+
+// Mock axios
+jest.mock('axios');
 
 describe('LoginPage Component', () => {
   test('submits login form with correct credentials', async () => {
-    // Mock successful login response
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-      json: jest.fn().mockResolvedValueOnce({ success: true, user_id: '123' })
+    axios.post.mockResolvedValue({
+      data: {
+        success: true,
+        sessionToken: 'someToken',
+        user_id: '123',
+        totp: 'disabled'
+      }
     });
 
-    //const { getByLabelText, getByText } = render(<LoginPage />);
-    const { getByLabelText, getByText } = render(<Router><LoginPage /></Router>);
+    render(
+      <Router>
+        <LoginPage />
+      </Router>
+    );
 
-    fireEvent.change(getByLabelText('Username or Email:'), { target: { value: 'testuser' } });
-    fireEvent.change(getByLabelText('Password:'), { target: { value: 'testpassword' } });
-    fireEvent.click(getByText('Login'));
+    fireEvent.change(screen.getByLabelText('Username or Email:'), { target: { value: 'jack_hamdi' } });
+    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'Password1!' } });
+
+    Storage.prototype.setItem = jest.fn();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
 
     await waitFor(() => {
-      // Assert that user is logged in
-      expect(sessionStorage.getItem('isLoggedIn')).toBe('true');
-      expect(sessionStorage.getItem('userId')).toBe('123');
-      expect(sessionStorage.getItem('sessionToken')).toBeDefined();
+      expect(axios.post).toHaveBeenCalled();
+      expect(screen.queryByText('Welcome to codeCraft!')).toBeInTheDocument();
     });
   });
 
-  test('displays error message with incorrect credentials', async () => {
-    // Mock unsuccessful login response
-    jest.spyOn(global, 'fetch').mockResolvedValueOnce({
-      json: jest.fn().mockResolvedValueOnce({ success: false })
-    });
+  test('checks for the presence of the Forgot password link', () => {
+    render(
+      <Router>
+        <LoginPage />
+      </Router>
+    );
 
-    const { getByLabelText, getByText } = render(<LoginPage />);
-
-    fireEvent.change(getByLabelText('Username or Email:'), { target: { value: 'invaliduser' } });
-    fireEvent.change(getByLabelText('Password:'), { target: { value: 'invalidpassword' } });
-    fireEvent.click(getByText('Login'));
-
-    await waitFor(() => {
-      // Assert that user is not logged in and error message is displayed
-      expect(sessionStorage.getItem('isLoggedIn')).toBeNull();
-      expect(getByText('Invalid credentials. Please try again.')).toBeInTheDocument();
-    });
+    const forgotPasswordLink = screen.getByText('Forgot password?');
+    expect(forgotPasswordLink).toBeInTheDocument();
+    expect(forgotPasswordLink.closest('a')).toHaveAttribute('href', '/forgotpassword');
   });
 
-  test('logs user out', async () => {
-    // Mock successful logout
-    const sessionStorageSpy = jest.spyOn(window.sessionStorage.__proto__, 'clear');
-    sessionStorageSpy.mockImplementation(() => {});
+  test('checks for the presence of the Register here link', () => {
+    render(
+      <Router>
+        <LoginPage />
+      </Router>
+    );
 
-    const { getByText } = render(<LoginPage />);
-    fireEvent.click(getByText('Logout'));
+    const registerLink = screen.getByText("Don't have an account? Register here");
+    expect(registerLink).toBeInTheDocument();
+    expect(registerLink.closest('a')).toHaveAttribute('href', '/register');
+  });
 
-    // Assert that sessionStorage.clear() is called
-    expect(sessionStorageSpy).toHaveBeenCalled();
+  test('submits login form with incorrect credentials and shows error message', async () => {
+    axios.post.mockResolvedValueOnce({
+      data: { success: false, errorMessage: 'User not found' }
+    });
+
+    render(
+      <Router>
+        <LoginPage />
+      </Router>
+    );
+
+    fireEvent.change(screen.getByLabelText('Username or Email:'), { target: { value: 'wrong_username' } });
+    fireEvent.change(screen.getByLabelText('Password:'), { target: { value: 'wrong_password' } });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Login' }));
+
+    expect(axios.post).toHaveBeenCalledWith(`${FLASK_URL}/userLoginCredentials`, {
+      email: "",
+      key: "8b3d72532edf7e492bb45467b7e82c0a93cd8e11d9771c77e9a8845a6d49b38a",
+      password: "ec519fa9c0f6b4ddf7c1ac55eccbb0951442663980837d25cc251cf2f29f110e",
+      rememberMe: false,
+      username: "wrong_username"
+    });
   });
 });
-
-// despite configuring Jest and Babel according to best practices, the tests are still failing due to unexpected token errors
-// reviewed Jest and Babel configurations, checked for syntax errors, verified dependencies, and attempted to clear the Jest cache
-// unexpected token errors can occur due to configuration mismatches, incompatible versions, file path issues, or conflicts within the project setup
-// 

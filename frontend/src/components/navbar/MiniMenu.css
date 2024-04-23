@@ -66,3 +66,6 @@
  font-weight: bolder;
 }
 
+.mini-menu{
+   z-index: 2;
+}

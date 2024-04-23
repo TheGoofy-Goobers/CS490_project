@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import TranslatePage from './TranslatePage';
 import axios from 'axios';
 import { FLASK_URL } from '../../vars';
@@ -87,7 +88,11 @@ jest.mock('@uiw/react-codemirror', () => {
 
 describe('TranslatePage Component', () => {
   test('renders correctly', () => {
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     expect(screen.getByText('Input')).toBeInTheDocument();
     expect(screen.getByText('Output')).toBeInTheDocument();
     expect(screen.getByText('Source Language')).toBeInTheDocument();
@@ -96,7 +101,11 @@ describe('TranslatePage Component', () => {
   
 
   test('copies text to clipboard', async () => {
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     fireEvent.click(screen.getByTitle('Copy to Clipboard'));
     await waitFor(() => expect(navigator.clipboard.writeText).toHaveBeenCalled());
   });
@@ -104,7 +113,11 @@ describe('TranslatePage Component', () => {
   test('downloads the code', () => {
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     const translateButton = screen.getByText('Get Translation');
     fireEvent.click(translateButton);
     const downloadButton = screen.getByTitle('Download Code');
@@ -115,7 +128,11 @@ describe('TranslatePage Component', () => {
   });
 
   test('allows code input and language selection', async () => {
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: 'function test() {}' } });
     expect(inputCodeMirror.value).toBe('function test() {}');
@@ -131,7 +148,11 @@ describe('TranslatePage Component', () => {
   });
 
   test('validates language selection and code input', async () => {
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: 'console.log("Hello World");' } });
     expect(inputCodeMirror.value).toBe('console.log("Hello World");');
@@ -144,7 +165,11 @@ describe('TranslatePage Component', () => {
   test('downloads long text as a file', () => {
     global.URL.createObjectURL = jest.fn();
     global.URL.revokeObjectURL = jest.fn();
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     const inputCodeMirror = screen.getByTestId('codemirror-input-input');
     fireEvent.change(inputCodeMirror, { target: { value: longText } });
     const downloadButton = screen.getByTitle('Download Code');
@@ -155,7 +180,11 @@ describe('TranslatePage Component', () => {
   });
 
   test('triggers file input when upload button is clicked', () => {
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     const fileInput = screen.getByTestId('fileInput');
     const clickSpy = jest.spyOn(fileInput, 'click');
     const uploadButton = screen.getByTitle('Upload File');
@@ -182,7 +211,11 @@ describe('TranslatePage Component', () => {
     axios.get.mockResolvedValueOnce({ data: historyData });
   
     // Act
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     fireEvent.click(screen.getByTestId('history-button')); // Open the history sidebar
   
     // Assert 'Today' section is present after the initial render
@@ -215,7 +248,11 @@ describe('TranslatePage Component', () => {
     axios.get.mockResolvedValueOnce({ data: historyData });
 
     // Act
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
 
     // Open the history sidebar to make the filter controls visible
     fireEvent.click(screen.getByTestId('history-button'));
@@ -249,8 +286,11 @@ describe('TranslatePage Component', () => {
     axios.get.mockResolvedValueOnce({ data: historyData });
   
     // Act
-    render(<TranslatePage />);
-  
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     // Open the history sidebar to make the filter controls visible
     fireEvent.click(screen.getByTestId('history-button'));
   
@@ -291,7 +331,11 @@ describe('TranslatePage - Deletion Tests', () => {
     axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
 
     // Act
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
     fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
 
     const deleteButtons = await screen.findAllByTestId(/^delete-button-/);
@@ -328,7 +372,11 @@ describe('TranslatePage - Deletion Tests', () => {
 
     axios.post.mockResolvedValueOnce({ data: { success: true, rows: historyData } });
 
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
 
     fireEvent.click(screen.getByTestId('history-button')); // Open the sidebar
 
@@ -385,7 +433,11 @@ describe('TranslatePage - Complex Translation Tests', () => {
     axios.get.mockResolvedValueOnce({ data: historyData });
 
     // Act
-    render(<TranslatePage />);
+    render(
+      <Router> {/* Wrap with Router */}
+        <TranslatePage />
+      </Router>
+    );
 
     // Open the history sidebar to make the filter controls visible
     fireEvent.click(screen.getByTestId('history-button'));
