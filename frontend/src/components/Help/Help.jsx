@@ -34,7 +34,7 @@ function Help() {
             </div>
             <div style={{ marginTop: '70px' }}>
               <p className='resources'>Still having trouble? Here are some resources that might help: </p>
-              <div style={{ marginBottom: '70px', display: 'flex', justifyContent: 'space-between', margin: '0 auto', maxWidth: '800px' }}>
+              <div style={{ marginBottom: '5rem', display: 'flex', justifyContent: 'space-between', margin: '0 auto', maxWidth: '800px' }}>
                 <div className='left-box'>
                   <p className='resources'>Resources</p>
                   <ul>

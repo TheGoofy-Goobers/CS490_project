@@ -40,6 +40,8 @@
 }
 
 .submit-button{
+    color: white;
+    background-color: #007bff;
     margin-top: 1rem;
     margin-bottom: 1rem;
     padding: .5rem 2rem;

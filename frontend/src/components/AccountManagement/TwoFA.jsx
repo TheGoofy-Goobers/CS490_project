@@ -203,7 +203,7 @@ const TwoFA = () => {
                                             </div>
                                         </div>
                                         <div className="login-button-container">
-                                            <button type="submit" className="login-form-button">Submit</button>
+                                            <button type="submit" className="login-form-button-regular">Submit</button>
                                         </div>
 
                                     </div>
@@ -217,7 +217,7 @@ const TwoFA = () => {
                 (localStorage.getItem("passIsVerified") === "true") &&
                 <div className="delete-box-container">
                     <form onSubmit={handleSubmit}>
-                        <div className='change_password'>
+                        <div className='login-form-box'>
                             <h2>Set up 2-factor authentication</h2>
                              <div>
                                 {qrCode && <img className="qrcode" src={`data:image/png;base64,${qrCode}`} alt="QR Code" />}

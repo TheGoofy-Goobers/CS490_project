@@ -30,6 +30,14 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
 }
+.login-form-box-2fa{
+  background-color: #23272b;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 65%;
+  margin: 50 50;
+}
 
 .login-form-box h2 {
   color: #fff;
@@ -150,4 +158,11 @@ a{
   position: relative;
   display: flex;
   align-items: center;
+}
+
+
+.input-container {
+  display: flex;           /* Makes the container a flex container */
+  justify-content: center; /* Centers the items horizontally */
+  gap: 10px;               /* Adds space between each input box */
 }

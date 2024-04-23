@@ -33,7 +33,22 @@
   padding: 2rem;
   border-radius: 0.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 100%;
+  width: 80%;
+  margin-top:10rem;
+  margin-bottom: 10rem;
+}
+
+.login-form-box-2fa {
+  background-color: #23272b;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width:35%;
+  
+  margin-top:5rem;
+  margin-bottom:5rem;
+   display: flex;
+    justify-content: center;
 }
 
 
@@ -108,4 +123,39 @@
   position: relative;
   display: flex;
   align-items: center;
+}
+
+.delete-form-button
+{
+  background-color:red;border-color:red;color:white;padding:.5rem 2rem;font-size:1.25rem;line-height:1.5;border-radius:.3rem;cursor:pointer;display:inline-block;font-family:'Proxima Nova',sans-serif;border-radius:.8rem}
+
+
+  .delete-form-button{
+    background-color: rgb(169, 2, 2);
+  }
+
+  
+.login-form-control {
+  background-color: #2d3238;
+  border: 1px solid #343a40;
+  border-radius: 4px;
+  color: white;
+  padding: 0.5rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+
+.login-form-control:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: #1e2124;
+}
+
+
+.login-form-group label {
+  display: block;
+  color: #bbb;
+  margin-bottom: 0.5rem;
+  position: relative;
 }

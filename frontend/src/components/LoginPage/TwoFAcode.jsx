@@ -80,10 +80,10 @@ const TwoFAcode = () => {
         else {
     return (
         
-        <div className="delete-box-container">
+        <div className="login-page-container">
             <ToastContainer position='top-center'/>
             <form onSubmit={handleSubmit}>
-                <div className='change_password'>
+                <div className='login-form-box-2fa'>
                     <div className="login-form-group">
                         <label>Please enter your 6-digit code:</label>
                         <div className="input-container">

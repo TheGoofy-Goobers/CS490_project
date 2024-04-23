@@ -16,7 +16,7 @@ function UserGuide(){
                 <p className='step-title-container'>
                      <p className='step-title'>First, grab your code and drop it into the translator</p>
                 </p>
-                <p className='steps'>You can do this by simply pasting or by uploading files:</p>
+                   <p style={{color:'white', marginLeft:'-5rem'}}>You can do this by simply pasting or by uploading files:</p>
                 <div className='tut-img-holder-1'><img className='tutorial-img' src={upload} alt="upload"/></div>
                 <p className='step-title-container'>
                      <p className='step-title'>Then, select your input language</p>
