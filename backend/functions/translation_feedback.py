@@ -62,9 +62,24 @@ def submit_feedback(mysql: MySQL) -> dict:
 
     return response
 
-def submit_feedback(mysql: MySQL) -> dict:
+def aggregated_feedback(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
-    responseJson = json.loads(request.data.decode())
+    try:
+        cur = mysql.connection.cursor()
+        selection = "SELECT AVG(rating) AS average_rating FROM translation_feedback"
+        cur.execute(selection)
+        agg = cur.fetchone()
+        response["average_rating"] = agg["average_rating"]
+
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = f"Exception: {str(e)}"
+        if cur:
+            cur.close()
+        return response
     
-    pass
+    if "average_rating" not in response:
+        response["hasError"] = True
+        response["errorMessage"] = "Failed to fetch average rating"
+        return response
