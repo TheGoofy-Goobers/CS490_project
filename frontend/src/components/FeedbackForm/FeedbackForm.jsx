@@ -30,7 +30,12 @@ function FeedbackForm() {
     .then((response) => {
       const res = response.data;
       console.log(`Response has error: ${res.hasError}`);
-      if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
+      if (res.hasError){ 
+        console.log(`Error response: ${res.errorMessage}`); 
+        toast(`Error ${res.errorMessage}`, {
+          className: 'fail',
+          autoClose: 2000
+        });}
       else if (res.success) {
         toast(`FEEDBACK SUBMITTED SUCCESFULLY!`, {
           className: 'fail',
