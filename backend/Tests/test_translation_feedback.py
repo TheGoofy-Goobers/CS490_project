@@ -29,7 +29,7 @@ class TestTranslationFeedback:
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
-        response = client.post("/translationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
+        response = client.post("/submitTranslationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
         response = response.json
 
         assert response["success"]
@@ -40,7 +40,7 @@ class TestTranslationFeedback:
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
-        response = client.post("/translationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
+        response = client.post("/submitTranslationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
         response = response.json
 
         assert response["hasError"]
@@ -61,7 +61,7 @@ class TestTranslationFeedback:
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
-        response = client.post("/translationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
+        response = client.post("/submitTranslationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
         response = response.json
 
         assert response["hasError"]
@@ -76,7 +76,7 @@ class TestTranslationFeedback:
         monkeypatch.setattr(MockFlaskMysqlCursor, "execute", seeded_error)
         monkeypatch.setattr(get_user_id, "get_user_id", lambda mysql, token: (1, ""))
 
-        response = client.post("/translationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
+        response = client.post("/submitTranslationFeedback", data=json.dumps({"sessionToken":sessionToken, "translation_id":translation_id, "star_rating":star_rating, "note":note}))
         response = response.json
 
         assert response["hasError"]
