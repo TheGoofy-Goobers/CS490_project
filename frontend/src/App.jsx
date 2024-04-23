@@ -9,6 +9,7 @@ import Home from './components/homepage/Home';
 import TranslatePage from './components/translatepage/TranslatePage';
 import ReleaseNotes from './components/ReleaseNotes/ReleaseNotes.jsx';
 import LoadTesting from './components/ReleaseNotes/Loadtesting.jsx'
+import 'react-toastify/dist/ReactToastify.css';
 
 //lazy load is used to import components only when theyre needed. non-lazy = needed fast and consistently
 //lazy load heavy components
