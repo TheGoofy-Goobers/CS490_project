@@ -3,7 +3,6 @@ import axios from 'axios'
 import { FLASK_URL, SITE_URL, setSessionLogin } from '../../vars';
 import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
-import { useNavigate } from 'react-router-dom'
 import { setLocal } from '../../vars';
 import { ToastContainer, toast } from 'react-toastify';
 
@@ -13,11 +12,6 @@ const RegistrationPage = () => {
     email: '',
     password: '',
   });
-
-  const [error, setError] = useState(null);
-  // use this if toast breaks again lmfao
-
-  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const handleCheck = (message) => {
     switch (message){
@@ -50,7 +44,8 @@ const RegistrationPage = () => {
         break;
     }
   }
-
+  const [error, setError] = useState(null);
+  // use this if toast breaks again lmfao
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
@@ -180,8 +175,9 @@ const RegistrationPage = () => {
           <form onSubmit={handleSubmit}>
             <h2 className="registration-form-title">Register</h2>
             <div className="registration-form-group">
-              <label>Username:</label>
+              <label htmlFor='Username'>Username:</label>
               <input 
+                id="Username"
                 type="text" 
                 name="username" 
                 value={user.username} 
@@ -191,8 +187,9 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="registration-form-group">
-              <label>Email:</label>
+              <label htmlFor='Email'>Email:</label>
               <input 
+                id='Email'
                 type="email" 
                 name="email" 
                 value={user.email} 
@@ -202,8 +199,10 @@ const RegistrationPage = () => {
               />
             </div>
             <div className="registration-form-group">
-              <label>Password:</label>
-              <input 
+              <label htmlFor='Password:' >Password:</label>
+              <input
+                data-testid="Password:"
+                id='Password:'
                 type="password" 
                 name="password" 
                 value={user.password} 
