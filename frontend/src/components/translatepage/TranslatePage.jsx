@@ -431,6 +431,7 @@ const TranslatePage = () => {
           setOutputText(res.output)
           console.log(`Finish reason: ${res.finish_reason}`)
           const reasonMessage = res.finish_reason || 'No reason provided'
+          setCurrentTranslationId(res.translation_id)
           toast(handleCheck(reasonMessage), {
             className: 'success',
             autoClose: 2000
