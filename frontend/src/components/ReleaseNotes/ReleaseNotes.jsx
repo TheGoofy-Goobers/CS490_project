@@ -8,7 +8,7 @@ const ReleaseNotes = () => {
         <div className='holder'>
             <div className='release-container'>
                 <div className='code-title'>
-                    <h1><b>codecarft v1.0</b></h1>
+                    <h1><b>codecraft v1.0</b></h1>
                     <a>Welcome to the the 1.0 release of codecraft, your favorite code translation tool.</a>
                     <p>Here we describe our tech stack improvements and new changes.</p>
                 </div>
