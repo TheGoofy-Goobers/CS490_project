@@ -9,11 +9,14 @@ const Star = ({ selected = false, onClick }) => (
 )
 
 
-function TranslationFeedback(){
+const TranslationFeedback = ({ currentTranslationId }) => {
+
+    console.log(`im here ${currentTranslationId}`)
 
     const [rating, setRating] = useState('');
     const [openended, setOpenEnded] = useState('');
     const [limit, setLimit] = useState(150);
+    
 
     const handleChange = (event) => {
         const inputValue = event.target.value;
@@ -27,15 +30,32 @@ function TranslationFeedback(){
         console.log(rate);
     };
 
+    function formatSubmissionDate(date) {
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return 'Today';
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        } else {
+            return 'Previous 30 Days';
+        }
+    }
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const translationFBData = {
             sessionToken: localStorage.getItem("sessionToken"),
+            translation_id: currentTranslationId,
             star_rating: parseInt(rating),
             note: openended
         };
-        console.log('Sending request with data:', translationFBData);
+
+
+        console.log('Sending feedback request with data:', translationFBData);
         axios.post(`${FLASK_URL}/translationFeedback`, translationFBData)
             .then((response) => {
                 const res = response.data;
@@ -68,6 +88,7 @@ function TranslationFeedback(){
     return(
         <div>
             <p>Rate Translation:</p>
+            <p>note: any new feedback will overwrite previous feedback for this translation</p>
             <div>
                 <form onSubmit={handleSubmit}>
                     {[1, 2, 3, 4, 5].map((star, index) => (
@@ -93,4 +114,4 @@ function TranslationFeedback(){
     )
 }
 
-export default TranslationFeedback
+export default TranslationFeedback;
