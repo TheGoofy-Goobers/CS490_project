@@ -3,7 +3,7 @@ import json
 from flask import request
 from functions import get_user_id
 
-def submit_feedback(mysql: MySQL) -> dict:
+def submit_translation_feedback(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
     responseJson = json.loads(request.data.decode())
@@ -67,11 +67,12 @@ def aggregated_feedback(mysql: MySQL) -> dict:
 
     try:
         cur = mysql.connection.cursor()
-        selection = "SELECT AVG(rating) AS average_rating FROM translation_feedback"
+        selection = "SELECT AVG(rating) AS average_rating, COUNT(rating) AS total_ratings FROM translation_feedback"
         cur.execute(selection)
         agg = cur.fetchone()
         response["average_rating"] = agg["average_rating"]
-
+        response["total_ratings"] = agg["total_ratings"]
+        cur.close()
     except Exception as e:
         response["hasError"] = True
         response["errorMessage"] = f"Exception: {str(e)}"
@@ -83,3 +84,7 @@ def aggregated_feedback(mysql: MySQL) -> dict:
         response["hasError"] = True
         response["errorMessage"] = "Failed to fetch average rating"
         return response
+    
+    response["success"] = True
+    response["hasError"] = False
+    return response

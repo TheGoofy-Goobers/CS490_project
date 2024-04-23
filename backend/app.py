@@ -11,6 +11,7 @@ from functions import register_user as register, user_login as login, submit_fee
 from functions import api_status as status, change_profile as profile, logout, forgot_password, delete_translations
 from functions import translation_history
 from functions import two_factor
+from functions import translation_feedback
 
 load_dotenv()
 
@@ -140,5 +141,16 @@ def create_app(testing: bool):
     def manage_translation_history():
         return delete_translations.delete_translations(mysql)
     
+
+    # Submit translation feedback
+    @api.route('/submitTranslationFeedback')
+    def submit_translation_feedback():
+        return translation_feedback.submit_translation_feedback(mysql)
+
     
+    # Fetch aggregated feedback
+    @api.route('/aggregatedFeedback')
+    def aggregated_feedback():
+        return translation_feedback.aggregated_feedback(mysql)
+
     return api
