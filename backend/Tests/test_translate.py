@@ -61,7 +61,7 @@ class TestTranslate:
             )
         if translated_before:
             lastSubmit = datetime.datetime(1970, 1, 1, 12, 10, 10)
-            mock = Mock(side_effect=[{"submission_date": lastSubmit}, None, None])
+            mock = Mock(side_effect=[{"submission_date": lastSubmit}, None, None, {"translation_id": 3}])
             monkeypatch.setattr(MockFlaskMysqlCursor, "fetchone", mock)
         monkeypatch.setattr(resources.chat.Completions, "create", lambda self, model, messages, max_tokens, temperature: gpt_response)
         monkeypatch.setattr(MySQL, "connection", MockFlaskMysqlConnection)

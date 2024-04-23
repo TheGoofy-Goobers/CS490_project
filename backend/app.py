@@ -58,10 +58,17 @@ def create_app(testing: bool):
     def translate_code():
         return translate.translate(mysql, gpt_client)
 
+
     # translation feedback
-    @api.route('/translationFeedback', methods=['POST'])
+    @api.route('/submitTranslationFeedback', methods=['POST'])
     def translation_feedback():
-        return translationFeedback.submit_feedback(mysql)
+        return translationFeedback.submit_translation_feedback(mysql)
+    
+
+    # Fetch aggregated feedback
+    @api.route('/getAggregatedFeedback')
+    def aggregated_feedback():
+        return translationFeedback.aggregated_feedback(mysql)
 
 
     # API status
@@ -134,6 +141,5 @@ def create_app(testing: bool):
     @api.route('/deleteTranslations', methods=['POST'])
     def manage_translation_history():
         return delete_translations.delete_translations(mysql)
-    
-    
+
     return api

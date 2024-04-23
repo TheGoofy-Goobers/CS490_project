@@ -3,15 +3,17 @@ import json
 from flask import request
 from functions import get_user_id
 
-def submit_feedback(mysql: MySQL) -> dict:
+def submit_translation_feedback(mysql: MySQL) -> dict:
     response = {"hasError": False}
 
     responseJson = json.loads(request.data.decode())
 
-    if 'sessionToken' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
+    if 'sessionToken' not in responseJson or 'translation_id' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
         response['hasError'] = True
         response['errorMessage'] = "Unexpected Error"
         return response
+    
+    translation_id = responseJson['translation_id']
     
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
     if error:
@@ -40,9 +42,11 @@ def submit_feedback(mysql: MySQL) -> dict:
         return response
     
     try:
-        insertion = "INSERT INTO translation_feedback (user_id, star_rating, note) VALUES (%s, %s, %s)"
         cur = mysql.connection.cursor()
-        cur.execute(insertion, (user_id, star_rating, note))
+        deletion = "DELETE FROM translation_feedback WHERE user_id = %s AND translation_id = %s"
+        cur.execute(deletion, (user_id, translation_id))
+        insertion = "INSERT INTO translation_feedback (user_id, translation_id, star_rating, note) VALUES (%s, %s, %s, %s)"
+        cur.execute(insertion, (user_id, translation_id, star_rating, note))
         mysql.connection.commit()
         cur.close()
 
@@ -56,4 +60,31 @@ def submit_feedback(mysql: MySQL) -> dict:
             cur.close()
         return response
 
+    return response
+
+def aggregated_feedback(mysql: MySQL) -> dict:
+    response = {"hasError": False}
+
+    try:
+        cur = mysql.connection.cursor()
+        selection = "SELECT AVG(star_rating) AS average_rating, COUNT(star_rating) AS total_ratings FROM translation_feedback"
+        cur.execute(selection)
+        agg = cur.fetchone()
+        response["average_rating"] = agg["average_rating"]
+        response["total_ratings"] = agg["total_ratings"]
+        cur.close()
+    except Exception as e:
+        response["hasError"] = True
+        response["errorMessage"] = f"Exception: {str(e)}"
+        if cur:
+            cur.close()
+        return response
+    
+    if "average_rating" not in response:
+        response["hasError"] = True
+        response["errorMessage"] = "Failed to fetch average rating"
+        return response
+    
+    response["success"] = True
+    response["hasError"] = False
     return response
