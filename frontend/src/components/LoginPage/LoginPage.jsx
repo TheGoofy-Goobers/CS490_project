@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
 import { FLASK_URL, setLocal, isExpired, Logout, isLoggedIn } from '../../vars';
-import { FLASK_URL, setLocal, isExpired, Logout, SITE_URL } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
 import { useNavigate, useLocation } from 'react-router-dom';
