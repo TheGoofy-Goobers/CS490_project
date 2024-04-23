@@ -66,7 +66,6 @@ const LoginPage = () => {
         if (res.success) {
           setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
           const is2FAEnabled = (res.totp === "enabled");
-          console.log(`enabled is ${is2FAEnabled}`);
           check2FA(is2FAEnabled);
           // delete credentials.username;
           // delete credentials.password;
@@ -98,11 +97,7 @@ const LoginPage = () => {
   };
 
   const check2FA = (isEnabled) => {
-
-    console.log("im HEREEEEEE");
-
     if (isEnabled == true) {
-      console.log(`check token b4 2FA ${localStorage.getItem("sessionToken")}`);
       setTimeout(() => {
         window.location.href = '/login/2FA';
       }, 500);
@@ -116,7 +111,6 @@ const LoginPage = () => {
         className: 'success',
         autoClose: 2000
       });
-
     }
   };
 

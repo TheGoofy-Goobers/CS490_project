@@ -5,8 +5,12 @@ import './RegistrationPage.css';
 import SHA256 from 'crypto-js/sha256';
 import { setLocal } from '../../vars';
 import { ToastContainer, toast } from 'react-toastify';
+import eyeicon from './eyeicon.svg';
+
 
 const RegistrationPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   const [user, setUser] = useState({
     username: '',
     email: '',
@@ -210,6 +214,13 @@ const RegistrationPage = () => {
                 className="registration-form-control"
                 required
               />
+              <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="show-password-button"
+                >
+                    <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                </button>
             </div>
             <div className="registration-button-container">
               <button type="submit" className="registration-form-button">Register</button>

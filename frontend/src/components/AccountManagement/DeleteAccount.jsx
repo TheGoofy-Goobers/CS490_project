@@ -8,7 +8,9 @@ import { ToastContainer, toast } from 'react-toastify';
 const DeleteAccount = () => {
     const handleDelete = (e) => {
         e.preventDefault();
-        deleteAccount()
+        if (window.confirm("Are you sure you want to delete your account?")) {
+            deleteAccount();
+        }
     }
     
     const deleteAccount = () => {
@@ -22,8 +24,8 @@ const DeleteAccount = () => {
                         className: 'success',
                         autoClose: 2000
                       });
-                    setTimeout(Logout, 4000);
-                    setTimeout(() => {window.location.href = SITE_URL}, 4000);
+                    setTimeout(Logout, 0);
+                    setTimeout(() => { window.location.href = `${SITE_URL}/login?redirect=true`; }, 500);
                 }
                 if (res.hasError) console.log(`Error response: ${res.errorMessage}`);
                 console.log(`Response has error: ${res.hasError}`);
@@ -32,6 +34,7 @@ const DeleteAccount = () => {
                         className: 'fail',
                         autoClose: 2000
                       });
+                    toast(`Deletion failed, session expired. Please login again.`);
                     setTimeout(Logout, 2000);
                     setTimeout(() => {window.location.href = SITE_URL}, 2000);
                 }

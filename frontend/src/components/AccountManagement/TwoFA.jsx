@@ -14,6 +14,8 @@ const TwoFA = () => {
     const [qrCode, setQrCode] = useState('');
     const [pass, setPass] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     
 
     // setQrCode('SGVsbG8sIHdvcmxkIQ==');
@@ -184,12 +186,21 @@ const TwoFA = () => {
                                         <p className="note">Please verify your password to setup or edit your 2-factor authentication</p>
                                         <div className="login-form-group">
                                             <label>Password</label>
+                                            <div className="password-container">
                                             <input
-                                                type="password"
+                                                type={showPassword ? 'text' : 'password'}
                                                 value={pass}
                                                 onChange={handlePassChange}
                                                 className="login-form-control"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="show-password-button"
+                                            >
+                                                <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                                            </button>
+                                            </div>
                                         </div>
                                         <div className="login-button-container">
                                             <button type="submit" className="login-form-button">Submit</button>
