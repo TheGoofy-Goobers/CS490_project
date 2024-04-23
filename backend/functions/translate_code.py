@@ -14,7 +14,6 @@ def translate(mysql: MySQL, gpt_client: OpenAI) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    print(responseJson)
     if 'text' not in responseJson or 'srcLang' not in responseJson or 'toLang' not in responseJson or 'sessionToken' not in responseJson:
         response["hasError"] = True
         response["errorMessage"] = "Unexpected error"

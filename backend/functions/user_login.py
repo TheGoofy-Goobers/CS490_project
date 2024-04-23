@@ -84,6 +84,43 @@ def login(mysql: MySQL) -> dict:
         response["errorMessage"] = str(e)
         return response
 
+    # check if the user has 2fa enabled
+    user_id = user["user_id"]
+    try:
+        cur.execute("SELECT totp FROM users WHERE user_id = %s", (user_id,))
+        user = cur.fetchone()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+    
+    if not user["totp"]:
+        response["sessionToken"] = id
+        response["success"] = True
+        response["totp"] = "disabled"
+        return response
+    response["totp"] = "enabled"
+    
+    if 'key' not in responseJson:
+        response["hasError"] = True
+        response["errorMessage"] = "2FA fernet key not found"
+        return response
+
+    fernet_key = responseJson["key"]
+
+    # if 2fa is enabled, add the key to the temporary table
+    try:
+        cur.execute("DELETE FROM twofa_login WHERE user_id = %s", (user_id,))
+        cur.execute("INSERT INTO twofa_login(user_id, fernet_key) VALUES(%s, %s)", (user_id, fernet_key))
+        mysql.connection.commit()
+        cur.close()
+    except Exception as e:
+        cur.close()
+        response["hasError"] = True
+        response["errorMessage"] = str(e)
+        return response
+
     response["sessionToken"] = id
     response["success"] = True
     return response

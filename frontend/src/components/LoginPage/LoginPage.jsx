@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './LoginPage.css';
-import { FLASK_URL, setLocal, isExpired, Logout } from '../../vars';
+import { FLASK_URL, setLocal, isExpired, Logout, isLoggedIn } from '../../vars';
 import axios from 'axios';
 import SHA256 from 'crypto-js/sha256';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import NavBar from '../navbar/NavBar';
 import eyeicon from './eyeicon.svg';
 import AlertBox from '../AlertBox/AlertBox';
@@ -13,6 +13,10 @@ const LoginPage = () => {
   const [message, setMessage] = useState('Default message');
   const [alertOpen, setAlertOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const location = useLocation();
+  const [is2FAEnabled, setIs2FAEnabled] = useState(false);
+  const [is2FASuccess, setIs2FASuccess] = useState(false);
 
   const [credentials, setCredentials] = useState({
     email: '',
@@ -52,7 +56,6 @@ const LoginPage = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle login logic here
     login();
     console.log('Login credentials:', credentials);
   };
@@ -60,34 +63,39 @@ const LoginPage = () => {
   var res;
   const login = () => {
     const hashedPassword = SHA256(credentials.password + "CS490!").toString();
-    delete credentials.password
+    const key = SHA256(credentials.password + "2FAkey").toString();
+    delete credentials.password;
     const loginData = {
       ...credentials,
       password: hashedPassword,
+      key: key,
     };
 
     axios.post(`${FLASK_URL}/userLoginCredentials`, loginData)
       .then((response) => {
-        res = response.data
+        res = response.data;
         if (res.success) {
           setLocal(res.sessionToken, credentials.username, Math.floor(Date.now() / 1000), credentials.rememberMe);
-          delete credentials.username;
-          delete credentials.password;
-          setMessage(`Welcome to codeCraft!`);
-          showAlert();
-          window.location.href = '/'
+          const is2FAEnabled = (res.totp === "enabled");
+          console.log(`enabled is ${is2FAEnabled}`);
+          check2FA(is2FAEnabled);
+          // delete credentials.username;
+          // delete credentials.password;
+          // setMessage(`Welcome to codeCraft!`);
+          // showAlert();
           // setTimeout(() => {
-          //   window.location.href = '/';}, 2000)
+          //   window.location.href = '/';
+          // }, 2000);
         }
         if (res.hasError) {
           console.log(`Error response: ${res.errorMessage}`);
-          setMessage(`${res.errorMessage}`)
+          setMessage(`${res.errorMessage}`);
           showAlert();
         }
         console.log(`Response has error: ${res.hasError}`);
       }).catch((error) => {
         if (error.response) {
-          setMessage(`${error.response}`)
+          setMessage(`${error.response}`);
           showAlert();
           console.log(error.response);
           console.log(error.response.status);
@@ -96,63 +104,87 @@ const LoginPage = () => {
       });
   };
 
+  const check2FA = (isEnabled) => {
+
+    console.log("im HEREEEEEE");
+
+    if (isEnabled == true) {
+      console.log(`check token b4 2FA ${localStorage.getItem("sessionToken")}`);
+      setTimeout(() => {
+        window.location.href = '/login/2FA';
+      }, 500);
+    }
+    else {
+      localStorage.setItem("isLoggedIn", true);
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 500);
+      setMessage(`Welcome to codeCraft!`);
+      showAlert();
+
+    }
+  };
+
+
+
   return (
 
     <div>
-    {<AlertBox message={message} isOpen={alertOpen} />}
-    <div className="login-page-container">
-      <div className="login-form-box">
-        {!localStorage.getItem("isLoggedIn") &&
-          <form onSubmit={handleSubmit}>
-            <h2>Login</h2>
-            <div className="login-form-group">
-              <label>Username or Email:</label>
-              <input
-                type="text"
-                name="username"
-                value={credentials.username}
-                onChange={handleChange}
-                className="login-form-control"
-              />
-            </div>
-            <div className="login-form-group">
-              <label>Password:</label>
-              <div className="password-container">
+      {<AlertBox message={message} isOpen={alertOpen} />}
+      {/* //ask hamdi wtf this does */}
+      <div className="login-page-container">
+        <div className="login-form-box">
+          {!(localStorage.getItem("isLoggedIn") === "true") &&
+            <form onSubmit={handleSubmit}>
+              <h2>Login</h2>
+              <div className="login-form-group">
+                <label>Username or Email:</label>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={credentials.password}
+                  type="text"
+                  name="username"
+                  value={credentials.username}
                   onChange={handleChange}
                   className="login-form-control"
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="show-password-button"
-                >
-                  <img src={eyeicon} className='eye-icon' alt="eyeicon" />
-                </button>
               </div>
               <div className="login-form-group">
-                <label>
+                <label>Password:</label>
+                <div className="password-container">
                   <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={credentials.rememberMe}
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={credentials.password}
                     onChange={handleChange}
-                  /> Remember Me
-                </label>
+                    className="login-form-control"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="show-password-button"
+                  >
+                    <img src={eyeicon} className='eye-icon' alt="eyeicon" />
+                  </button>
+                </div>
+                <div className="login-form-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="rememberMe"
+                      checked={credentials.rememberMe}
+                      onChange={handleChange}
+                    /> Remember Me
+                  </label>
+                </div>
+                <p><a href='/register'>
+                  Don't have an account? Register here
+                </a></p>
+                <a href='/forgotpassword'>
+                  Forgot password?
+                </a>
+                <div className="login-button-container">
+                  <button type="submit" className="login-form-button">Login</button>
+                </div>
               </div>
-              <p><a href='/register'>
-                Don't have an account? Register here
-              </a></p>
-              <a href='/forgotpassword'>
-                Forgot password?
-              </a>
-              <div className="login-button-container">
-                <button type="submit" className="login-form-button">Login</button>
-              </div>
-            </div>
             </form>
           }
         </div>
