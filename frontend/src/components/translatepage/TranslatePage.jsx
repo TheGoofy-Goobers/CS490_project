@@ -14,6 +14,7 @@ import { SITE_URL, FLASK_URL, Logout } from '../../vars'
 import { isExpired } from '../../vars';
 import { ToastContainer, toast } from 'react-toastify';
 import TranslationFeedback from './TranslationFeedback';
+import { useNavigate } from 'react-router-dom';
 
 const TranslatePage = () => {
   const [inputText, setInputText] = useState('');
@@ -65,6 +66,8 @@ const TranslatePage = () => {
         break;
     }
   }
+  
+  const navigate = useNavigate()
 
   const filterTranslationHistory = (history) => {
     return history
@@ -198,7 +201,7 @@ const TranslatePage = () => {
             className: 'fail',
             autoClose: 2000
           })
-          Logout()
+          Logout(navigate)
         }
       })
       .catch(error => console.error("Error fetching translation history:", error));
@@ -440,7 +443,7 @@ const TranslatePage = () => {
             className: 'fail',
             autoClose: 2000
           })
-          Logout()
+          Logout(navigate)
         }
       }).catch((error) => {
         if (error.response) {

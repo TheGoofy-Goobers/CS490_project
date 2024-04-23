@@ -2,18 +2,20 @@ import { useState, React } from 'react';
 import './MiniMenu.css';
 import { Logout } from '../../vars';
 import { Link } from 'react-router-dom';
-
-const handleLogout = (e) => {
-    e.preventDefault();
-    Logout();
-};
+import { useNavigate } from 'react-router-dom';
 
 const MiniMenuComponent = () => {
-
+    const navigate = useNavigate()
     const [showAccountMenu, setShowAccountMenu] = useState(false);
 
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    const handleLogout = (e) => {
+        e.preventDefault();
+        Logout(navigate);
+    };
+
+    
     const handlePWVerificationReset = () => {
         localStorage.setItem("passIsVerified", false);
     }
