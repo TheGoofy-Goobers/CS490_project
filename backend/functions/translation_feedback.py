@@ -8,10 +8,12 @@ def submit_feedback(mysql: MySQL) -> dict:
 
     responseJson = json.loads(request.data.decode())
 
-    if 'sessionToken' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
+    if 'sessionToken' not in responseJson or 'translation_id' not in responseJson or 'star_rating' not in responseJson or 'note' not in responseJson:
         response['hasError'] = True
         response['errorMessage'] = "Unexpected Error"
         return response
+    
+    translation_id = responseJson['translation_id']
     
     user_id, error = get_user_id.get_user_id(mysql, responseJson['sessionToken'])
     if error:
@@ -40,9 +42,11 @@ def submit_feedback(mysql: MySQL) -> dict:
         return response
     
     try:
-        insertion = "INSERT INTO translation_feedback (user_id, star_rating, note) VALUES (%s, %s, %s)"
         cur = mysql.connection.cursor()
-        cur.execute(insertion, (user_id, star_rating, note))
+        deletion = "DELETE FROM translation_feedback WHERE user_id = %s AND translation_id = %s"
+        cur.execute(deletion, (user_id, translation_id))
+        insertion = "INSERT INTO translation_feedback (user_id, translation_id, star_rating, note) VALUES (%s, %s, %s, %s)"
+        cur.execute(insertion, (user_id, translation_id, star_rating, note))
         mysql.connection.commit()
         cur.close()
 
