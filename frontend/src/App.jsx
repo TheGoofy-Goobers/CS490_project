@@ -3,12 +3,24 @@ import NavBar from './components/navbar/NavBar';
 import './App.css'; // Assuming you have global styles here
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { isExpired } from './vars.js';
-import AccountManagement from './components/AccountManagement/AccountManagement.jsx';
-import ChangeUserame from './components/AccountManagement/ChangeUsername.jsx';
-import ChangePassword from './components/AccountManagement/ChangePassword.jsx';
-import DeleteAccount from './components/AccountManagement/DeleteAccount.jsx';
-import ForgotPass from './components/ForgotPass/ForgotPass.jsx';
-import ResetPass from './components/ForgotPass/ResetPass.jsx'
+
+//non-lazy components
+import Home from './components/homepage/Home';
+import TranslatePage from './components/translatepage/TranslatePage';
+
+//lazy load is used to import components only when theyre needed. non-lazy = needed fast and consistently
+//lazy load heavy components
+const LoginPage = lazy(() => import('./components/LoginPage/LoginPage.jsx'));
+const Register = lazy(() => import('./components/Registration/RegistrationPage.jsx'));
+const Feedback = lazy(() => import('./components/FeedbackForm/FeedbackForm.jsx'));
+const References = lazy(() => import('./components/References/References.jsx'));
+const Help = lazy(() => import('./components/Help/Help.jsx'));
+const AccountManagement = lazy(() => import('./components/AccountManagement/AccountManagement.jsx'));
+const ChangeUsername = lazy(() => import('./components/AccountManagement/ChangeUsername.jsx'));
+const ChangePassword = lazy(() => import('./components/AccountManagement/ChangePassword.jsx'));
+const DeleteAccount = lazy(() => import('./components/AccountManagement/DeleteAccount.jsx'));
+const ForgotPass = lazy(() => import('./components/ForgotPass/ForgotPass.jsx'));
+const ResetPass = lazy(() => import('./components/ForgotPass/ResetPass.jsx'));
 
 function App() {
   setInterval(isExpired, 1000); //checks every second
