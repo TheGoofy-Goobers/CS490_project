@@ -65,7 +65,7 @@ def create_app(testing: bool):
 
 
     # translation feedback
-    @api.route('/translationFeedback', methods=['POST'])
+    @api.route('/submitTranslationFeedback', methods=['POST'])
     def translation_feedback():
         return translationFeedback.submit_translation_feedback(mysql)
     
