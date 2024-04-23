@@ -76,6 +76,8 @@ const TwoFAcode = () => {
         }
     };
 
+   if (localStorage.getItem("isLoggedIn") != "false") window.location.href = "/"
+        else {
     return (
         
         <div className="delete-box-container">
@@ -97,15 +99,16 @@ const TwoFAcode = () => {
                                     ref={el => inputsRef.current[index] = el}
                                 />
                             ))}
+                           </div>
+                        </div>
+                        <div className="login-button-container">
+                            <button type="submit" className="login-form-button">Submit</button>
                         </div>
                     </div>
-                    <div className="login-button-container">
-                        <button type="submit" className="login-form-button">Submit</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    );
+                </form>
+            </div>
+        );
+    }
 };
 
 export default TwoFAcode; 
