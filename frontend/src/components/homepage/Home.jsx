@@ -77,9 +77,8 @@ const Home = () => {
                 </div>
             </div>
             <div className="reviews">
-                <h2>How our users    <span className="rating-number">   ({totalRatings})</span> rate us:</h2>
+                <h2>How our users    <span className="rating-number">   ({totalRatings})</span> rate us: <span style={{ color: 'gold', }}>   {Number.parseFloat(rating).toFixed(1)} stars</span></h2>
                 {renderStars()}
-                
             </div>
             <h1>Accepted Languages</h1>
             <div className="Accepted">
