@@ -127,22 +127,26 @@ const LoginPage = () => {
               <div className="login-form-group">
                 <label htmlFor="Username or Email:" id="Username or Email:">Username or Email:</label>
                 <input
+                  id="Username or Email:"
                   type="text"
                   name="username"
                   value={credentials.username}
                   onChange={handleChange}
                   className="login-form-control"
+                  data-testid="username-input"
                 />
               </div>
               <div className="login-form-group">
                 <label htmlFor="password">Password:</label>
                 <div className="password-container">
                   <input
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={credentials.password}
                     onChange={handleChange}
                     className="login-form-control"
+                    data-testid="password-input"
                   />
                   <button
                     type="button"

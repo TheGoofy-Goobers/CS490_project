@@ -97,12 +97,13 @@ const TwoFAcode = () => {
                                     onKeyDown={e => handleBackspace(index, e)}
                                     className="login-form-control digit-input"
                                     ref={el => inputsRef.current[index] = el}
+                                    data-testid={`digit-input-${index}`}
                                 />
                             ))}
                            </div>
                         </div>
                         <div className="login-button-container">
-                            <button type="submit" className="login-form-button">Submit</button>
+                            <button type="submit" className="login-form-button" data-testid='submit-button'>Submit</button>
                         </div>
                     </div>
                 </form>
